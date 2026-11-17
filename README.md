@@ -8,52 +8,59 @@ Website resmi FUTURiSE, festival inovasi digital mahasiswa skala Jawa Barat yang
 |-------|-----------|
 | Backend | Laravel 11 (PHP 8.3+) |
 | Frontend | Next.js 14+ |
-| Database | PostgreSQL 16+ |
+| Database | MySQL 8.0+ |
 | Cache/Queue | Redis |
 | Auth | Laravel Sanctum |
 
-## Fitur Utama
+## Struktur Repository
 
-- Website publik (katalog karya, agenda, direktori industri)
-- Portal peserta (kampus, industri, sponsor, sekolah, pengunjung)
-- Dashboard panitia lengkap (kurasi, booth, keuangan, check-in, penjurian)
-- Portal juri (penilaian & rubrik)
-- QR check-in & voting People's Choice
-- Laporan & audit terpusat
-
-## Setup Lokal (Backend)
-
-```bash
-# Install dependencies
-composer install
-
-# Copy env
-cp .env.example .env
-php artisan key:generate
-
-# Setup database
-php artisan migrate
-php artisan db:seed
-
-# Jalankan server
-php artisan serve
-
-# Queue worker (terminal terpisah)
-php artisan queue:work
+```
+Futurise/
+├── backend/     ← Laravel API
+├── frontend/    ← Next.js
+├── .gitignore
+└── README.md
 ```
 
-## Struktur Tahapan Development
+## Setup Backend
+
+```bash
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan db:seed
+php artisan serve
+```
+
+## Branch Strategy
+
+| Branch | Fungsi |
+|--------|--------|
+| `main` | Production — protected |
+| `staging` | UAT — protected |
+| `development` | Integrasi semua fitur — protected |
+| `feat/backend/*` | Fitur backend |
+| `feat/frontend/*` | Fitur frontend |
+| `fix/backend/*` | Bug fix backend |
+| `integration/*` | Testing integrasi FE-BE |
+
+## Tahapan Development
 
 | Tahap | Scope |
 |-------|-------|
-| 1 — Siap Pendaftaran | Website publik, CMS, akun, pendaftaran, karya, kurasi, keuangan, katalog |
-| 2 — Siap Hari-H | Booth, agenda, pertemuan, QR check-in, penjurian, voting, survei |
-| 3 — Pelaporan | Laporan H+30, sertifikat, integrasi lanjutan |
+| 0 — Fondasi | Setup Laravel, convention, festival & auth |
+| 1 — Master Data | Festival, periode, kategori, panitia, divisi |
+| 2 — Registrasi & Karya | Peserta, karya, tim, file, submit |
+| 3 — Publikasi & Program | Publikasi karya, jadwal juri, penilaian |
+| 4 — Hari Acara | Pengunjung, QR, check-in, interaksi |
+| 5 — Finalisasi | UAT, bugfix, deployment |
 
 ## Tim
 
-- **Dev1**: Backend Laravel + Merge FE-BE
-- **Dev2**: Frontend Next.js
+- **Dev1**: Backend (Festival, Panitia, Peserta, Karya, Publikasi) + Merge & Integration
+- **Dev2**: Backend (Juri, Booth, Sponsor, Mitra, Pengunjung) + Frontend
 
 ## Lisensi
 

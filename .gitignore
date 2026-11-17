@@ -1,80 +1,86 @@
-# === SECRETS & ENV ===
+# .gitignore — FUTURiSE Monorepo
+# Struktur: frontend/ (Next.js) + backend/ (Laravel)
+
+# ============================================================
+# SECRETS & ENV
+# ============================================================
 .env
-.env.backup
-.env.production
-.env.staging
+.env.*
+!.env.example
 *.env
 
-# === DEPENDENCIES ===
-vendor/
-node_modules/
+# ============================================================
+# BACKEND — Laravel
+# ============================================================
+backend/vendor/
+backend/node_modules/
+backend/storage/app/public/
+backend/storage/app/private/
+backend/storage/logs/
+backend/bootstrap/cache/
+backend/public/storage
+backend/public/hot
+backend/.phpunit.result.cache
+backend/coverage/
 
-# === LARAVEL SPECIFIC ===
-storage/app/public/
-storage/app/private/
-storage/logs/
-bootstrap/cache/
-public/storage
-public/hot
+# ============================================================
+# FRONTEND — Next.js
+# ============================================================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/build/
+frontend/.cache/
 
-# === TESTING ===
-.phpunit.result.cache
-coverage/
-.coverage
-
-# === SYSTEM FILES ===
-.DS_Store
-Thumbs.db
-desktop.ini
-*.swp
-*.swo
-*~
-
-# === IDE / EDITOR ===
-.idea/
-.vscode/
-*.iml
-.project
-.settings/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# === AI TOOLS ===
-.gemini/
-brain/
-.agy/
-*.ai_session
-
-# === DOCUMENTATION (semua .md kecuali README.md) ===
+# ============================================================
+# DOKUMENTASI INTERNAL (tidak perlu di repo)
+# ============================================================
 docs/
 *.md
 !README.md
 
-# === MISC FILES DI ROOT ===
+# ============================================================
+# FILE ROOT YANG TIDAK RELEVAN KE KODE
+# ============================================================
 backend.txt
 rule github.txt
 *.txt
 *.pdf
 *.docx
-*.xlsx
 
-# === LOGS ===
+# ============================================================
+# AI TOOLS
+# ============================================================
+.gemini/
+brain/
+.agy/
+*.ai_session
+
+# ============================================================
+# SYSTEM & IDE
+# ============================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.suo
+*.iml
+
+# ============================================================
+# LOGS
+# ============================================================
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# === BUILD OUTPUT ===
-dist/
-build/
-out/
-.next/
-.nuxt/
-
-# === CACHE ===
-.cache/
-.php-cs-fixer.cache
-.php_cs.cache
+# ============================================================
+# MISC
+# ============================================================
+*.zip
+*.tar.gz
