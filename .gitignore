@@ -1,45 +1,89 @@
-/.phpunit.cache
-/bootstrap/ssr
-/node_modules
-/public/build
-/public/fonts-manifest.dev.json
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/resources/js/actions
-/resources/js/routes
-/resources/js/wayfinder
-/vendor
-.DS_Store
+# .gitignore — FUTURiSE Monorepo
+# Struktur: frontend/ (Next.js) + backend/ (Laravel)
+
+# ============================================================
+# SECRETS & ENV
+# ============================================================
 .env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
-npm-debug.log
-yarn-error.log
-/auth.json
-/.fleet
-/.idea
-/.nova
-/.vscode
-/.zed
-/.agents
-/.amp
-/.claude
-/.codex
-/.cursor
-/.factory
-/.grok
-/.junie
-/.kiro
-/.pi
-/.mcp.json
-/AGENTS.md
-/CLAUDE.md
-/boost.json
-/opencode.json
-/opencode.jsonc
+.env.*
+!.env.example
+*.env
+
+# ============================================================
+# BACKEND — Laravel
+# ============================================================
+backend/vendor/
+backend/node_modules/
+backend/storage/app/public/
+backend/storage/app/private/
+backend/storage/logs/
+backend/bootstrap/cache/
+backend/public/storage
+backend/public/hot
+backend/.phpunit.result.cache
+backend/coverage/
+
+# ============================================================
+# FRONTEND — Next.js
+# ============================================================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+
+# ============================================================
+# DOKUMENTASI INTERNAL (tidak perlu di repo)
+# ============================================================
+docs/
+*.md
+!README.md
+
+# ============================================================
+# FILE ROOT YANG TIDAK RELEVAN KE KODE
+# ============================================================
+backend.txt
+rule github.txt
+file tambahan/
+*.txt
+*.pdf
+*.docx
+*.xlsx
+*.csv
+
+# ============================================================
+# AI TOOLS
+# ============================================================
+.gemini/
+brain/
+.agy/
+*.ai_session
+
+# ============================================================
+# SYSTEM & IDE
+# ============================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.suo
+*.iml
+
+# ============================================================
+# LOGS
+# ============================================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================================
+# MISC
+# ============================================================
+*.zip
+*.tar.gz
