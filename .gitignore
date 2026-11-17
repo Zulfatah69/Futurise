@@ -1,0 +1,80 @@
+# === SECRETS & ENV ===
+.env
+.env.backup
+.env.production
+.env.staging
+*.env
+
+# === DEPENDENCIES ===
+vendor/
+node_modules/
+
+# === LARAVEL SPECIFIC ===
+storage/app/public/
+storage/app/private/
+storage/logs/
+bootstrap/cache/
+public/storage
+public/hot
+
+# === TESTING ===
+.phpunit.result.cache
+coverage/
+.coverage
+
+# === SYSTEM FILES ===
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# === IDE / EDITOR ===
+.idea/
+.vscode/
+*.iml
+.project
+.settings/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# === AI TOOLS ===
+.gemini/
+brain/
+.agy/
+*.ai_session
+
+# === DOCUMENTATION (semua .md kecuali README.md) ===
+docs/
+*.md
+!README.md
+
+# === MISC FILES DI ROOT ===
+backend.txt
+rule github.txt
+*.txt
+*.pdf
+*.docx
+*.xlsx
+
+# === LOGS ===
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === BUILD OUTPUT ===
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# === CACHE ===
+.cache/
+.php-cs-fixer.cache
+.php_cs.cache
