@@ -87,3 +87,5 @@ yarn-error.log*
 # ============================================================
 *.zip
 *.tar.gz
+composer.json
+vendor
