@@ -1,0 +1,12 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="futurise_navy_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="50%" stop-color="#1E3A8A" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#futurise_navy_grad)" />
+  <path d="M42 34H86C88.2091 34 90 35.7909 90 38V46C90 48.2091 88.2091 50 86 50H56V60H80C82.2091 60 84 61.7909 84 64V70C84 72.2091 82.2091 74 80 74H56V90C56 92.2091 54.2091 94 52 94H46C43.7909 94 42 92.2091 42 90V34Z" fill="#FFFFFF" />
+  <circle cx="86" cy="86" r="10" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="3" />
+</svg>
