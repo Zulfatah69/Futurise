@@ -72,4 +72,20 @@ class Festival extends Model
     {
         return $this->hasMany(Karya::class, 'festival_id');
     }
+
+    /**
+     * Relasi ke divisi kepanitiaan festival.
+     */
+    public function divisions(): HasMany
+    {
+        return $this->hasMany(DivisiPanitia::class, 'festival_id')->orderBy('urutan');
+    }
+
+    /**
+     * Relasi ke penugasan panitia pada edisi festival ini.
+     */
+    public function committeeAssignments(): HasMany
+    {
+        return $this->hasMany(PanitiaFestival::class, 'festival_id');
+    }
 }

@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\v1\AuthController;
+use App\Http\Controllers\Api\v1\CommitteeController;
+use App\Http\Controllers\Api\v1\CommitteeTaskController;
+use App\Http\Controllers\Api\v1\DivisionController;
 use App\Http\Controllers\Api\v1\FestivalController;
 use App\Http\Controllers\Api\v1\InstitutionController;
 use App\Http\Controllers\Api\v1\PublicationController;
@@ -70,5 +73,30 @@ Route::prefix('v1')->group(function () {
         Route::post('/work-publications/{id}/publish', [PublicationController::class, 'publish']);
         Route::post('/work-publications/{id}/withdraw', [PublicationController::class, 'withdraw']);
         Route::get('/work-publications/{id}/logs', [PublicationController::class, 'logs']);
+
+        // ── Kepanitiaan, Divisi & Shift Penugasan ─────────────────────────────
+        Route::get('/committee', [CommitteeController::class, 'index']);
+        Route::post('/committee', [CommitteeController::class, 'store']);
+        Route::get('/committee/{committee}', [CommitteeController::class, 'show']);
+        Route::match(['put', 'patch'], '/committee/{committee}', [CommitteeController::class, 'update']);
+        Route::delete('/committee/{committee}', [CommitteeController::class, 'destroy']);
+        Route::post('/festivals/{festival}/committee/{committee}/assign', [CommitteeController::class, 'assignToFestival']);
+        Route::match(['put', 'patch'], '/committee-assignments/{assignment}', [CommitteeController::class, 'updateAssignment']);
+
+        // Divisi Panitia Festival
+        Route::get('/festivals/{festival}/divisions', [DivisionController::class, 'index']);
+        Route::post('/festivals/{festival}/divisions', [DivisionController::class, 'store']);
+        Route::get('/festivals/{festival}/divisions/{division}', [DivisionController::class, 'show']);
+        Route::match(['put', 'patch'], '/festivals/{festival}/divisions/{division}', [DivisionController::class, 'update']);
+        Route::delete('/festivals/{festival}/divisions/{division}', [DivisionController::class, 'destroy']);
+
+        // Shift Penugasan Tugas Panitia
+        Route::get('/committee-tasks', [CommitteeTaskController::class, 'index']);
+        Route::post('/committee-tasks', [CommitteeTaskController::class, 'store']);
+        Route::get('/committee-tasks/{task}', [CommitteeTaskController::class, 'show']);
+        Route::match(['put', 'patch'], '/committee-tasks/{task}', [CommitteeTaskController::class, 'update']);
+        Route::delete('/committee-tasks/{task}', [CommitteeTaskController::class, 'destroy']);
+        Route::post('/committee-tasks/{task}/check-in', [CommitteeTaskController::class, 'checkIn']);
+        Route::post('/committee-tasks/{task}/complete', [CommitteeTaskController::class, 'complete']);
     });
 });
