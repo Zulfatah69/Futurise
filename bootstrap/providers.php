@@ -5,5 +5,6 @@ use App\Providers\FortifyServiceProvider;
 
 return [
     AppServiceProvider::class,
+    App\Providers\Filament\AdminPanelProvider::class,
     FortifyServiceProvider::class,
 ];
