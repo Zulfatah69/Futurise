@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
 
 class Karya extends Model
@@ -70,5 +71,15 @@ class Karya extends Model
     public function files(): HasMany
     {
         return $this->hasMany(KaryaFile::class, 'karya_id')->orderBy('urutan');
+    }
+
+    public function publikasis(): HasMany
+    {
+        return $this->hasMany(PublikasiKarya::class, 'karya_id');
+    }
+
+    public function publikasiWeb(): HasOne
+    {
+        return $this->hasOne(PublikasiKarya::class, 'karya_id')->where('kanal', 'website');
     }
 }
