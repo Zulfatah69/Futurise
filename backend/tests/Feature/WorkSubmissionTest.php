@@ -250,4 +250,82 @@ class WorkSubmissionTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    /**
+     * Pengguna lain tidak dapat melihat detail karya tim lain (dicegah IDOR dengan 404).
+     */
+    public function test_unauthorized_user_cannot_view_other_users_work(): void
+    {
+        $user1 = User::factory()->create(['account_status' => 'active']);
+        $peserta1 = Peserta::create([
+            'user_id'       => $user1->id,
+            'nama_lengkap'  => $user1->name,
+            'email'         => $user1->email,
+            'institusi'     => 'Universitas Padjadjaran',
+            'jenis_peserta' => 'mahasiswa',
+        ]);
+
+        $festival = Festival::aktif()->first();
+        $karya = Karya::create([
+            'festival_id' => $festival->id,
+            'peserta_id'  => $peserta1->id,
+            'judul'       => 'Smart Waste Classifier',
+            'deskripsi'   => 'AI sorting robot.',
+            'kategori'    => 'Artificial Intelligence & Big Data',
+            'teknologi'   => 'YOLOv8, Raspberry Pi',
+            'status'      => 'draft',
+        ]);
+
+        // User 2 yang berbeda mencoba mengakses karya milik User 1
+        $user2 = User::factory()->create(['account_status' => 'active']);
+        Sanctum::actingAs($user2);
+
+        $response = $this->getJson("/api/v1/works/{$karya->id}");
+        $response->assertNotFound();
+
+        // Pemilik asli (User 1) bisa melihat
+        Sanctum::actingAs($user1);
+        $ownerResponse = $this->getJson("/api/v1/works/{$karya->id}");
+        $ownerResponse->assertOk()
+            ->assertJsonPath('data.id', $karya->id);
+    }
+
+    /**
+     * File upload menolak berkas dengan format berbahaya / tidak diizinkan.
+     */
+    public function test_cannot_upload_file_with_disallowed_mime_type(): void
+    {
+        $user = User::factory()->create(['account_status' => 'active']);
+        $peserta = Peserta::create([
+            'user_id'       => $user->id,
+            'nama_lengkap'  => $user->name,
+            'email'         => $user->email,
+            'institusi'     => 'Institut Teknologi Bandung',
+            'jenis_peserta' => 'mahasiswa',
+        ]);
+
+        $festival = Festival::aktif()->first();
+        $karya = Karya::create([
+            'festival_id' => $festival->id,
+            'peserta_id'  => $peserta->id,
+            'judul'       => 'Sistem Deteksi Anomali',
+            'deskripsi'   => 'Deskripsi karya.',
+            'kategori'    => 'Cyber Security',
+            'teknologi'   => 'Python',
+            'status'      => 'draft',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        // Upload file .php atau executable berbahaya
+        $maliciousFile = UploadedFile::fake()->create('exploit.php', 100, 'application/x-php');
+
+        $response = $this->postJson("/api/v1/works/{$karya->id}/files", [
+            'file'  => $maliciousFile,
+            'jenis' => 'dokumen',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['file']);
+    }
 }

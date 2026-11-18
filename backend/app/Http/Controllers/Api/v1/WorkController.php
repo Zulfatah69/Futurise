@@ -8,10 +8,12 @@ use App\Models\Festival;
 use App\Models\Karya;
 use App\Models\KaryaFile;
 use App\Models\Peserta;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class WorkController extends Controller
 {
@@ -106,6 +108,16 @@ class WorkController extends Controller
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
+        // Ownership check: Hanya admin, panitia, atau pemilik/anggota tim yang berhak melihat detail karya non-publik
+        $user = $request->user();
+        $peserta = $this->getCurrentPeserta($request);
+        $isAdminOrPanitia = $user && ($user->hasAnyRole(User::ADMIN_ROLES) || $user->hasRole('panitia'));
+        $isOwnerOrMember = $peserta && ($karya->peserta_id === $peserta->id || $karya->pesertas()->where('peserta_id', $peserta->id)->exists());
+
+        if (! $isAdminOrPanitia && ! $isOwnerOrMember) {
+            return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
+        }
+
         return $this->jsonResponse(true, 'Detail karya berhasil dimuat.', $karya);
     }
 
@@ -121,7 +133,7 @@ class WorkController extends Controller
         }
 
         $validated = $request->validate([
-            'festival_id'           => 'nullable|exists:festival,id',
+            'festival_id'           => ['nullable', Rule::exists('festival', 'id')->where('aktif', true)],
             'judul'                 => 'required|string|max:200',
             'deskripsi'             => 'required|string',
             'kategori'              => 'required|string|max:50',
@@ -272,7 +284,12 @@ class WorkController extends Controller
         }
 
         $request->validate([
-            'file'        => 'required|file|max:25600', // maks 25 MB
+            'file'        => [
+                'required',
+                'file',
+                'max:25600', // maks 25 MB
+                'mimes:pdf,jpg,jpeg,png,gif,mp4,mov,zip,rar,doc,docx,ppt,pptx',
+            ],
             'jenis'       => 'required|in:utama,thumbnail,galeri,dokumen,video,lainnya',
             'keterangan'  => 'nullable|string|max:255',
             'is_publik'   => 'nullable|boolean',
@@ -314,10 +331,20 @@ class WorkController extends Controller
      * GET /api/v1/works/{id}/files
      * Mengambil seluruh berkas yang dilampirkan pada karya.
      */
-    public function getFiles(int $id): JsonResponse
+    public function getFiles(Request $request, int $id): JsonResponse
     {
-        $karya = Karya::find($id);
+        $karya = Karya::with('files')->find($id);
         if (! $karya) {
+            return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
+        }
+
+        // Ownership check
+        $user = $request->user();
+        $peserta = $this->getCurrentPeserta($request);
+        $isAdminOrPanitia = $user && ($user->hasAnyRole(User::ADMIN_ROLES) || $user->hasRole('panitia'));
+        $isOwnerOrMember = $peserta && ($karya->peserta_id === $peserta->id || $karya->pesertas()->where('peserta_id', $peserta->id)->exists());
+
+        if (! $isAdminOrPanitia && ! $isOwnerOrMember) {
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
@@ -346,7 +373,7 @@ class WorkController extends Controller
             'email'           => 'nullable|email|max:100',
             'no_telepon'      => 'nullable|string|max:20',
             'institusi'       => 'nullable|string|max:150',
-            'jenis_peserta'   => 'nullable|string|max:30',
+            'jenis_peserta'   => ['nullable', 'string', Rule::in(['mahasiswa', 'siswa', 'umum', 'pic'])],
             'nomor_identitas' => 'nullable|string|max:30',
         ]);
 

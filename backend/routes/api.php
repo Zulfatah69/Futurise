@@ -22,7 +22,7 @@ Route::prefix('v1')->group(function () {
     // ── Etalase Galeri Karya Publik (Showcase & Expo) ─────────────────────────
     Route::get('/showcase', [PublicationController::class, 'publicShowcase']);
     Route::get('/showcase/{slug}', [PublicationController::class, 'publicShowcaseDetail']);
-    Route::post('/showcase/{slug}/like', [PublicationController::class, 'like']);
+    Route::post('/showcase/{slug}/like', [PublicationController::class, 'like'])->middleware('throttle:30,1');
 
     // ── Festival Publik ───────────────────────────────────────────────────────
     Route::get('/festivals', [FestivalController::class, 'index']);

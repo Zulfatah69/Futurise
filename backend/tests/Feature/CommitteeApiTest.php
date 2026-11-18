@@ -309,4 +309,40 @@ class CommitteeApiTest extends TestCase
         $forbiddenRes = $this->getJson('/api/v1/committee');
         $forbiddenRes->assertForbidden();
     }
+
+    /**
+     * Pengguna tanpa role admin atau bukan panitia yang ditugaskan ditolak saat presensi check-in.
+     */
+    public function test_unauthorized_user_cannot_check_in_committee_task(): void
+    {
+        $panitia = Panitia::create([
+            'nama_lengkap' => 'Staff Resmi',
+            'email'        => 'staff.resmi@futurise.id',
+            'jenis'        => 'internal',
+            'aktif'        => true,
+        ]);
+
+        $assignment = PanitiaFestival::create([
+            'festival_id' => $this->festival->id,
+            'panitia_id'  => $panitia->id,
+            'jabatan'     => 'anggota',
+            'status'      => 'aktif',
+        ]);
+
+        $task = PanitiaTugas::create([
+            'panitia_festival_id' => $assignment->id,
+            'judul'               => 'Jaga Meja Registrasi',
+            'tanggal'             => '2026-11-20',
+            'jam_mulai'           => '08:00',
+            'jam_selesai'         => '12:00',
+            'status'              => 'terjadwal',
+        ]);
+
+        // User acak / peserta biasa
+        $otherUser = User::factory()->create(['email' => 'peserta.iseng@gmail.com']);
+        Sanctum::actingAs($otherUser);
+
+        $response = $this->postJson("/api/v1/committee-tasks/{$task->id}/check-in");
+        $response->assertForbidden();
+    }
 }

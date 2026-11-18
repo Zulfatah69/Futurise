@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Festival;
 use App\Models\FestivalKategori;
 use App\Models\FestivalPeriode;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -23,6 +24,15 @@ class FestivalController extends Controller
             'data'    => $data,
             'meta'    => $meta,
         ], $statusCode);
+    }
+
+    /**
+     * Cek apakah user memiliki hak akses administratif atau panitia.
+     */
+    private function isAdminOrPanitia(Request $request): bool
+    {
+        $user = $request->user();
+        return $user && ($user->hasAnyRole(User::ADMIN_ROLES) || $user->hasRole('panitia'));
     }
 
     /**
@@ -97,6 +107,10 @@ class FestivalController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator atau panitia yang berwenang.', null, null, 403);
+        }
+
         $validated = $request->validate([
             'nama'            => 'required|string|max:150',
             'slug'            => 'nullable|string|max:150|unique:festival,slug',
@@ -133,6 +147,10 @@ class FestivalController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator atau panitia yang berwenang.', null, null, 403);
+        }
+
         $festival = Festival::find($id);
         if (! $festival) {
             return $this->jsonResponse(false, 'Festival tidak ditemukan.', null, null, 404);
@@ -168,8 +186,12 @@ class FestivalController extends Controller
      * DELETE /api/v1/festivals/{id}
      * Menghapus festival.
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(Request $request, int $id): JsonResponse
     {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator atau panitia yang berwenang.', null, null, 403);
+        }
+
         $festival = Festival::find($id);
         if (! $festival) {
             return $this->jsonResponse(false, 'Festival tidak ditemukan.', null, null, 404);
@@ -196,6 +218,10 @@ class FestivalController extends Controller
 
     public function storePeriod(Request $request, int $id): JsonResponse
     {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator atau panitia yang berwenang.', null, null, 403);
+        }
+
         $festival = Festival::find($id);
         if (! $festival) {
             return $this->jsonResponse(false, 'Festival tidak ditemukan.', null, null, 404);
@@ -215,6 +241,10 @@ class FestivalController extends Controller
 
     public function updatePeriod(Request $request, int $festivalId, int $periodId): JsonResponse
     {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator atau panitia yang berwenang.', null, null, 403);
+        }
+
         $periode = FestivalPeriode::where('festival_id', $festivalId)->find($periodId);
         if (! $periode) {
             return $this->jsonResponse(false, 'Periode tahapan tidak ditemukan.', null, null, 404);
@@ -232,8 +262,12 @@ class FestivalController extends Controller
         return $this->jsonResponse(true, 'Periode tahapan berhasil diperbarui.', $periode);
     }
 
-    public function destroyPeriod(int $festivalId, int $periodId): JsonResponse
+    public function destroyPeriod(Request $request, int $festivalId, int $periodId): JsonResponse
     {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator atau panitia yang berwenang.', null, null, 403);
+        }
+
         $periode = FestivalPeriode::where('festival_id', $festivalId)->find($periodId);
         if (! $periode) {
             return $this->jsonResponse(false, 'Periode tahapan tidak ditemukan.', null, null, 404);
@@ -260,6 +294,10 @@ class FestivalController extends Controller
 
     public function storeCategory(Request $request, int $id): JsonResponse
     {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator atau panitia yang berwenang.', null, null, 403);
+        }
+
         $festival = Festival::find($id);
         if (! $festival) {
             return $this->jsonResponse(false, 'Festival tidak ditemukan.', null, null, 404);
@@ -279,6 +317,10 @@ class FestivalController extends Controller
 
     public function updateCategory(Request $request, int $festivalId, int $categoryId): JsonResponse
     {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator atau panitia yang berwenang.', null, null, 403);
+        }
+
         $kategori = FestivalKategori::where('festival_id', $festivalId)->find($categoryId);
         if (! $kategori) {
             return $this->jsonResponse(false, 'Kategori kompetisi tidak ditemukan.', null, null, 404);
@@ -296,8 +338,12 @@ class FestivalController extends Controller
         return $this->jsonResponse(true, 'Kategori kompetisi berhasil diperbarui.', $kategori);
     }
 
-    public function destroyCategory(int $festivalId, int $categoryId): JsonResponse
+    public function destroyCategory(Request $request, int $festivalId, int $categoryId): JsonResponse
     {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator atau panitia yang berwenang.', null, null, 403);
+        }
+
         $kategori = FestivalKategori::where('festival_id', $festivalId)->find($categoryId);
         if (! $kategori) {
             return $this->jsonResponse(false, 'Kategori kompetisi tidak ditemukan.', null, null, 404);

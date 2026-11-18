@@ -199,7 +199,10 @@ class PublicationController extends Controller
             return $this->jsonResponse(false, 'Anda tidak berhak mengajukan publikasi karya ini.', null, null, 403);
         }
 
-        $notes = $request->input('catatan');
+        $validated = $request->validate([
+            'catatan' => ['nullable', 'string', 'max:500'],
+        ]);
+        $notes = $validated['catatan'] ?? null;
         $updated = $this->publikasiService->submitForApproval($pub, $request->user(), $notes);
 
         return $this->jsonResponse(
@@ -219,7 +222,10 @@ class PublicationController extends Controller
         }
 
         $pub = PublikasiKarya::findOrFail($id);
-        $notes = $request->input('catatan');
+        $validated = $request->validate([
+            'catatan' => ['nullable', 'string', 'max:500'],
+        ]);
+        $notes = $validated['catatan'] ?? null;
 
         $approved = $this->publikasiService->approve($pub, $request->user(), $notes);
 
@@ -240,7 +246,10 @@ class PublicationController extends Controller
         }
 
         $pub = PublikasiKarya::findOrFail($id);
-        $notes = $request->input('catatan');
+        $validated = $request->validate([
+            'catatan' => ['nullable', 'string', 'max:500'],
+        ]);
+        $notes = $validated['catatan'] ?? null;
 
         $published = $this->publikasiService->publish($pub, $request->user(), $notes);
 
