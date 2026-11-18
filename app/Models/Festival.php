@@ -64,4 +64,12 @@ class Festival extends Model
     {
         return $this->hasMany(FestivalKategori::class, 'festival_id')->orderBy('urutan');
     }
+
+    /**
+     * Relasi ke seluruh karya yang diajukan pada festival ini.
+     */
+    public function karyas(): HasMany
+    {
+        return $this->hasMany(Karya::class, 'festival_id');
+    }
 }

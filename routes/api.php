@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\FestivalController;
 use App\Http\Controllers\Api\v1\InstitutionController;
+use App\Http\Controllers\Api\v1\WorkController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,5 +42,16 @@ Route::prefix('v1')->group(function () {
         Route::post('/festivals/{id}/categories', [FestivalController::class, 'storeCategory']);
         Route::match(['put', 'patch'], '/festivals/{id}/categories/{categoryId}', [FestivalController::class, 'updateCategory']);
         Route::delete('/festivals/{id}/categories/{categoryId}', [FestivalController::class, 'destroyCategory']);
+
+        // ── Pengajuan Karya Lomba & Berkas ─────────────────────────────────────
+        Route::get('/works', [WorkController::class, 'index']);
+        Route::post('/works', [WorkController::class, 'store']);
+        Route::get('/works/{id}', [WorkController::class, 'show']);
+        Route::match(['put', 'patch'], '/works/{id}', [WorkController::class, 'update']);
+        Route::post('/works/{id}/submit', [WorkController::class, 'submit']);
+        Route::post('/works/{id}/files', [WorkController::class, 'uploadFile']);
+        Route::get('/works/{id}/files', [WorkController::class, 'getFiles']);
+        Route::post('/works/{id}/team-members', [WorkController::class, 'addTeamMember']);
+        Route::delete('/works/{id}/team-members/{memberId}', [WorkController::class, 'removeTeamMember']);
     });
 });
