@@ -33,6 +33,23 @@ class CommitteeTaskController extends Controller
         return $user && ($user->hasAnyRole(User::ADMIN_ROLES) || $user->hasRole('panitia'));
     }
 
+    private function authorizeTaskAction(Request $request, PanitiaTugas $task): bool
+    {
+        $user = $request->user();
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(User::ADMIN_ROLES)) {
+            return true;
+        }
+
+        $task->loadMissing('panitiaFestival.panitia');
+        $panitiaEmail = $task->panitiaFestival?->panitia?->email;
+
+        return ($panitiaEmail && $user->email === $panitiaEmail) || $user->hasRole('panitia');
+    }
+
     /**
      * GET /api/v1/committee-tasks
      * Daftar tugas/shift panitia dengan filter & paginasi.
@@ -145,6 +162,10 @@ class CommitteeTaskController extends Controller
      */
     public function checkIn(Request $request, PanitiaTugas $task): JsonResponse
     {
+        if (! $this->authorizeTaskAction($request, $task)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Anda tidak berwenang melakukan presensi untuk tugas ini.', null, null, 403);
+        }
+
         $validated = $request->validate([
             'catatan' => ['nullable', 'string', 'max:255'],
         ]);
@@ -160,6 +181,10 @@ class CommitteeTaskController extends Controller
      */
     public function complete(Request $request, PanitiaTugas $task): JsonResponse
     {
+        if (! $this->authorizeTaskAction($request, $task)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Anda tidak berwenang memperbarui status tugas ini.', null, null, 403);
+        }
+
         $validated = $request->validate([
             'catatan' => ['nullable', 'string', 'max:255'],
         ]);

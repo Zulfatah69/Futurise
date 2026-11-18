@@ -100,7 +100,29 @@ class FestivalApiTest extends TestCase
     }
 
     /**
-     * Pengguna terautentikasi dapat membuat festival baru dan menambahkan periode serta kategori.
+     * Pengguna terautentikasi tanpa role admin/panitia ditolak saat mencoba membuat festival.
+     */
+    public function test_regular_authenticated_user_without_admin_role_cannot_manage_festival(): void
+    {
+        $regularUser = User::factory()->create([
+            'email_verified_at' => now(),
+            'account_status'    => 'active',
+        ]);
+        Sanctum::actingAs($regularUser);
+
+        $response = $this->postJson('/api/v1/festivals', [
+            'nama'            => 'FUTURiSE 2027',
+            'edisi'           => 'Edisi 2',
+            'tahun'           => 2027,
+            'tanggal_mulai'   => '2027-11-01',
+            'tanggal_selesai' => '2027-12-15',
+        ]);
+
+        $response->assertForbidden();
+    }
+
+    /**
+     * Administrator dapat membuat festival baru dan menambahkan periode serta kategori.
      */
     public function test_authenticated_user_can_manage_festival(): void
     {
@@ -108,6 +130,7 @@ class FestivalApiTest extends TestCase
             'email_verified_at' => now(),
             'account_status'    => 'active',
         ]);
+        $admin->assignRole('super-admin');
         Sanctum::actingAs($admin);
 
         // 1. Buat Festival Baru
