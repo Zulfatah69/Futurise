@@ -734,7 +734,7 @@
 
                 <div class="info-box">
                     <span class="info-box-label">Nomor Telepon</span>
-                    <div class="info-box-value">{{ $user->person?->phone ?? '-' }}</div>
+                    <div class="info-box-value">{{ $user->peserta?->no_telepon ?? $user->person?->phone ?? '-' }}</div>
                 </div>
 
                 <div class="info-box">

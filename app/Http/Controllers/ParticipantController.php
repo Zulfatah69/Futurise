@@ -35,15 +35,29 @@ class ParticipantController extends Controller
         ]);
 
         DB::transaction(function () use ($user, $validated) {
+            $phone = $validated['no_telepon'] ?? $user->person?->phone;
+
             Peserta::create([
                 'user_id'         => $user->id,
                 'nama_lengkap'    => $user->name,
                 'email'           => $user->email,
-                'no_telepon'      => $validated['no_telepon'] ?? $user->person?->phone,
+                'no_telepon'      => $phone,
                 'institusi'       => $validated['institusi'],
                 'jenis_peserta'   => $validated['jenis_peserta'],
                 'nomor_identitas' => $validated['nomor_identitas'],
             ]);
+
+            // Selaraskan nomor telepon ke tabel people (profil akun)
+            if (! empty($phone)) {
+                $user->person()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'full_name' => $user->name,
+                        'email'     => $user->email,
+                        'phone'     => $phone,
+                    ]
+                );
+            }
 
             // Jika role saat ini adalah pengunjung, ubah / tambahkan role tim-mahasiswa
             if ($user->hasRole('pengunjung') && Role::where('name', 'tim-mahasiswa')->where('guard_name', 'web')->exists()) {
