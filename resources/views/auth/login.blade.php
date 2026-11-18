@@ -309,7 +309,6 @@
                     id="email"
                     name="email"
                     value="{{ old('email') }}"
-                    placeholder="nama@email.com"
                     required
                     autofocus
                     autocomplete="email"
@@ -324,7 +323,6 @@
                         type="password"
                         id="password"
                         name="password"
-                        placeholder="Masukkan kata sandi"
                         required
                         autocomplete="current-password"
                     >

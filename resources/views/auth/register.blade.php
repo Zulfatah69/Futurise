@@ -284,7 +284,6 @@
                     id="name"
                     name="name"
                     value="{{ old('name') }}"
-                    placeholder="Contoh: Muhammad Zulfatah"
                     required
                     autofocus
                     autocomplete="name"
@@ -299,7 +298,6 @@
                     id="email"
                     name="email"
                     value="{{ old('email') }}"
-                    placeholder="nama@email.com"
                     required
                     autocomplete="email"
                 >
@@ -313,7 +311,6 @@
                     id="phone"
                     name="phone"
                     value="{{ old('phone') }}"
-                    placeholder="Contoh: 081234567890"
                     autocomplete="tel"
                 >
             </div>
@@ -326,7 +323,6 @@
                         type="password"
                         id="password"
                         name="password"
-                        placeholder="Minimal 8 karakter"
                         required
                         autocomplete="new-password"
                     >
@@ -352,7 +348,6 @@
                         type="password"
                         id="password_confirmation"
                         name="password_confirmation"
-                        placeholder="Ulangi kata sandi"
                         required
                         autocomplete="new-password"
                     >
@@ -375,8 +370,9 @@
                 Daftar & Kirim Kode OTP
             </button>
 
-            <div class="notice-box">
-                🛡️ Kode OTP verifikasi 6-digit akan dikirim langsung ke alamat email Anda.
+            <div class="notice-box" style="display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; color: var(--color-primary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Kode OTP verifikasi 6-digit akan dikirim ke alamat email Anda.</span>
             </div>
         </form>
 
