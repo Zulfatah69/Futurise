@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\v1\InstitutionController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\WorkWebController;
+use App\Models\Festival;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -36,7 +38,11 @@ Route::middleware(['auth', 'verified:otp.show', 'account.active'])->group(functi
     })->name('account.pending');
 
     Route::get('/dashboard', function () {
-        $user = auth()->user()->load('peserta');
+        $user = auth()->user()->load([
+            'peserta.karyasAsLeader.festival',
+            'peserta.karyasAsLeader.anggotaTims',
+            'peserta.karyasAsLeader.files',
+        ]);
 
         if (
             $user->account_type === 'pic' &&
@@ -45,11 +51,18 @@ Route::middleware(['auth', 'verified:otp.show', 'account.active'])->group(functi
             return redirect()->route('account.pending');
         }
 
-        return view('dashboard', compact('user'));
+        $activeFestival = Festival::aktif()->with('kategoris')->first();
+
+        return view('dashboard', compact('user', 'activeFestival'));
     })->name('dashboard');
 
     // Registrasi Profil Peserta Lomba (Tahap 2)
     Route::post('/peserta/daftar', [ParticipantController::class, 'register'])->name('participant.register');
+
+    // Submisi Karya & Upload Berkas (Web Dashboard)
+    Route::post('/karya/simpan', [WorkWebController::class, 'store'])->name('karya.store');
+    Route::post('/karya/{id}/submit', [WorkWebController::class, 'submit'])->name('karya.submit');
+    Route::post('/karya/{id}/upload', [WorkWebController::class, 'uploadFile'])->name('karya.upload');
 
     // Pencarian Institusi (Autocomplete)
     Route::get('/institusi/search', [InstitutionController::class, 'search'])->name('institusi.search');

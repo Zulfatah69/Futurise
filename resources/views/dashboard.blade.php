@@ -196,7 +196,7 @@
             border: 1px solid #F59E0B;
         }
 
-        /* PESERTA REGISTRATION FORM SECTION */
+        /* PESERTA REGISTRATION & KARYA STYLING */
         .register-section-header {
             display: flex;
             align-items: center;
@@ -204,6 +204,164 @@
             margin-bottom: 22px;
             padding-bottom: 16px;
             border-bottom: 1px solid var(--color-hairline);
+        }
+
+        .karya-item-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-hairline);
+            border-left: 4px solid var(--color-primary);
+            padding: 24px;
+            margin-bottom: 20px;
+            border-radius: var(--radius-card);
+        }
+
+        .karya-item-card.status-lolos {
+            border-left-color: #10B981;
+        }
+
+        .karya-item-card.status-diajukan {
+            border-left-color: var(--color-accent);
+        }
+
+        .karya-item-card.status-perlu_revisi {
+            border-left-color: #F59E0B;
+        }
+
+        .karya-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .karya-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            letter-spacing: -0.4px;
+        }
+
+        .karya-meta-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .karya-meta-tag {
+            background: rgba(43, 43, 94, 0.08);
+            color: var(--color-primary);
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .karya-files-box {
+            background: var(--color-canvas);
+            border: 1px solid var(--color-hairline);
+            padding: 14px 16px;
+            margin: 14px 0;
+            border-radius: 4px;
+        }
+
+        .file-link-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--color-accent);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .file-link-item:hover {
+            text-decoration: underline;
+        }
+
+        .team-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .team-pill {
+            background: var(--color-canvas);
+            border: 1px solid var(--color-hairline);
+            padding: 5px 12px;
+            font-size: 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+            padding: 10px 22px;
+            border-radius: var(--radius-btn);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-outline:hover {
+            background: var(--color-primary);
+            color: var(--color-canvas);
+        }
+
+        .btn-success {
+            background: #10B981;
+            color: #FFFFFF;
+            border: none;
+            padding: 10px 22px;
+            border-radius: var(--radius-btn);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: #E2DFEB;
+            color: var(--color-primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-btn);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #D1CDE0;
+        }
+
+        .team-member-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 2fr auto;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
         .register-section-header h2 {
@@ -455,7 +613,7 @@
 
         <!-- KEPESERTAAN LOMBA -->
         @if ($user->peserta)
-            <!-- SUDAH TERDAFTAR SEBAGAI PESERTA -->
+            <!-- 1. KARTU PROFIL KEPESERTAAN -->
             <section class="card">
                 <div class="register-section-header">
                     <h2>🎖️ Profil Kepesertaan Lomba</h2>
@@ -483,10 +641,307 @@
                         <strong>{{ $user->peserta->no_telepon ?? '-' }}</strong>
                     </div>
                 </div>
+            </section>
 
-                <div style="margin-top: 24px; padding: 16px; background: var(--color-surface); border: 1px solid var(--color-hairline); font-size: 13px; color: var(--color-ink); line-height: 1.6;">
-                    ℹ️ Profil kepesertaan Anda sudah aktif. Anda dapat mengikuti kompetisi dan mengunggah karya saat submisi dibuka.
+            <!-- 2. DAFTAR KARYA YANG SUDAH DIAJUKAN -->
+            <section class="card">
+                <div class="register-section-header">
+                    <div>
+                        <h2>💡 Karya & Inovasi Terdaftar</h2>
+                        <p style="font-size: 13px; color: var(--color-ink); margin-top: 4px;">
+                            Daftar proyek inovasi yang Anda daftarkan pada ajang {{ $activeFestival->nama ?? 'FUTURiSE 2026' }}.
+                        </p>
+                    </div>
+
+                    <a href="#form-karya" class="btn-outline" style="padding: 8px 16px; font-size: 12px;">
+                        + Buat Submisi Baru
+                    </a>
                 </div>
+
+                @if ($user->peserta->karyasAsLeader->count() > 0)
+                    @foreach ($user->peserta->karyasAsLeader as $karya)
+                        <div class="karya-item-card status-{{ $karya->status }}">
+                            <div class="karya-title-row">
+                                <div>
+                                    <h3 class="karya-title">{{ $karya->judul }}</h3>
+                                    <div class="karya-meta-tags">
+                                        <span class="karya-meta-tag">{{ $karya->kategori }}</span>
+                                        <span class="karya-meta-tag" style="background: rgba(1, 125, 199, 0.1); color: var(--color-accent);">
+                                            🛠️ {{ $karya->teknologi }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    @php
+                                        $statusBadges = [
+                                            'draft'             => ['label' => 'DRAFT', 'bg' => '#E5E7EB', 'text' => '#374151', 'border' => '#9CA3AF'],
+                                            'diajukan'          => ['label' => 'DIAJUKAN', 'bg' => '#DBEAFE', 'text' => '#1E40AF', 'border' => '#3B82F6'],
+                                            'dalam_pemeriksaan' => ['label' => 'DALAM PEMERIKSAAN', 'bg' => '#FEF3C7', 'text' => '#92400E', 'border' => '#F59E0B'],
+                                            'perlu_revisi'      => ['label' => 'PERLU REVISI', 'bg' => '#FEF3C7', 'text' => '#B45309', 'border' => '#D97706'],
+                                            'lolos'             => ['label' => 'LOLOS KURASI', 'bg' => '#D1FAE5', 'text' => '#065F46', 'border' => '#10B981'],
+                                            'tidak_lolos'       => ['label' => 'TIDAK LOLOS', 'bg' => '#FEE2E2', 'text' => '#991B1B', 'border' => '#EF4444'],
+                                        ];
+                                        $badge = $statusBadges[$karya->status] ?? $statusBadges['draft'];
+                                    @endphp
+                                    <span class="badge" style="background: {{ $badge['bg'] }}; color: {{ $badge['text'] }}; border: 1px solid {{ $badge['border'] }};">
+                                        {{ $badge['label'] }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <p style="font-size: 14px; color: var(--color-ink); line-height: 1.7; margin-bottom: 14px;">
+                                {{ $karya->deskripsi }}
+                            </p>
+
+                            @if ($karya->url_demo)
+                                <div style="margin-bottom: 12px; font-size: 13px;">
+                                    <strong>🔗 Tautan Demo / Video:</strong>
+                                    <a href="{{ $karya->url_demo }}" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 700;">
+                                        {{ $karya->url_demo }} ↗
+                                    </a>
+                                </div>
+                            @endif
+
+                            <!-- BERKAS LAMPIRAN -->
+                            <div class="karya-files-box">
+                                <small style="display: block; font-size: 11px; font-weight: 700; color: var(--color-ink); text-transform: uppercase; margin-bottom: 6px;">
+                                    📁 Berkas Lampiran & Proposal:
+                                </small>
+                                @if ($karya->files->count() > 0)
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        @foreach ($karya->files as $file)
+                                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                                                <a href="{{ asset('storage/' . $file->path) }}" target="_blank" class="file-link-item">
+                                                    📄 {{ $file->nama_asli }}
+                                                    <span style="font-size: 11px; color: var(--color-ink); font-weight: 400;">
+                                                        ({{ number_format($file->ukuran_byte / 1024, 1) }} KB)
+                                                    </span>
+                                                </a>
+                                                <span style="font-size: 11px; color: var(--color-ink);">
+                                                    {{ $file->keterangan ?? $file->jenis }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p style="font-size: 12px; color: #DC2626;">
+                                        ⚠️ Belum ada proposal PDF yang dilampirkan.
+                                    </p>
+                                @endif
+                            </div>
+
+                            <!-- SUSUNAN TIM -->
+                            <div style="margin-top: 14px;">
+                                <small style="display: block; font-size: 11px; font-weight: 700; color: var(--color-ink); text-transform: uppercase; margin-bottom: 4px;">
+                                    👥 Anggota Tim Pengembang:
+                                </small>
+                                <div class="team-pills">
+                                    <div class="team-pill" style="border-color: var(--color-primary); font-weight: 700; color: var(--color-primary);">
+                                        👑 {{ $user->peserta->nama_lengkap }} (Ketua Tim)
+                                    </div>
+                                    @foreach ($karya->anggotaTims as $anggota)
+                                        <div class="team-pill">
+                                            👤 {{ $anggota->nama_lengkap }}
+                                            <span style="color: var(--color-ink); font-size: 11px;">({{ $anggota->peran ?? 'Anggota' }})</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- AKSI KARYA -->
+                            @if (in_array($karya->status, ['draft', 'perlu_revisi']))
+                                <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-hairline);">
+                                    <!-- UPLOAD BERKAS TAMBAHAN FORM -->
+                                    <form method="POST" action="{{ route('karya.upload', $karya->id) }}" enctype="multipart/form-data" style="display: inline-flex; align-items: center; gap: 8px;">
+                                        @csrf
+                                        <input type="hidden" name="jenis" value="dokumen">
+                                        <input type="file" name="file" accept=".pdf,.zip,.png,.jpg" style="padding: 6px 10px; font-size: 12px; width: auto;" required>
+                                        <button type="submit" class="btn-outline" style="padding: 8px 14px; font-size: 12px;">
+                                            Upload Berkas
+                                        </button>
+                                    </form>
+
+                                    <!-- FINAL SUBMIT FORM -->
+                                    <form method="POST" action="{{ route('karya.submit', $karya->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin mengajukan karya ini secara final? Setelah diajukan, data karya akan masuk tahap kurasi.');">
+                                        @csrf
+                                        <button type="submit" class="btn-success">
+                                            🚀 Ajukan Karya ke Kurator
+                                        </button>
+                                    </form>
+                                </div>
+                            @elseif ($karya->status === 'diajukan')
+                                <div style="margin-top: 16px; padding: 12px; background: rgba(1, 125, 199, 0.08); border-left: 3px solid var(--color-accent); font-size: 13px; color: var(--color-primary);">
+                                    ⏳ <strong>Status: Diajukan.</strong> Karya Anda sedang dalam antrean kurasi administrasi panitia APTIKOM.
+                                </div>
+                            @elseif ($karya->status === 'lolos')
+                                <div style="margin-top: 16px; padding: 12px; background: #ECFDF5; border-left: 3px solid #10B981; font-size: 13px; color: #065F46;">
+                                    🏆 <strong>Selamat!</strong> Karya inovasi Anda telah dinyatakan <strong>Lolos Kurasi</strong> dan berhak dinilai oleh dewan juri ahli pada sesi presentasi final.
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                @else
+                    <div style="text-align: center; padding: 40px 20px; background: var(--color-surface); border: 1px dashed var(--color-hairline); border-radius: var(--radius-card);">
+                        <div style="font-size: 36px; margin-bottom: 8px;">🚀</div>
+                        <h4 style="color: var(--color-primary); font-size: 18px; font-weight: 700; margin-bottom: 6px;">
+                            Belum Ada Karya yang Diajukan
+                        </h4>
+                        <p style="color: var(--color-ink); font-size: 14px; max-width: 500px; margin: 0 auto 18px;">
+                            Anda sudah terdaftar resmi sebagai peserta. Sekarang, daftarkan proyek inovasi terbaik tim Anda melalui formulir di bawah ini!
+                        </p>
+                    </div>
+                @endif
+            </section>
+
+            <!-- 3. FORM PENDAFTARAN KARYA BARU -->
+            <section id="form-karya" class="card">
+                <div class="register-section-header">
+                    <div>
+                        <h2>📝 Formulir Submisi Karya Inovasi Baru</h2>
+                        <p style="font-size: 13px; color: var(--color-ink); margin-top: 4px;">
+                            Event: <strong>{{ $activeFestival->nama ?? 'FUTURiSE 2026' }}</strong> (Penyelenggara: {{ $activeFestival->penyelenggara ?? 'APTIKOM Jawa Barat' }})
+                        </p>
+                    </div>
+                    <span class="badge badge-success">SUBMISI AKTIF</span>
+                </div>
+
+                <form method="POST" action="{{ route('karya.store') }}" enctype="multipart/form-data">
+                    @csrf
+
+                    <!-- JUDUL KARYA -->
+                    <div class="form-group">
+                        <label for="judul">Judul Karya / Proyek Inovasi <span style="color: #DC2626;">*</span></label>
+                        <input
+                            type="text"
+                            id="judul"
+                            name="judul"
+                            value="{{ old('judul') }}"
+                            placeholder="Contoh: Sistem Deteksi Anomali Jaringan Berbasis AI untuk Smart Campus"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <!-- KATEGORI LOMBA -->
+                        <div class="form-group">
+                            <label for="kategori">Kategori Lomba <span style="color: #DC2626;">*</span></label>
+                            <select id="kategori" name="kategori" required>
+                                <option value="">-- Pilih Kategori Kompetisi --</option>
+                                @if (isset($activeFestival) && $activeFestival->kategoris->count() > 0)
+                                    @foreach ($activeFestival->kategoris as $kat)
+                                        <option value="{{ $kat->nama }}" @selected(old('kategori') === $kat->nama)>
+                                            {{ $kat->nama }}
+                                        </option>
+                                    @endforeach
+                                @else
+                                    <option value="Web & Mobile App Innovation">Web & Mobile App Innovation</option>
+                                    <option value="Artificial Intelligence & Big Data">Artificial Intelligence & Big Data</option>
+                                    <option value="IoT, Robotics & Embedded Systems">IoT, Robotics & Embedded Systems</option>
+                                    <option value="Game Development & Interactive Media">Game Development & Interactive Media</option>
+                                    <option value="Cybersecurity & Infrastructure">Cybersecurity & Infrastructure</option>
+                                @endif
+                            </select>
+                        </div>
+
+                        <!-- STACK TEKNOLOGI -->
+                        <div class="form-group">
+                            <label for="teknologi">Stack Teknologi Utama <span style="color: #DC2626;">*</span></label>
+                            <input
+                                type="text"
+                                id="teknologi"
+                                name="teknologi"
+                                value="{{ old('teknologi') }}"
+                                placeholder="Contoh: Python, YOLOv8, Vue.js, Laravel, Docker"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- DESKRIPSI KARYA -->
+                    <div class="form-group">
+                        <label for="deskripsi">Deskripsi & Ringkasan Solusi Inovasi <span style="color: #DC2626;">*</span></label>
+                        <textarea
+                            id="deskripsi"
+                            name="deskripsi"
+                            rows="4"
+                            placeholder="Jelaskan latar belakang masalah, solusi inovasi yang ditawarkan, dan dampak manfaatnya..."
+                            style="width: 100%; padding: 13px 15px; border: 1px solid var(--color-hairline); border-radius: var(--radius-btn); outline: none; font-size: 14px; font-family: var(--font-family); background: var(--color-canvas); resize: vertical;"
+                            required
+                        >{{ old('deskripsi') }}</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- URL DEMO / VIDEO -->
+                        <div class="form-group">
+                            <label for="url_demo">Tautan Demo / Video YouTube (Opsional)</label>
+                            <input
+                                type="url"
+                                id="url_demo"
+                                name="url_demo"
+                                value="{{ old('url_demo') }}"
+                                placeholder="https://youtube.com/watch?v=... atau https://demo.app"
+                            >
+                        </div>
+
+                        <!-- BERKAS PROPOSAL PDF -->
+                        <div class="form-group">
+                            <label for="proposal">Unggah Berkas Proposal (PDF, Maks. 20 MB)</label>
+                            <input
+                                type="file"
+                                id="proposal"
+                                name="proposal"
+                                accept=".pdf"
+                                style="padding: 10px 12px;"
+                            >
+                            <p style="font-size: 11px; color: var(--color-ink); margin-top: 4px;">
+                                💡 <em>Format proposal sesuai panduan kompetisi APTIKOM (format PDF).</em>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- SUSUNAN ANGGOTA TIM DINAMIS -->
+                    <div class="form-group" style="margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <label style="margin-bottom: 0;">Anggota Tim Pengembang (Maks. 3-5 Orang)</label>
+                            <button type="button" id="btn-add-member" class="btn-secondary" style="padding: 6px 14px; font-size: 12px;">
+                                + Tambah Anggota
+                            </button>
+                        </div>
+
+                        <div style="padding: 12px 14px; background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: var(--radius-btn); margin-bottom: 12px; font-size: 13px; color: var(--color-primary);">
+                            👑 <strong>Ketua Tim:</strong> {{ $user->peserta->nama_lengkap }} ({{ $user->peserta->institusi }}) — <em>Otomatis terdaftar sebagai penanggung jawab</em>
+                        </div>
+
+                        <div id="team-members-container">
+                            <!-- Dynamic rows will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- PERSETUJUAN PUBLIKASI -->
+                    <div class="form-group" style="margin: 20px 0;">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; font-size: 14px; color: #1A1A36;">
+                            <input
+                                type="checkbox"
+                                name="persetujuan_publikasi"
+                                value="1"
+                                style="width: 18px; height: 18px; accent-color: var(--color-primary); cursor: pointer;"
+                                @checked(old('persetujuan_publikasi', true))
+                            >
+                            Saya mengizinkan karya inovasi ini untuk dipamerkan pada Galeri Publik (Showcase Expo) FUTURiSE jika dinyatakan lolos kurasi.
+                        </label>
+                    </div>
+
+                    <!-- TOMBOL AKSI SUBMISI -->
+                    <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 24px;">
+                        <button type="submit" name="action_type" value="submit" class="btn-primary">
+                            🚀 Ajukan Karya Sekarang
+                        </button>
+                        <button type="submit" name="action_type" value="draft" class="btn-outline">
+                            💾 Simpan Sebagai Draft
+                        </button>
+                    </div>
+                </form>
             </section>
         @else
             <!-- BELUM TERDAFTAR SEBAGAI PESERTA: TAMPILKAN FORM TAHAP 2 -->
@@ -654,6 +1109,41 @@
                     suggestionsBox.style.display = 'none';
                 }
             });
+        }
+
+        // DYNAMIC TEAM MEMBERS SCRIPT
+        const btnAddMember = document.getElementById('btn-add-member');
+        const teamContainer = document.getElementById('team-members-container');
+
+        if (btnAddMember && teamContainer) {
+            let memberCount = 0;
+            const maxMembers = 4;
+
+            btnAddMember.addEventListener('click', function() {
+                if (teamContainer.children.length >= maxMembers) {
+                    alert('Maksimal anggota tim tambahan adalah ' + maxMembers + ' orang.');
+                    return;
+                }
+
+                memberCount++;
+                const row = document.createElement('div');
+                row.className = 'team-member-row';
+                row.id = `member-row-${memberCount}`;
+                row.innerHTML = `
+                    <input type="text" name="anggota_nama[]" placeholder="Nama Lengkap Anggota" required style="padding: 10px 12px; font-size: 13px;">
+                    <input type="text" name="anggota_peran[]" placeholder="Peran (misal: UI Designer, Frontend)" style="padding: 10px 12px; font-size: 13px;">
+                    <input type="email" name="anggota_email[]" placeholder="Email Anggota (opsional)" style="padding: 10px 12px; font-size: 13px;">
+                    <button type="button" class="btn-outline" style="padding: 9px 12px; color: #DC2626; border-color: #DC2626; font-size: 12px;" onclick="removeMemberRow('member-row-${memberCount}')">
+                        ✕
+                    </button>
+                `;
+                teamContainer.appendChild(row);
+            });
+        }
+
+        function removeMemberRow(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
         }
     </script>
 
