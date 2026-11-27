@@ -3,9 +3,26 @@ import pymysql
 import pandas as pd
 from datetime import datetime
 
+def load_db_config():
+    env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+    cfg = {"DB_HOST": "127.0.0.1", "DB_PORT": "3306", "DB_DATABASE": "futurise", "DB_USERNAME": "root", "DB_PASSWORD": ""}
+    if os.path.exists(env_path):
+        with open(env_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                k = k.strip()
+                if k in cfg:
+                    cfg[k] = v.strip().strip('"').strip("'")
+    return cfg
+
+
 def run_import():
-    excel_path = r"D:\Kuliah\Akademik\KP\futurise\file tambahan\Dataset\Perguruan Tinggi.xlsx"
-    csv_path = r"D:\Kuliah\Akademik\KP\futurise\file tambahan\Dataset\statistik-smk-20261104_215115.csv"
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    excel_path = os.path.join(base_dir, "file tambahan", "Dataset", "Perguruan Tinggi.xlsx")
+    csv_path = os.path.join(base_dir, "file tambahan", "Dataset", "statistik-smk-20261104_215115.csv")
 
     print("Membaca data Perguruan Tinggi...")
     df_pt = pd.read_excel(excel_path)
@@ -36,13 +53,14 @@ def run_import():
 
     print(f"Total seluruh institusi: {len(records)}")
 
-    print("Menghubungkan ke MySQL database 'futurise'...")
+    db = load_db_config()
+    print(f"Menghubungkan ke MySQL database '{db['DB_DATABASE']}'...")
     conn = pymysql.connect(
-        host="127.0.0.1",
-        port=3306,
-        user="root",
-        password="",
-        database="futurise",
+        host=db["DB_HOST"],
+        port=int(db["DB_PORT"]),
+        user=db["DB_USERNAME"],
+        password=db["DB_PASSWORD"],
+        database=db["DB_DATABASE"],
         charset="utf8mb4"
     )
 

@@ -1187,6 +1187,14 @@
                 }, 200);
             });
 
+            if (jenisPesertaSelect) {
+                jenisPesertaSelect.addEventListener('change', function() {
+                    if (institusiInput.value.trim().length >= 2) {
+                        institusiInput.dispatchEvent(new Event('input'));
+                    }
+                });
+            }
+
             document.addEventListener('click', function(e) {
                 if (!institusiInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
                     suggestionsBox.style.display = 'none';

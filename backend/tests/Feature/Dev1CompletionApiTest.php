@@ -12,6 +12,7 @@ use App\Models\PeranAkses;
 use App\Models\Peserta;
 use App\Models\User;
 use Database\Seeders\FestivalSeeder;
+use Database\Seeders\ReferensiInstitusiSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -320,5 +321,26 @@ class Dev1CompletionApiTest extends TestCase
             'festival_id' => $festival->id,
         ]);
         $this->assertEquals(1, PeranAkses::count());
+    }
+
+    public function test_institution_seeder_and_search_endpoint_work_for_aliases_and_smk(): void
+    {
+        $this->seed(ReferensiInstitusiSeeder::class);
+        $initialCount = \App\Models\ReferensiInstitusi::count();
+        $this->assertGreaterThan(0, $initialCount);
+
+        // Idempotent when already populated
+        $this->seed(ReferensiInstitusiSeeder::class);
+        $this->assertEquals($initialCount, \App\Models\ReferensiInstitusi::count());
+
+        $ptRes = $this->getJson('/api/v1/institusi/search?q=itenas&kategori=perguruan_tinggi');
+        $ptRes->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.0.nama', 'Institut Teknologi Nasional Bandung');
+
+        $smkRes = $this->getJson('/api/v1/institusi/search?q=smk%201%20bandung&kategori=smk');
+        $smkRes->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.0.nama', 'SMKN 1 BANDUNG');
     }
 }
