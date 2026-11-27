@@ -1064,6 +1064,9 @@
                                     name="institusi"
                                     value="{{ old('institusi') }}"
                                     autocomplete="off"
+                                    autocorrect="off"
+                                    autocapitalize="none"
+                                    spellcheck="false"
                                     required
                                 >
                                 <div id="institusi-spinner" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: none; font-size: 11px; color: var(--color-ink);">
@@ -1086,12 +1089,17 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="nomor_identitas">Nomor Identitas (NIM / NISN / KTP) <span class="req">*</span></label>
+                            <label for="nomor_identitas"><span id="identity-label-text">Nomor Induk Mahasiswa (NIM)</span> <span class="req">*</span></label>
                             <input
                                 type="text"
                                 id="nomor_identitas"
                                 name="nomor_identitas"
                                 value="{{ old('nomor_identitas') }}"
+                                aria-describedby="identity-hint"
+                                autocorrect="off"
+                                autocapitalize="none"
+                                spellcheck="false"
+                                inputmode="text"
                                 required
                             >
                             <small id="identity-hint" style="display: block; margin-top: 5px; font-size: 11px; color: var(--color-ink);">
@@ -1368,20 +1376,38 @@
             });
 
             if (jenisPesertaSelect) {
+                const identityLabelText = document.getElementById('identity-label-text');
                 const identityHint = document.getElementById('identity-hint');
-                const updateIdentityHint = () => {
-                    if (!identityHint) return;
-                    const hints = {
-                        mahasiswa: 'Gunakan NIM resmi dari perguruan tinggi Anda.',
-                        siswa: 'Masukkan 10 digit angka NISN resmi Anda.',
-                        umum: 'Masukkan 16 digit angka NIK sesuai KTP Anda.',
-                    };
-                    identityHint.textContent = hints[jenisPesertaSelect.value] || hints.mahasiswa;
+                const nomorIdentitasInput = document.getElementById('nomor_identitas');
+
+                const identityMeta = {
+                    mahasiswa: {
+                        label: 'Nomor Induk Mahasiswa (NIM)',
+                        hint: 'Gunakan NIM resmi dari perguruan tinggi Anda.',
+                        inputMode: 'text',
+                    },
+                    siswa: {
+                        label: 'Nomor Induk Siswa Nasional (NISN)',
+                        hint: 'Masukkan 10 digit angka NISN resmi Anda.',
+                        inputMode: 'numeric',
+                    },
+                    umum: {
+                        label: 'Nomor Induk Kependudukan (NIK / KTP)',
+                        hint: 'Masukkan 16 digit angka NIK sesuai KTP Anda.',
+                        inputMode: 'numeric',
+                    },
                 };
-                updateIdentityHint();
+
+                const updateIdentityField = () => {
+                    const meta = identityMeta[jenisPesertaSelect.value] || identityMeta.mahasiswa;
+                    if (identityLabelText) identityLabelText.textContent = meta.label;
+                    if (identityHint) identityHint.textContent = meta.hint;
+                    if (nomorIdentitasInput) nomorIdentitasInput.setAttribute('inputmode', meta.inputMode);
+                };
+                updateIdentityField();
 
                 jenisPesertaSelect.addEventListener('change', function() {
-                    updateIdentityHint();
+                    updateIdentityField();
                     const cat = getSelectedCategory();
                     if (cat) preloadCategory(cat);
                     if (institusiInput.value.trim().length >= 2) {
