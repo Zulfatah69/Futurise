@@ -93,6 +93,7 @@ class PublikasiKaryasTable
                     ->label('Setujui & Terbitkan')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
+                    ->authorize('update')
                     ->requiresConfirmation()
                     ->modalHeading('Terbitkan Karya ke Showcase?')
                     ->modalDescription('Karya ini akan disetujui kurasinya dan langsung tayang di galeri showcase publik.')
@@ -105,6 +106,7 @@ class PublikasiKaryasTable
                     ->label('Tarik dari Etalase')
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('danger')
+                    ->authorize('update')
                     ->form([
                         TextInput::make('alasan')
                             ->label('Alasan Penarikan')
