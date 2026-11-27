@@ -15,6 +15,7 @@ use App\Models\Panitia;
 use App\Models\Peserta;
 use App\Models\PublikasiKarya;
 use App\Models\User;
+use Database\Seeders\DemoAccountSeeder;
 use Database\Seeders\FestivalSeeder;
 use Database\Seeders\RoleSeeder;
 use Filament\Facades\Filament;
@@ -247,5 +248,23 @@ class FilamentRoleAccessTest extends TestCase
         $this->actingAs($inactiveAdmin);
         $this->assertFalse(KaryaResource::canViewAny());
         $this->get(KaryaResource::getUrl('index'))->assertForbidden();
+    }
+
+    public function test_demo_account_seeder_creates_verified_accounts_for_every_role(): void
+    {
+        $this->seed(DemoAccountSeeder::class);
+
+        $this->assertDatabaseHas('users', [
+            'email'          => 'kurasi@futurise.test',
+            'account_status' => 'active',
+        ]);
+        $this->assertDatabaseHas('users', [
+            'email'          => 'publikasi@futurise.test',
+            'account_status' => 'active',
+        ]);
+        $this->assertDatabaseHas('peserta', [
+            'email'           => 'mahasiswa@futurise.test',
+            'nomor_identitas' => '152026999',
+        ]);
     }
 }
