@@ -342,5 +342,42 @@ class Dev1CompletionApiTest extends TestCase
         $smkRes->assertOk()
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.0.nama', 'SMKN 1 BANDUNG');
+
+        // Prefix & phrase ranking: "institut teknologi" puts "Institut Teknologi ..." above "Institut Bisnis dan Teknologi..."
+        \App\Models\ReferensiInstitusi::create([
+            'nama'     => 'Institut Bisnis dan Teknologi Indonesia',
+            'kategori' => 'perguruan_tinggi',
+            'provinsi' => 'Prov. Bali',
+            'kab_kota' => 'Kota Denpasar',
+        ]);
+        \App\Models\ReferensiInstitusi::create([
+            'nama'     => 'Institut Teknologi Sepuluh Nopember',
+            'kategori' => 'perguruan_tinggi',
+            'provinsi' => 'Prov. Jawa Timur',
+            'kab_kota' => 'Kota Surabaya',
+        ]);
+
+        $rankRes = $this->getJson('/api/v1/institusi/search?q=institut%20teknologi&kategori=perguruan_tinggi');
+        $rankRes->assertOk();
+        $names = collect($rankRes->json('data'))->pluck('nama')->all();
+        // West Java "Institut Teknologi Bandung" and "Institut Teknologi Nasional Bandung" must outrank "Institut Bisnis dan Teknologi..."
+        $this->assertEquals('Institut Teknologi Bandung', $names[0]);
+        $this->assertLessThan(
+            array_search('Institut Bisnis dan Teknologi Indonesia', $names, true),
+            array_search('Institut Teknologi Sepuluh Nopember', $names, true)
+        );
+
+        // Abbreviation expansion & English alias + lightweight typo fallback
+        $this->getJson('/api/v1/institusi/search?q=univ%20padjadjaran&kategori=perguruan_tinggi')
+            ->assertOk()
+            ->assertJsonPath('data.0.nama', 'Universitas Padjadjaran');
+
+        $this->getJson('/api/v1/institusi/search?q=telkom%20university&kategori=perguruan_tinggi')
+            ->assertOk()
+            ->assertJsonPath('data.0.nama', 'Universitas Telkom');
+
+        $this->getJson('/api/v1/institusi/search?q=institu%20teknologi&kategori=perguruan_tinggi')
+            ->assertOk()
+            ->assertJsonPath('data.0.nama', 'Institut Teknologi Bandung');
     }
 }
