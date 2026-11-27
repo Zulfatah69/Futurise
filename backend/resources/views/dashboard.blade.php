@@ -738,13 +738,35 @@
                 </div>
 
                 <div class="info-box">
-                    <span class="info-box-label">Institusi</span>
-                    <div class="info-box-value">{{ $user->peserta?->institusi ?? 'Belum terdaftar' }}</div>
+                    <span class="info-box-label">Institusi / Afiliasi</span>
+                    <div class="info-box-value">
+                        @if ($user->peserta)
+                            {{ $user->peserta->institusi }}
+                        @elseif ($user->hasRole('juri'))
+                            Dewan Juri FUTURiSE
+                        @elseif ($user->hasAnyRole(['pic-industri', 'pic-sponsor']))
+                            Mitra / Sponsor Industri
+                        @elseif ($user->hasAnyRole(['pic-kampus', 'pic-sekolah']))
+                            Koordinator Institusi Pendidikan
+                        @else
+                            Belum terdaftar
+                        @endif
+                    </div>
                 </div>
 
                 <div class="info-box">
                     <span class="info-box-label">Peran</span>
-                    <div class="info-box-value">{{ $user->peserta ? strtoupper($user->peserta->jenis_peserta) : 'PENGUNJUNG' }}</div>
+                    <div class="info-box-value">
+                        @php
+                            $roleName = $user->getRoleNames()->first();
+                            $displayRole = match (true) {
+                                $user->peserta !== null => strtoupper($user->peserta->jenis_peserta),
+                                $roleName !== null      => strtoupper(str_replace('-', ' ', $roleName)),
+                                default                 => 'PENGUNJUNG',
+                            };
+                        @endphp
+                        {{ $displayRole }}
+                    </div>
                 </div>
             </div>
         </section>
@@ -1036,9 +1058,252 @@
                 </form>
             </section>
 
+        @elseif ($user->hasRole('juri'))
+
+            <!-- PORTAL KHUSUS JURI -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-tag">Portal Dewan Juri</div>
+                        <h2 class="card-title">Daftar Karya Lolos Kurasi untuk Penilaian</h2>
+                        <p class="card-subtitle">
+                            Daftar karya peserta pada {{ $activeFestival->nama ?? 'FUTURiSE 2026' }} yang telah lolos tahap kurasi administrasi.
+                        </p>
+                    </div>
+                    <span class="status-pill pill-pemeriksaan">
+                        <span class="status-dot"></span>
+                        Mode Tinjauan Juri
+                    </span>
+                </div>
+
+                @if ($curatedWorks->count() > 0)
+                    @foreach ($curatedWorks as $karya)
+                        <div class="karya-card">
+                            <div class="karya-category-tag">{{ $karya->kategori }}</div>
+                            <div class="karya-header-row">
+                                <h3 class="karya-heading">{{ $karya->judul }}</h3>
+                                <span class="status-pill pill-lolos">
+                                    <span class="status-dot"></span>
+                                    Lolos Kurasi
+                                </span>
+                            </div>
+                            <p class="karya-desc">{{ $karya->deskripsi }}</p>
+                            <div class="karya-meta-row">
+                                <div class="karya-meta-item">
+                                    <span style="color: var(--color-ink);">Ketua / Institusi:</span>
+                                    <strong>{{ $karya->submitter?->nama_lengkap ?? '-' }} ({{ $karya->submitter?->institusi ?? '-' }})</strong>
+                                </div>
+                                <div class="karya-meta-item">
+                                    <span style="color: var(--color-ink);">Teknologi:</span>
+                                    <strong>{{ $karya->teknologi }}</strong>
+                                </div>
+                                @if ($karya->url_demo)
+                                    <div class="karya-meta-item">
+                                        <span style="color: var(--color-ink);">Demo:</span>
+                                        <a href="{{ $karya->url_demo }}" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 600; text-decoration: none;">
+                                            Buka Demo
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div style="padding: 28px 20px; background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: 4px; text-align: center; color: var(--color-ink); font-size: 14px;">
+                        Belum ada karya berstatus lolos kurasi yang siap dinilai saat ini.
+                    </div>
+                @endif
+            </section>
+
+            @if ($activeFestival && $activeFestival->periodes->count() > 0)
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-tag">Jadwal Festival</div>
+                            <h2 class="card-title">Tahapan Pelaksanaan &amp; Penjurian</h2>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        @foreach ($activeFestival->periodes as $periode)
+                            <div class="info-box">
+                                <span class="info-box-label">{{ strtoupper(str_replace('_', ' ', $periode->tahap)) }}</span>
+                                <div class="info-box-value" style="font-size: 13px;">
+                                    {{ \Carbon\Carbon::parse($periode->mulai)->format('d M Y') }} &ndash; {{ \Carbon\Carbon::parse($periode->selesai)->format('d M Y') }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+        @elseif ($user->hasAnyRole(['pic-kampus', 'pic-sekolah']))
+
+            <!-- PORTAL PIC KAMPUS / SEKOLAH -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-tag">Portal Koordinator Institusi</div>
+                        <h2 class="card-title">Ringkasan {{ $user->hasRole('pic-sekolah') ? 'PIC Sekolah' : 'PIC Kampus' }}</h2>
+                        <p class="card-subtitle">
+                            Pantau kategori kompetisi, kuota peserta, dan karya inovasi terdaftar pada {{ $activeFestival->nama ?? 'FUTURiSE 2026' }}.
+                        </p>
+                    </div>
+                    <span class="status-pill pill-diajukan">
+                        <span class="status-dot"></span>
+                        {{ $user->hasRole('pic-sekolah') ? 'PIC Sekolah' : 'PIC Kampus' }}
+                    </span>
+                </div>
+
+                @if ($activeFestival && $activeFestival->kategoris->count() > 0)
+                    <div class="info-grid" style="margin-bottom: 20px;">
+                        @foreach ($activeFestival->kategoris as $kat)
+                            <div class="info-box">
+                                <span class="info-box-label">Kategori Lomba</span>
+                                <div class="info-box-value" style="font-size: 13px;">{{ $kat->nama }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if ($institutionWorks->count() > 0)
+                    @foreach ($institutionWorks as $karya)
+                        <div class="karya-card">
+                            <div class="karya-category-tag">{{ $karya->kategori }}</div>
+                            <div class="karya-header-row">
+                                <h3 class="karya-heading">{{ $karya->judul }}</h3>
+                                <span class="status-pill pill-draft">
+                                    <span class="status-dot"></span>
+                                    {{ strtoupper(str_replace('_', ' ', $karya->status)) }}
+                                </span>
+                            </div>
+                            <div class="karya-meta-row" style="margin-bottom: 0;">
+                                <div class="karya-meta-item">
+                                    <span style="color: var(--color-ink);">Ketua Tim:</span>
+                                    <strong>{{ $karya->submitter?->nama_lengkap ?? '-' }}</strong>
+                                </div>
+                                <div class="karya-meta-item">
+                                    <span style="color: var(--color-ink);">Institusi:</span>
+                                    <strong>{{ $karya->submitter?->institusi ?? '-' }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div style="padding: 28px 20px; background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: 4px; text-align: center; color: var(--color-ink); font-size: 14px;">
+                        Belum ada karya yang terdaftar pada edisi festival ini.
+                    </div>
+                @endif
+            </section>
+
+        @elseif ($user->hasAnyRole(['pic-industri', 'pic-sponsor']))
+
+            <!-- PORTAL MITRA INDUSTRI & SPONSOR -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-tag">Portal Kemitraan</div>
+                        <h2 class="card-title">Etalase Karya &amp; Kemitraan {{ $user->hasRole('pic-sponsor') ? 'Sponsor' : 'Industri' }}</h2>
+                        <p class="card-subtitle">
+                            Informasi penyelenggaraan {{ $activeFestival->nama ?? 'FUTURiSE 2026' }} dan karya inovasi terbit yang siap dikolaborasikan.
+                        </p>
+                    </div>
+                    <span class="status-pill pill-lolos">
+                        <span class="status-dot"></span>
+                        {{ $user->hasRole('pic-sponsor') ? 'PIC Sponsor' : 'PIC Industri' }}
+                    </span>
+                </div>
+
+                @if ($activeFestival)
+                    <div class="info-grid" style="margin-bottom: 22px;">
+                        <div class="info-box">
+                            <span class="info-box-label">Nama Festival</span>
+                            <div class="info-box-value">{{ $activeFestival->nama }}</div>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-label">Format &amp; Lokasi</span>
+                            <div class="info-box-value">{{ ucfirst($activeFestival->format ?? 'Hibrida') }} &bull; {{ $activeFestival->lokasi_utama ?? 'Bandung' }}</div>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-label">Penyelenggara</span>
+                            <div class="info-box-value">{{ $activeFestival->penyelenggara ?? 'APTIKOM Jawa Barat' }}</div>
+                        </div>
+                        <div class="info-box">
+                            <span class="info-box-label">Kontak Resmi</span>
+                            <div class="info-box-value">{{ $activeFestival->email_kontak ?? 'futurise@aptikom.org' }}</div>
+                        </div>
+                    </div>
+                @endif
+
+                @if ($publishedWorks->count() > 0)
+                    @foreach ($publishedWorks as $pub)
+                        <div class="karya-card">
+                            <div class="karya-category-tag">{{ $pub->karya?->kategori ?? 'Showcase' }}</div>
+                            <div class="karya-header-row">
+                                <h3 class="karya-heading">{{ $pub->judul_publik }}</h3>
+                                <span class="status-pill pill-lolos">
+                                    <span class="status-dot"></span>
+                                    Terbit di Showcase
+                                </span>
+                            </div>
+                            <p class="karya-desc">{{ $pub->ringkasan_publik ?? $pub->karya?->deskripsi }}</p>
+                            <div class="karya-meta-row" style="margin-bottom: 0;">
+                                <div class="karya-meta-item">
+                                    <span style="color: var(--color-ink);">Institusi:</span>
+                                    <strong>{{ $pub->karya?->submitter?->institusi ?? '-' }}</strong>
+                                </div>
+                                <div class="karya-meta-item">
+                                    <span style="color: var(--color-ink);">Tayangan / Apresiasi:</span>
+                                    <strong>{{ $pub->jumlah_dilihat }} / {{ $pub->jumlah_suka }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div style="padding: 28px 20px; background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: 4px; text-align: center; color: var(--color-ink); font-size: 14px;">
+                        Etalase karya showcase terbit akan tampil di sini setelah kurasi publikasi disetujui panitia.
+                    </div>
+                @endif
+            </section>
+
         @else
 
-            <!-- FORM PENDAFTARAN PESERTA (JIKA BELUM TERDAFTAR) -->
+            <!-- PORTAL PENGUNJUNG: INFO FESTIVAL + OPSIONAL PENDAFTARAN PESERTA LOMBA -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-tag">Portal Pengunjung</div>
+                        <h2 class="card-title">Informasi &amp; Showcase {{ $activeFestival->nama ?? 'FUTURiSE 2026' }}</h2>
+                        <p class="card-subtitle">
+                            Selamat datang di portal pengunjung. Anda dapat memantau jadwal acara, melihat etalase karya terbit, atau mendaftar sebagai peserta lomba di bawah ini.
+                        </p>
+                    </div>
+                </div>
+
+                @if ($activeFestival && $activeFestival->periodes->count() > 0)
+                    <div class="info-grid" style="margin-bottom: 18px;">
+                        @foreach ($activeFestival->periodes as $periode)
+                            <div class="info-box">
+                                <span class="info-box-label">{{ strtoupper(str_replace('_', ' ', $periode->tahap)) }}</span>
+                                <div class="info-box-value" style="font-size: 13px;">
+                                    {{ \Carbon\Carbon::parse($periode->mulai)->format('d M Y') }} &ndash; {{ \Carbon\Carbon::parse($periode->selesai)->format('d M Y') }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if ($publishedWorks->count() > 0)
+                    @foreach ($publishedWorks as $pub)
+                        <div class="karya-card">
+                            <div class="karya-category-tag">{{ $pub->karya?->kategori ?? 'Showcase' }}</div>
+                            <h3 class="karya-heading" style="margin-bottom: 6px;">{{ $pub->judul_publik }}</h3>
+                            <p class="karya-desc" style="margin-bottom: 0;">{{ $pub->ringkasan_publik ?? $pub->karya?->deskripsi }}</p>
+                        </div>
+                    @endforeach
+                @endif
+            </section>
+
+            <!-- FORM PENDAFTARAN PESERTA (KHUSUS PENGUNJUNG YANG INGIN IKUT LOMBA) -->
             <section class="card">
                 <div class="card-header">
                     <div>

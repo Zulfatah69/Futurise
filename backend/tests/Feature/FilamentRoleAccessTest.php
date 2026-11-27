@@ -276,4 +276,42 @@ class FilamentRoleAccessTest extends TestCase
             'kode' => 'kurator_karya',
         ]);
     }
+
+    public function test_non_admin_roles_render_distinct_dashboard_views(): void
+    {
+        $this->seed(DemoAccountSeeder::class);
+
+        $juri = User::where('email', 'juri@futurise.test')->firstOrFail();
+        $this->actingAs($juri)->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Portal Dewan Juri')
+            ->assertSee('JURI')
+            ->assertDontSee('Lengkapi Data Peserta');
+
+        $picKampus = User::where('email', 'pic.kampus@futurise.test')->firstOrFail();
+        $this->actingAs($picKampus)->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Portal Koordinator Institusi')
+            ->assertSee('Ringkasan PIC Kampus')
+            ->assertDontSee('Lengkapi Data Peserta');
+
+        $picSponsor = User::where('email', 'pic.sponsor@futurise.test')->firstOrFail();
+        $this->actingAs($picSponsor)->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Portal Kemitraan')
+            ->assertSee('PIC Sponsor')
+            ->assertDontSee('Lengkapi Data Peserta');
+
+        $pengunjung = User::where('email', 'pengunjung@futurise.test')->firstOrFail();
+        $this->actingAs($pengunjung)->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Portal Pengunjung')
+            ->assertSee('Lengkapi Data Peserta');
+
+        $mahasiswa = User::where('email', 'mahasiswa@futurise.test')->firstOrFail();
+        $this->actingAs($mahasiswa)->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Karya yang Didaftarkan')
+            ->assertSee('Pendaftaran Karya Inovasi Baru');
+    }
 }

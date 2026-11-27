@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\WorkWebController;
 use App\Models\Festival;
+use App\Models\Karya;
+use App\Models\PublikasiKarya;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -51,9 +53,39 @@ Route::middleware(['auth', 'verified:otp.show', 'account.active'])->group(functi
             return redirect()->route('account.pending');
         }
 
-        $activeFestival = Festival::aktif()->with('kategoris')->first();
+        $activeFestival = Festival::aktif()->with(['kategoris', 'periodes'])->first();
 
-        return view('dashboard', compact('user', 'activeFestival'));
+        $curatedWorks = $user->hasRole('juri')
+            ? Karya::with(['submitter:id,nama_lengkap,institusi', 'files'])
+                ->where('status', 'lolos')
+                ->when($activeFestival, fn ($q) => $q->where('festival_id', $activeFestival->id))
+                ->latest()
+                ->get()
+            : collect();
+
+        $institutionWorks = $user->hasAnyRole(['pic-kampus', 'pic-sekolah'])
+            ? Karya::with(['submitter:id,nama_lengkap,institusi'])
+                ->when($activeFestival, fn ($q) => $q->where('festival_id', $activeFestival->id))
+                ->latest()
+                ->limit(10)
+                ->get()
+            : collect();
+
+        $publishedWorks = $user->hasAnyRole(['pic-industri', 'pic-sponsor', 'pengunjung'])
+            ? PublikasiKarya::published()
+                ->with(['karya.submitter:id,nama_lengkap,institusi'])
+                ->latest('tanggal_terbit')
+                ->limit(6)
+                ->get()
+            : collect();
+
+        return view('dashboard', compact(
+            'user',
+            'activeFestival',
+            'curatedWorks',
+            'institutionWorks',
+            'publishedWorks'
+        ));
     })->name('dashboard');
 
     // Registrasi Profil Peserta Lomba (Tahap 2)
