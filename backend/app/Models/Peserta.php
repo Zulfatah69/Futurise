@@ -22,8 +22,52 @@ class Peserta extends Model
         'institusi',
         'jenis_peserta',
         'nomor_identitas',
+        'identity_unique_key',
         'foto',
     ];
+
+    protected $hidden = [
+        'identity_unique_key',
+    ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Peserta $peserta): void {
+            $peserta->nomor_identitas = self::normalizeIdentityNumber($peserta->nomor_identitas);
+            $peserta->identity_unique_key = self::buildIdentityUniqueKey(
+                $peserta->jenis_peserta,
+                $peserta->institusi,
+                $peserta->nomor_identitas
+            );
+        });
+    }
+
+    public static function normalizeIdentityNumber(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $cleaned = preg_replace('/[\s\-]+/', '', trim($value)) ?? '';
+
+        return $cleaned === '' ? null : mb_strtoupper($cleaned);
+    }
+
+    public static function buildIdentityUniqueKey(?string $jenisPeserta, ?string $institusi, ?string $nomorIdentitas): ?string
+    {
+        $normalizedNumber = self::normalizeIdentityNumber($nomorIdentitas);
+        if ($normalizedNumber === null) {
+            return null;
+        }
+
+        $jenis = mb_strtolower(trim((string) $jenisPeserta));
+
+        return match ($jenis) {
+            'siswa', 'siswa_smk' => "nisn:{$normalizedNumber}",
+            'umum'               => "nik:{$normalizedNumber}",
+            default              => 'nim:' . mb_strtolower(preg_replace('/\s+/', ' ', trim((string) $institusi)) ?? '') . ":{$normalizedNumber}",
+        };
+    }
 
     public function user(): BelongsTo
     {

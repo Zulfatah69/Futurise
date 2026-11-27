@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\Peserta;
 use App\Models\User;
+use App\Rules\ValidParticipantIdentity;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -91,8 +92,16 @@ class AuthController extends Controller
 
         $validated = $request->validate([
             'institusi'       => ['required', 'string', 'max:150'],
-            'jenis_peserta'   => ['required', 'string', 'in:mahasiswa,siswa,umum,pic'],
-            'nomor_identitas' => ['required', 'string', 'max:50'],
+            'jenis_peserta'   => ['required', 'string', 'in:mahasiswa,siswa,siswa_smk,umum,pic'],
+            'nomor_identitas' => [
+                'required',
+                'string',
+                'max:30',
+                new ValidParticipantIdentity(
+                    $request->input('jenis_peserta'),
+                    $request->input('institusi')
+                ),
+            ],
             'no_telepon'      => ['nullable', 'string', 'max:20'],
         ]);
 

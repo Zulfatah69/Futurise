@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Peserta;
+use App\Rules\ValidParticipantIdentity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,8 +25,16 @@ class ParticipantController extends Controller
 
         $validated = $request->validate([
             'institusi'       => ['required', 'string', 'max:150'],
-            'jenis_peserta'   => ['required', 'string', 'in:mahasiswa,siswa,umum,pic'],
-            'nomor_identitas' => ['required', 'string', 'max:50'],
+            'jenis_peserta'   => ['required', 'string', 'in:mahasiswa,siswa,siswa_smk,umum,pic'],
+            'nomor_identitas' => [
+                'required',
+                'string',
+                'max:30',
+                new ValidParticipantIdentity(
+                    $request->input('jenis_peserta'),
+                    $request->input('institusi')
+                ),
+            ],
             'no_telepon'      => ['nullable', 'string', 'max:20'],
         ], [
             'institusi.required'       => 'Asal kampus / institusi wajib diisi.',

@@ -386,4 +386,125 @@ class Dev1CompletionApiTest extends TestCase
         $this->assertIsArray($preloadRes->json('data.0'));
         $this->assertNotEmpty($preloadRes->json('data.0.0'));
     }
+
+    public function test_identity_uniqueness_allows_cross_campus_nim_but_blocks_same_campus_nim_nisn_and_ktp(): void
+    {
+        // 1. Mahasiswa ITENAS mendaftarkan NIM 152024001
+        $mhs1 = User::factory()->create(['account_status' => 'active']);
+        Sanctum::actingAs($mhs1);
+        $res1 = $this->postJson('/api/v1/participants/register', [
+            'institusi'       => 'Institut Teknologi Nasional Bandung',
+            'jenis_peserta'   => 'mahasiswa',
+            'nomor_identitas' => '15-2024-001',
+        ]);
+        $res1->assertCreated()
+            ->assertJsonMissingPath('data.peserta.identity_unique_key');
+
+        $this->assertDatabaseHas('peserta', [
+            'user_id'             => $mhs1->id,
+            'nomor_identitas'     => '152024001',
+            'identity_unique_key' => 'nim:institut teknologi nasional bandung:152024001',
+        ]);
+
+        // 2. Mahasiswa kampus BERBEDA (UNPAD) dengan NIM yang sama -> BOLEH
+        $mhs2 = User::factory()->create(['account_status' => 'active']);
+        Sanctum::actingAs($mhs2);
+        $this->postJson('/api/v1/participants/register', [
+            'institusi'       => 'Universitas Padjadjaran',
+            'jenis_peserta'   => 'mahasiswa',
+            'nomor_identitas' => '152024001',
+        ])->assertCreated();
+
+        // 3. Mahasiswa kampus SAMA (ITENAS, beda huruf/spasi) dengan NIM sama -> DITOLAK (422)
+        $mhs3 = User::factory()->create(['account_status' => 'active']);
+        Sanctum::actingAs($mhs3);
+        $this->postJson('/api/v1/participants/register', [
+            'institusi'       => '  institut teknologi nasional bandung ',
+            'jenis_peserta'   => 'mahasiswa',
+            'nomor_identitas' => '152024001',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['nomor_identitas']);
+
+        // Web form /peserta/daftar juga menolak NIM sama di kampus yang sama
+        $this->actingAs($mhs3)->post('/peserta/daftar', [
+            'institusi'       => 'Institut Teknologi Nasional Bandung',
+            'jenis_peserta'   => 'mahasiswa',
+            'nomor_identitas' => '152024001',
+        ])->assertSessionHasErrors(['nomor_identitas']);
+
+        // 4. Siswa SMK dengan NISN invalid (< 10 digit) -> DITOLAK (422)
+        $siswa1 = User::factory()->create(['account_status' => 'active']);
+        Sanctum::actingAs($siswa1);
+        $this->postJson('/api/v1/participants/register', [
+            'institusi'       => 'SMKN 1 BANDUNG',
+            'jenis_peserta'   => 'siswa',
+            'nomor_identitas' => '12345',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['nomor_identitas']);
+
+        // Siswa SMKN 1 BANDUNG dengan NISN valid 10 digit -> BOLEH
+        $this->postJson('/api/v1/participants/register', [
+            'institusi'       => 'SMKN 1 BANDUNG',
+            'jenis_peserta'   => 'siswa',
+            'nomor_identitas' => '0081234567',
+        ])->assertCreated();
+
+        // Siswa dari sekolah BERBEDA (SMKN 2 BANDUNG) dengan NISN sama -> DITOLAK (422)
+        $siswa2 = User::factory()->create(['account_status' => 'active']);
+        Sanctum::actingAs($siswa2);
+        $this->postJson('/api/v1/participants/register', [
+            'institusi'       => 'SMKN 2 BANDUNG',
+            'jenis_peserta'   => 'siswa',
+            'nomor_identitas' => '0081234567',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['nomor_identitas']);
+
+        // 5. Umum dengan NIK KTP invalid (< 16 digit) -> DITOLAK, valid 16 digit -> BOLEH, duplikat beda instansi -> DITOLAK
+        $umum1 = User::factory()->create(['account_status' => 'active']);
+        Sanctum::actingAs($umum1);
+        $this->postJson('/api/v1/participants/register', [
+            'institusi'       => 'Komunitas Bandung',
+            'jenis_peserta'   => 'umum',
+            'nomor_identitas' => '32730101',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['nomor_identitas']);
+
+        $this->postJson('/api/v1/participants/register', [
+            'institusi'       => 'Komunitas Bandung',
+            'jenis_peserta'   => 'umum',
+            'nomor_identitas' => '3273 0101 0101 0001',
+        ])->assertCreated();
+
+        $umum2 = User::factory()->create(['account_status' => 'active']);
+        Sanctum::actingAs($umum2);
+        $this->postJson('/api/v1/participants/register', [
+            'institusi'       => 'Komunitas Cimahi',
+            'jenis_peserta'   => 'umum',
+            'nomor_identitas' => '3273010101010001',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['nomor_identitas']);
+
+        // 6. Update profil: mengubah institusi sehingga NIM bertabrakan -> DITOLAK, tetap milik sendiri -> BOLEH
+        $peserta2 = Peserta::where('user_id', $mhs2->id)->firstOrFail();
+        Sanctum::actingAs($mhs2);
+        $this->putJson("/api/v1/participants/{$peserta2->id}", [
+            'institusi' => 'Institut Teknologi Nasional Bandung',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['nomor_identitas']);
+
+        $this->putJson("/api/v1/participants/{$peserta2->id}", [
+            'nama_lengkap' => 'Nama Baru Valid',
+        ])->assertOk();
+
+        // 7. Database-level unique constraint tetap memblokir walau insert langsung via model
+        $this->expectException(\Illuminate\Database\UniqueConstraintViolationException::class);
+        Peserta::create([
+            'user_id'         => $mhs3->id,
+            'nama_lengkap'    => $mhs3->name,
+            'email'           => $mhs3->email,
+            'institusi'       => 'SMKN 4 BANDUNG',
+            'jenis_peserta'   => 'siswa',
+            'nomor_identitas' => '0081234567',
+        ]);
+    }
 }

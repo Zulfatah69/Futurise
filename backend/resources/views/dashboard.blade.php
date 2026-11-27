@@ -1094,6 +1094,9 @@
                                 value="{{ old('nomor_identitas') }}"
                                 required
                             >
+                            <small id="identity-hint" style="display: block; margin-top: 5px; font-size: 11px; color: var(--color-ink);">
+                                Gunakan NIM resmi dari perguruan tinggi Anda.
+                            </small>
                         </div>
 
                         <div class="form-group">
@@ -1365,7 +1368,20 @@
             });
 
             if (jenisPesertaSelect) {
+                const identityHint = document.getElementById('identity-hint');
+                const updateIdentityHint = () => {
+                    if (!identityHint) return;
+                    const hints = {
+                        mahasiswa: 'Gunakan NIM resmi dari perguruan tinggi Anda.',
+                        siswa: 'Masukkan 10 digit angka NISN resmi Anda.',
+                        umum: 'Masukkan 16 digit angka NIK sesuai KTP Anda.',
+                    };
+                    identityHint.textContent = hints[jenisPesertaSelect.value] || hints.mahasiswa;
+                };
+                updateIdentityHint();
+
                 jenisPesertaSelect.addEventListener('change', function() {
+                    updateIdentityHint();
                     const cat = getSelectedCategory();
                     if (cat) preloadCategory(cat);
                     if (institusiInput.value.trim().length >= 2) {

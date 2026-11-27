@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\Peserta;
 use App\Models\User;
+use App\Rules\ValidParticipantIdentity;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class ParticipantController extends Controller
 {
@@ -70,13 +72,28 @@ class ParticipantController extends Controller
             return $this->jsonResponse(false, 'Anda tidak berwenang mengubah profil peserta ini.', null, null, 403);
         }
 
+        $effectiveJenis = $request->input('jenis_peserta', $peserta->jenis_peserta);
+        $effectiveInstitusi = $request->input('institusi', $peserta->institusi);
+
         $validated = $request->validate([
             'nama_lengkap'    => ['sometimes', 'required', 'string', 'max:100'],
             'no_telepon'      => ['nullable', 'string', 'max:20'],
             'institusi'       => ['sometimes', 'required', 'string', 'max:150'],
             'jenis_peserta'   => ['sometimes', 'required', 'string', Rule::in(['mahasiswa', 'siswa', 'siswa_smk', 'umum', 'pic'])],
-            'nomor_identitas' => ['nullable', 'string', 'max:30'],
+            'nomor_identitas' => [
+                'nullable',
+                'string',
+                'max:30',
+                new ValidParticipantIdentity($effectiveJenis, $effectiveInstitusi, $peserta->id),
+            ],
         ]);
+
+        if (! array_key_exists('nomor_identitas', $validated) && $peserta->nomor_identitas !== null) {
+            (new ValidParticipantIdentity($effectiveJenis, $effectiveInstitusi, $peserta->id))
+                ->validate('nomor_identitas', $peserta->nomor_identitas, static function (string $message): void {
+                    throw ValidationException::withMessages(['nomor_identitas' => [$message]]);
+                });
+        }
 
         $updated = DB::transaction(function () use ($peserta, $validated) {
             $peserta->update($validated);
