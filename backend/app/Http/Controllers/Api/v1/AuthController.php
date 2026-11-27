@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\Peserta;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 
@@ -236,6 +239,76 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Logout berhasil.',
+            'data'    => null,
+            'meta'    => null,
+        ]);
+    }
+
+    /**
+     * Request token reset kata sandi melalui email.
+     */
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email'],
+        ]);
+
+        $status = Password::sendResetLink(['email' => $validated['email']]);
+
+        if ($status === Password::RESET_THROTTLED) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terlalu banyak permintaan reset kata sandi. Silakan tunggu beberapa saat.',
+                'data'    => null,
+                'meta'    => null,
+            ], 429);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jika email terdaftar, tautan reset kata sandi telah dikirimkan.',
+            'data'    => null,
+            'meta'    => null,
+        ]);
+    }
+
+    /**
+     * Reset kata sandi menggunakan token yang valid.
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'token'    => ['required', 'string'],
+            'email'    => ['required', 'string', 'email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $status = Password::reset(
+            $validated,
+            function (User $user, string $password): void {
+                $user->forceFill([
+                    'password'       => Hash::make($password),
+                    'remember_token' => Str::random(60),
+                ])->save();
+
+                $user->tokens()->delete();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token reset kata sandi tidak valid atau telah kedaluwarsa.',
+                'data'    => null,
+                'meta'    => null,
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kata sandi berhasil diperbarui. Silakan login kembali.',
             'data'    => null,
             'meta'    => null,
         ]);

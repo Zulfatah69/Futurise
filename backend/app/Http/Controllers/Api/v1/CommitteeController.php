@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Festival;
 use App\Models\Panitia;
 use App\Models\PanitiaFestival;
+use App\Models\PeranAkses;
 use App\Models\User;
 use App\Services\PanitiaService;
 use Illuminate\Http\JsonResponse;
@@ -197,5 +198,90 @@ class CommitteeController extends Controller
         $updated = $this->panitiaService->updateAssignment($assignment, $validated);
 
         return $this->jsonResponse(true, 'Penugasan panitia berhasil diperbarui.', $updated);
+    }
+
+    /**
+     * GET /api/v1/festivals/{festival}/committee
+     * Daftar penugasan panitia pada edisi festival tertentu.
+     */
+    public function festivalCommittee(Request $request, Festival $festival): JsonResponse
+    {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak.', null, null, 403);
+        }
+
+        $filters = $request->only(['divisi_id', 'status', 'jabatan']);
+        $perPage = min((int) $request->query('per_page', 20), 100);
+        $paginator = $this->panitiaService->listFestivalAssignments($festival, $filters, $perPage);
+
+        return $this->jsonResponse(true, 'Daftar penugasan panitia festival berhasil dimuat.', $paginator->items(), [
+            'current_page' => $paginator->currentPage(),
+            'per_page'     => $paginator->perPage(),
+            'total'        => $paginator->total(),
+            'last_page'    => $paginator->lastPage(),
+        ]);
+    }
+
+    /**
+     * GET /api/v1/access-roles
+     * Daftar peran dan hak akses kepanitiaan (peran_akses).
+     */
+    public function accessRoles(Request $request): JsonResponse
+    {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak.', null, null, 403);
+        }
+
+        return $this->jsonResponse(true, 'Daftar peran akses berhasil dimuat.', $this->panitiaService->listAccessRoles());
+    }
+
+    /**
+     * POST /api/v1/access-roles
+     * Tambah definisi peran akses kepanitiaan baru.
+     */
+    public function storeAccessRole(Request $request): JsonResponse
+    {
+        if (! $request->user()?->hasAnyRole(User::ADMIN_ROLES)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator yang dapat menambah peran akses.', null, null, 403);
+        }
+
+        $validated = $request->validate([
+            'kode'      => ['required', 'string', 'max:50', 'unique:peran_akses,kode'],
+            'nama'      => ['required', 'string', 'max:100'],
+            'deskripsi' => ['nullable', 'string', 'max:255'],
+            'izin'      => ['nullable', 'array'],
+        ]);
+
+        $role = $this->panitiaService->createAccessRole($validated);
+
+        return $this->jsonResponse(true, 'Peran akses berhasil ditambahkan.', $role, null, 201);
+    }
+
+    /**
+     * POST /api/v1/committee/{committee}/roles
+     * Memberikan peran akses kepada anggota panitia.
+     */
+    public function assignRole(Request $request, Panitia $committee): JsonResponse
+    {
+        if (! $request->user()?->hasAnyRole(User::ADMIN_ROLES)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator yang dapat memberikan peran akses.', null, null, 403);
+        }
+
+        $validated = $request->validate([
+            'peran_id'    => ['required', 'integer', 'exists:peran_akses,id'],
+            'festival_id' => ['nullable', 'integer', 'exists:festival,id'],
+        ]);
+
+        $role = PeranAkses::findOrFail($validated['peran_id']);
+        $grantedById = Panitia::where('email', $request->user()->email)->value('id');
+
+        $updated = $this->panitiaService->assignAccessRole(
+            $committee,
+            $role,
+            $validated['festival_id'] ?? null,
+            $grantedById
+        );
+
+        return $this->jsonResponse(true, 'Peran akses berhasil diberikan kepada panitia.', $updated);
     }
 }

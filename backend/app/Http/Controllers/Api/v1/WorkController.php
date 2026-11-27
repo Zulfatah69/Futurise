@@ -35,19 +35,38 @@ class WorkController extends Controller
         return Peserta::where('user_id', $request->user()->id)->first();
     }
 
-    /**
-     * GET /api/v1/works
-     * Menampilkan daftar karya peserta yang sedang login (atau semua karya jika admin).
-     */
-    public function index(Request $request): JsonResponse
+    private function isAdminOrPanitia(Request $request): bool
     {
         $user = $request->user();
-        $query = Karya::query()->with(['festival:id,nama,edisi,tahun', 'submitter:id,nama_lengkap,institusi', 'anggotaTims', 'files']);
+
+        return $user && ($user->hasAnyRole(User::ADMIN_ROLES) || $user->hasRole('panitia'));
+    }
+
+    private function canViewKarya(Request $request, Karya $karya): bool
+    {
+        if ($this->isAdminOrPanitia($request)) {
+            return true;
+        }
 
         $peserta = $this->getCurrentPeserta($request);
 
-        // Jika bukan admin, hanya tampilkan karya di mana user adalah ketua/anggota
-        if (! $user->hasRole('super-admin') && ! $user->hasRole('admin')) {
+        return $peserta !== null && (
+            $karya->peserta_id === $peserta->id
+            || $karya->pesertas()->where('peserta_id', $peserta->id)->exists()
+        );
+    }
+
+    /**
+     * GET /api/v1/works
+     * Menampilkan daftar karya peserta yang sedang login (atau semua karya jika admin/panitia).
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = Karya::query()->with(['festival:id,nama,edisi,tahun', 'submitter:id,nama_lengkap,institusi', 'anggotaTims', 'files']);
+
+        // Jika bukan admin/panitia, hanya tampilkan karya di mana user adalah ketua/anggota
+        if (! $this->isAdminOrPanitia($request)) {
+            $peserta = $this->getCurrentPeserta($request);
             if (! $peserta) {
                 return $this->jsonResponse(true, 'Belum memiliki karya yang didaftarkan.', []);
             }
@@ -109,12 +128,7 @@ class WorkController extends Controller
         }
 
         // Ownership check: Hanya admin, panitia, atau pemilik/anggota tim yang berhak melihat detail karya non-publik
-        $user = $request->user();
-        $peserta = $this->getCurrentPeserta($request);
-        $isAdminOrPanitia = $user && ($user->hasAnyRole(User::ADMIN_ROLES) || $user->hasRole('panitia'));
-        $isOwnerOrMember = $peserta && ($karya->peserta_id === $peserta->id || $karya->pesertas()->where('peserta_id', $peserta->id)->exists());
-
-        if (! $isAdminOrPanitia && ! $isOwnerOrMember) {
+        if (! $this->canViewKarya($request, $karya)) {
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
@@ -268,6 +282,40 @@ class WorkController extends Controller
     }
 
     /**
+     * POST /api/v1/works/{id}/review
+     * Putusan kurasi karya oleh kurator/panitia (dalam_pemeriksaan, perlu_revisi, lolos, tidak_lolos).
+     */
+    public function review(Request $request, int $id): JsonResponse
+    {
+        if (! $this->isAdminOrPanitia($request)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya kurator atau panitia yang dapat meninjau karya.', null, null, 403);
+        }
+
+        $karya = Karya::find($id);
+        if (! $karya) {
+            return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
+        }
+
+        if ($karya->status === 'draft') {
+            return $this->jsonResponse(false, 'Karya masih berstatus draft dan belum diajukan peserta.', null, null, 422);
+        }
+
+        $validated = $request->validate([
+            'status'  => ['required', 'string', Rule::in(['dalam_pemeriksaan', 'perlu_revisi', 'lolos', 'tidak_lolos'])],
+            'catatan' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $karya->update([
+            'status' => $validated['status'],
+        ]);
+
+        return $this->jsonResponse(true, 'Status kurasi karya berhasil diperbarui.', $karya->fresh(['festival', 'submitter']), [
+            'catatan'     => $validated['catatan'] ?? null,
+            'reviewed_by' => $request->user()->id,
+        ]);
+    }
+
+    /**
      * POST /api/v1/works/{id}/files
      * Mengunggah berkas lampiran karya (proposal PDF, gambar thumbnail, demo video).
      */
@@ -339,16 +387,82 @@ class WorkController extends Controller
         }
 
         // Ownership check
-        $user = $request->user();
-        $peserta = $this->getCurrentPeserta($request);
-        $isAdminOrPanitia = $user && ($user->hasAnyRole(User::ADMIN_ROLES) || $user->hasRole('panitia'));
-        $isOwnerOrMember = $peserta && ($karya->peserta_id === $peserta->id || $karya->pesertas()->where('peserta_id', $peserta->id)->exists());
-
-        if (! $isAdminOrPanitia && ! $isOwnerOrMember) {
+        if (! $this->canViewKarya($request, $karya)) {
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
         return $this->jsonResponse(true, 'Daftar berkas karya berhasil dimuat.', $karya->files);
+    }
+
+    /**
+     * DELETE /api/v1/works/{id}/files/{fileId}
+     * Menghapus berkas lampiran karya oleh ketua tim atau admin.
+     */
+    public function deleteFile(Request $request, int $id, int $fileId): JsonResponse
+    {
+        $karya = Karya::find($id);
+        if (! $karya) {
+            return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
+        }
+
+        $peserta = $this->getCurrentPeserta($request);
+        $user = $request->user();
+        if ($karya->peserta_id !== ($peserta?->id) && ! $user->hasAnyRole(User::ADMIN_ROLES)) {
+            return $this->jsonResponse(false, 'Anda tidak berwenang menghapus berkas karya ini.', null, null, 403);
+        }
+
+        if (! in_array($karya->status, ['draft', 'perlu_revisi']) && ! $user->hasRole('super-admin')) {
+            return $this->jsonResponse(false, 'Berkas karya yang sedang atau sudah dikurasi tidak dapat dihapus.', null, null, 422);
+        }
+
+        $file = KaryaFile::where('karya_id', $id)->find($fileId);
+        if (! $file) {
+            return $this->jsonResponse(false, 'Berkas karya tidak ditemukan.', null, null, 404);
+        }
+
+        $filePath = $file->path;
+
+        DB::transaction(function () use ($karya, $file, $filePath): void {
+            if ($karya->file_utama === $filePath) {
+                $karya->update(['file_utama' => null]);
+            }
+            if ($karya->thumbnail === $filePath) {
+                $karya->update(['thumbnail' => null]);
+            }
+
+            $file->delete();
+        });
+
+        if ($filePath && Storage::disk('public')->exists($filePath)) {
+            Storage::disk('public')->delete($filePath);
+        }
+
+        return $this->jsonResponse(true, 'Berkas karya berhasil dihapus.');
+    }
+
+    /**
+     * GET /api/v1/works/{id}/team-members
+     * Mengambil seluruh anggota tim pada karya (peserta terdaftar dan anggota offline).
+     */
+    public function getTeamMembers(Request $request, int $id): JsonResponse
+    {
+        $karya = Karya::with([
+            'pesertas:id,nama_lengkap,email,institusi,jenis_peserta',
+            'anggotaTims',
+        ])->find($id);
+
+        if (! $karya) {
+            return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
+        }
+
+        if (! $this->canViewKarya($request, $karya)) {
+            return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
+        }
+
+        return $this->jsonResponse(true, 'Daftar anggota tim berhasil dimuat.', [
+            'peserta_terdaftar' => $karya->pesertas,
+            'anggota_tim'       => $karya->anggotaTims,
+        ]);
     }
 
     /**

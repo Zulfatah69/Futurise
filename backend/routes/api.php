@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\v1\CommitteeTaskController;
 use App\Http\Controllers\Api\v1\DivisionController;
 use App\Http\Controllers\Api\v1\FestivalController;
 use App\Http\Controllers\Api\v1\InstitutionController;
+use App\Http\Controllers\Api\v1\ParticipantController;
 use App\Http\Controllers\Api\v1\PublicationController;
 use App\Http\Controllers\Api\v1\WorkController;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ Route::prefix('v1')->group(function () {
     // ── Autentikasi Publik (Tahap 1: Registrasi Akun) ─────────────────────────
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
     // ── Referensi Data Institusi (Autocomplete Pencarian PT & SMK) ───────────
     Route::get('/institusi/search', [InstitutionController::class, 'search']);
@@ -36,8 +39,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
 
-        // Tahap 2: Registrasi Peserta Lomba setelah login
+        // Tahap 2: Registrasi & Profil Peserta Lomba setelah login
         Route::post('/participants/register', [AuthController::class, 'registerParticipant']);
+        Route::get('/participants/{id}', [ParticipantController::class, 'show']);
+        Route::match(['put', 'patch'], '/participants/{id}', [ParticipantController::class, 'update']);
 
         // ── Festival Management (Admin/Panitia) ───────────────────────────────
         Route::post('/festivals', [FestivalController::class, 'store']);
@@ -58,8 +63,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/works/{id}', [WorkController::class, 'show']);
         Route::match(['put', 'patch'], '/works/{id}', [WorkController::class, 'update']);
         Route::post('/works/{id}/submit', [WorkController::class, 'submit']);
+        Route::post('/works/{id}/review', [WorkController::class, 'review']);
         Route::post('/works/{id}/files', [WorkController::class, 'uploadFile']);
         Route::get('/works/{id}/files', [WorkController::class, 'getFiles']);
+        Route::delete('/works/{id}/files/{fileId}', [WorkController::class, 'deleteFile']);
+        Route::get('/works/{id}/team-members', [WorkController::class, 'getTeamMembers']);
         Route::post('/works/{id}/team-members', [WorkController::class, 'addTeamMember']);
         Route::delete('/works/{id}/team-members/{memberId}', [WorkController::class, 'removeTeamMember']);
 
@@ -80,8 +88,14 @@ Route::prefix('v1')->group(function () {
         Route::get('/committee/{committee}', [CommitteeController::class, 'show']);
         Route::match(['put', 'patch'], '/committee/{committee}', [CommitteeController::class, 'update']);
         Route::delete('/committee/{committee}', [CommitteeController::class, 'destroy']);
+        Route::get('/festivals/{festival}/committee', [CommitteeController::class, 'festivalCommittee']);
         Route::post('/festivals/{festival}/committee/{committee}/assign', [CommitteeController::class, 'assignToFestival']);
         Route::match(['put', 'patch'], '/committee-assignments/{assignment}', [CommitteeController::class, 'updateAssignment']);
+
+        // Peran & Hak Akses Kepanitiaan
+        Route::get('/access-roles', [CommitteeController::class, 'accessRoles']);
+        Route::post('/access-roles', [CommitteeController::class, 'storeAccessRole']);
+        Route::post('/committee/{committee}/roles', [CommitteeController::class, 'assignRole']);
 
         // Divisi Panitia Festival
         Route::get('/festivals/{festival}/divisions', [DivisionController::class, 'index']);

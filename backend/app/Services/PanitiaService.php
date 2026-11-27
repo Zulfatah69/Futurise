@@ -7,6 +7,7 @@ use App\Models\Festival;
 use App\Models\Panitia;
 use App\Models\PanitiaFestival;
 use App\Models\PanitiaTugas;
+use App\Models\PeranAkses;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
@@ -260,5 +261,70 @@ class PanitiaService
 
         $task->update($update);
         return $task->fresh(['panitiaFestival.panitia']);
+    }
+
+    /**
+     * Daftar penugasan panitia pada edisi festival tertentu.
+     */
+    public function listFestivalAssignments(Festival $festival, array $filters = [], int $perPage = 20): LengthAwarePaginator
+    {
+        $query = PanitiaFestival::query()
+            ->where('festival_id', $festival->id)
+            ->with(['panitia', 'divisi', 'atasan.panitia']);
+
+        if (! empty($filters['divisi_id'])) {
+            $query->where('divisi_id', $filters['divisi_id']);
+        }
+
+        if (! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (! empty($filters['jabatan'])) {
+            $query->where('jabatan', $filters['jabatan']);
+        }
+
+        return $query->orderBy('jabatan')->orderBy('id')->paginate($perPage);
+    }
+
+    /**
+     * Daftar seluruh peran akses kepanitiaan.
+     */
+    public function listAccessRoles(): Collection
+    {
+        return PeranAkses::orderBy('id')->get();
+    }
+
+    /**
+     * Tambah definisi peran akses kepanitiaan baru.
+     */
+    public function createAccessRole(array $data): PeranAkses
+    {
+        return PeranAkses::create($data);
+    }
+
+    /**
+     * Berikan peran akses ke panitia (idempotent pada pasangan panitia + peran).
+     */
+    public function assignAccessRole(
+        Panitia $panitia,
+        PeranAkses $role,
+        ?int $festivalId = null,
+        ?int $grantedByPanitiaId = null
+    ): Panitia {
+        return DB::transaction(function () use ($panitia, $role, $festivalId, $grantedByPanitiaId) {
+            $pivotData = [
+                'festival_id'    => $festivalId,
+                'diberikan_oleh' => $grantedByPanitiaId,
+            ];
+
+            if ($panitia->peranAkses()->where('peran_id', $role->id)->exists()) {
+                $panitia->peranAkses()->updateExistingPivot($role->id, $pivotData);
+            } else {
+                $panitia->peranAkses()->attach($role->id, $pivotData);
+            }
+
+            return $panitia->fresh(['peranAkses']);
+        });
     }
 }

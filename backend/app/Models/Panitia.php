@@ -54,4 +54,10 @@ class Panitia extends Model
             ->withPivot(['id', 'divisi_id', 'jabatan', 'atasan_id', 'status', 'tanggal_bergabung', 'tanggal_selesai', 'catatan'])
             ->withTimestamps();
     }
+
+    public function peranAkses(): BelongsToMany
+    {
+        return $this->belongsToMany(PeranAkses::class, 'panitia_peran', 'panitia_id', 'peran_id')
+            ->withPivot(['festival_id', 'diberikan_oleh', 'created_at']);
+    }
 }
