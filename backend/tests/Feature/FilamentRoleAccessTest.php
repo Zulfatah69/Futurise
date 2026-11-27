@@ -266,5 +266,14 @@ class FilamentRoleAccessTest extends TestCase
             'email'           => 'mahasiswa@futurise.test',
             'nomor_identitas' => '152026999',
         ]);
+        $this->assertDatabaseHas('divisi_panitia', [
+            'nama' => 'Program & Kurasi Karya',
+        ]);
+        $this->assertDatabaseHas('panitia', [
+            'email' => 'kurasi@futurise.test',
+        ]);
+        $this->assertDatabaseHas('peran_akses', [
+            'kode' => 'kurator_karya',
+        ]);
     }
 }
