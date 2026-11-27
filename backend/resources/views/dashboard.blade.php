@@ -1123,72 +1123,251 @@
 
     <!-- JAVASCRIPT: AUTOCOMPLETE & DROPZONE & TEAM BUILDER -->
     <script>
-        // 1. AUTOCOMPLETE INSTITUSI
+        // 1. AUTOCOMPLETE INSTITUSI (Preload Client-Side + AbortController Anti-Stale)
         const institusiInput = document.getElementById('institusi');
         const suggestionsBox = document.getElementById('institusi-suggestions');
         const spinner = document.getElementById('institusi-spinner');
         const jenisPesertaSelect = document.getElementById('jenis_peserta');
 
+        const INSTITUTION_ALIASES = {
+            'itenas': 'institut teknologi nasional',
+            'itb': 'institut teknologi bandung',
+            'ui': 'universitas indonesia',
+            'ugm': 'universitas gadjah mada',
+            'unpad': 'universitas padjadjaran',
+            'its': 'institut teknologi sepuluh nopember',
+            'undip': 'universitas diponegoro',
+            'unair': 'universitas airlangga',
+            'ub': 'universitas brawijaya',
+            'upi': 'universitas pendidikan indonesia',
+            'ipb': 'institut pertanian bogor',
+            'uny': 'universitas negeri yogyakarta',
+            'unesa': 'universitas negeri surabaya',
+            'uns': 'universitas sebelas maret',
+            'unhas': 'universitas hasanuddin',
+            'usu': 'universitas sumatera utara',
+            'unand': 'universitas andalas',
+            'unsri': 'universitas sriwijaya',
+            'binus': 'universitas bina nusantara',
+            'telkom': 'universitas telkom',
+            'telkom university': 'universitas telkom',
+            'polban': 'politeknik negeri bandung',
+            'pens': 'politeknik elektronika negeri surabaya',
+            'unikom': 'universitas komputer indonesia',
+            'unpar': 'universitas katolik parahyangan',
+            'maranatha': 'universitas kristen maranatha',
+            'unisba': 'universitas islam bandung',
+            'widyatama': 'universitas widyatama',
+            'unjani': 'universitas jenderal achmad yani',
+            'uin bandung': 'universitas islam negeri sunan gunung djati',
+        };
+        const WORD_EXPANSIONS = {
+            'univ': 'universitas',
+            'poltek': 'politeknik',
+            'inst': 'institut',
+        };
+
+        const preloadedInstitutions = { perguruan_tinggi: null, smk: null };
+        const preloadPromises = {};
+        const queryCache = new Map();
         let debounceTimer = null;
+        let activeAbortController = null;
+        let requestSeq = 0;
+
+        function getSelectedCategory() {
+            const jenis = jenisPesertaSelect ? jenisPesertaSelect.value : '';
+            if (jenis === 'mahasiswa') return 'perguruan_tinggi';
+            if (jenis === 'siswa') return 'smk';
+            return '';
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function preloadCategory(kategori) {
+            if (!kategori || preloadedInstitutions[kategori] || preloadPromises[kategori]) {
+                return preloadPromises[kategori] || Promise.resolve(preloadedInstitutions[kategori]);
+            }
+
+            preloadPromises[kategori] = fetch(`/api/v1/institusi/search?preload=1&kategori=${encodeURIComponent(kategori)}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success && Array.isArray(res.data)) {
+                        preloadedInstitutions[kategori] = res.data.map(row => ({
+                            nama: row[0],
+                            namaLower: row[0].toLowerCase(),
+                            provinsi: row[1] || '',
+                            kab_kota: row[2] || '',
+                            isJabar: (row[1] || '').includes('Jawa Barat') ? 0 : 1,
+                        }));
+                    }
+                    return preloadedInstitutions[kategori];
+                })
+                .catch(() => null);
+
+            return preloadPromises[kategori];
+        }
+
+        function searchLocal(dataset, rawQuery) {
+            const lower = rawQuery.replace(/\s+/g, ' ').trim().toLowerCase();
+            const alias = INSTITUTION_ALIASES[lower];
+            const phrase = alias || lower.split(' ').map(w => WORD_EXPANSIONS[w] || w).join(' ');
+            const words = phrase.split(' ').filter(Boolean);
+
+            const matches = [];
+            for (let i = 0; i < dataset.length; i++) {
+                const item = dataset[i];
+                const name = item.namaLower;
+                let tier = -1;
+
+                if (alias) {
+                    if (name.includes(alias) || name.includes(lower)) {
+                        tier = name === alias ? 0 : (name.startsWith(alias) ? 1 : 2);
+                    }
+                } else if (words.every(w => name.includes(w))) {
+                    tier = name === phrase ? 0 : (name.startsWith(phrase) ? 1 : (name.includes(phrase) ? 2 : 3));
+                }
+
+                if (tier !== -1) {
+                    matches.push({ item, tier });
+                }
+            }
+
+            // Ringan typo fallback jika hasil ketat kosong
+            if (matches.length === 0 && phrase.length >= 4) {
+                const prefixes = words.map(w => w.slice(0, Math.min(3, w.length))).filter(Boolean);
+                if (prefixes.length > 0) {
+                    for (let i = 0; i < dataset.length; i++) {
+                        const item = dataset[i];
+                        if (prefixes.every(p => item.namaLower.includes(p))) {
+                            const tier = item.namaLower.startsWith(phrase.slice(0, 4)) ? 1 : 3;
+                            matches.push({ item, tier });
+                        }
+                    }
+                }
+            }
+
+            matches.sort((a, b) => {
+                if (a.tier !== b.tier) return a.tier - b.tier;
+                if (a.item.isJabar !== b.item.isJabar) return a.item.isJabar - b.item.isJabar;
+                if (a.item.nama.length !== b.item.nama.length) return a.item.nama.length - b.item.nama.length;
+                return a.item.nama.localeCompare(b.item.nama);
+            });
+
+            return matches.slice(0, 15).map(m => m.item);
+        }
+
+        function renderSuggestions(items) {
+            if (items && items.length > 0) {
+                suggestionsBox.innerHTML = items.map(item => {
+                    const location = [item.kab_kota, item.provinsi].filter(Boolean).join(', ');
+                    return `
+                        <div class="suggestion-item" data-name="${escapeHtml(item.nama)}">
+                            <div class="suggestion-name">${escapeHtml(item.nama)}</div>
+                            ${location ? `<div class="suggestion-meta">${escapeHtml(location)}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+                suggestionsBox.style.display = 'block';
+
+                suggestionsBox.querySelectorAll('.suggestion-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        institusiInput.value = this.dataset.name;
+                        suggestionsBox.style.display = 'none';
+                    });
+                });
+            } else {
+                suggestionsBox.innerHTML = `
+                    <div style="padding: 10px 14px; font-size: 12px; color: var(--color-ink);">
+                        Institusi tidak ditemukan. Anda dapat mengetikkannya secara manual.
+                    </div>
+                `;
+                suggestionsBox.style.display = 'block';
+            }
+        }
 
         if (institusiInput && suggestionsBox) {
+            // Preload kategori aktif di latar belakang segera setelah halaman siap
+            const initialCategory = getSelectedCategory();
+            if (initialCategory) {
+                preloadCategory(initialCategory);
+            }
+
+            institusiInput.addEventListener('focus', function() {
+                const cat = getSelectedCategory();
+                if (cat) preloadCategory(cat);
+            });
+
             institusiInput.addEventListener('input', function() {
                 const query = this.value.trim();
                 clearTimeout(debounceTimer);
 
+                if (activeAbortController) {
+                    activeAbortController.abort();
+                    activeAbortController = null;
+                }
+                const mySeq = ++requestSeq;
+
                 if (query.length < 2) {
+                    if (spinner) spinner.style.display = 'none';
                     suggestionsBox.style.display = 'none';
                     suggestionsBox.innerHTML = '';
                     return;
                 }
 
+                const kategori = getSelectedCategory();
+                const localDataset = kategori ? preloadedInstitutions[kategori] : null;
+
+                // Jika preload sudah siap, saring & urutkan langsung di browser (< 5 ms)
+                if (localDataset) {
+                    if (spinner) spinner.style.display = 'none';
+                    renderSuggestions(searchLocal(localDataset, query));
+                    return;
+                }
+
+                const cacheKey = `${kategori}|${query.toLowerCase()}`;
+                if (queryCache.has(cacheKey)) {
+                    if (spinner) spinner.style.display = 'none';
+                    renderSuggestions(queryCache.get(cacheKey));
+                    return;
+                }
+
+                // Bersihkan dropdown hasil lama agar hasil query sebelumnya tidak menyesatkan
+                suggestionsBox.style.display = 'none';
                 if (spinner) spinner.style.display = 'block';
 
                 debounceTimer = setTimeout(() => {
-                    const jenis = jenisPesertaSelect ? jenisPesertaSelect.value : '';
-                    let kategori = '';
-                    if (jenis === 'mahasiswa') kategori = 'perguruan_tinggi';
-                    else if (jenis === 'siswa') kategori = 'smk';
+                    activeAbortController = new AbortController();
 
-                    fetch(`/api/v1/institusi/search?q=${encodeURIComponent(query)}&kategori=${encodeURIComponent(kategori)}`)
+                    fetch(`/api/v1/institusi/search?q=${encodeURIComponent(query)}&kategori=${encodeURIComponent(kategori)}`, {
+                        signal: activeAbortController.signal,
+                    })
                         .then(res => res.json())
                         .then(res => {
-                            if (spinner) spinner.style.display = 'none';
-                            if (res.success && res.data && res.data.length > 0) {
-                                suggestionsBox.innerHTML = res.data.map(item => {
-                                    const location = [item.kab_kota, item.provinsi].filter(Boolean).join(', ');
-                                    return `
-                                        <div class="suggestion-item" data-name="${item.nama.replace(/"/g, '&quot;')}">
-                                            <div class="suggestion-name">${item.nama}</div>
-                                            ${location ? `<div class="suggestion-meta">${location}</div>` : ''}
-                                        </div>
-                                    `;
-                                }).join('');
-                                suggestionsBox.style.display = 'block';
-
-                                suggestionsBox.querySelectorAll('.suggestion-item').forEach(el => {
-                                    el.addEventListener('click', function() {
-                                        institusiInput.value = this.dataset.name;
-                                        suggestionsBox.style.display = 'none';
-                                    });
-                                });
-                            } else {
-                                suggestionsBox.innerHTML = `
-                                    <div style="padding: 10px 14px; font-size: 12px; color: var(--color-ink);">
-                                        Institusi tidak ditemukan. Anda dapat mengetikkannya secara manual.
-                                    </div>
-                                `;
-                                suggestionsBox.style.display = 'block';
+                            if (mySeq !== requestSeq || institusiInput.value.trim() !== query) {
+                                return;
                             }
-                        })
-                        .catch(() => {
                             if (spinner) spinner.style.display = 'none';
+                            const items = (res.success && Array.isArray(res.data)) ? res.data : [];
+                            queryCache.set(cacheKey, items);
+                            renderSuggestions(items);
+                        })
+                        .catch(err => {
+                            if (err && err.name === 'AbortError') return;
+                            if (mySeq === requestSeq && spinner) spinner.style.display = 'none';
                         });
-                }, 200);
+                }, 300);
             });
 
             if (jenisPesertaSelect) {
                 jenisPesertaSelect.addEventListener('change', function() {
+                    const cat = getSelectedCategory();
+                    if (cat) preloadCategory(cat);
                     if (institusiInput.value.trim().length >= 2) {
                         institusiInput.dispatchEvent(new Event('input'));
                     }

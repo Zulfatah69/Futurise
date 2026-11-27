@@ -379,5 +379,11 @@ class Dev1CompletionApiTest extends TestCase
         $this->getJson('/api/v1/institusi/search?q=institu%20teknologi&kategori=perguruan_tinggi')
             ->assertOk()
             ->assertJsonPath('data.0.nama', 'Institut Teknologi Bandung');
+
+        $preloadRes = $this->getJson('/api/v1/institusi/search?preload=1&kategori=perguruan_tinggi');
+        $preloadRes->assertOk()
+            ->assertJsonPath('success', true);
+        $this->assertIsArray($preloadRes->json('data.0'));
+        $this->assertNotEmpty($preloadRes->json('data.0.0'));
     }
 }

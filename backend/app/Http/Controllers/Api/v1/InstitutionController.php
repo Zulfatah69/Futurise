@@ -82,8 +82,8 @@ class InstitutionController extends Controller
         return $query->orderByRaw(
             'CASE
                 WHEN LOWER(nama) = ? THEN 0
-                WHEN LOWER(nama) LIKE ? THEN 1
-                WHEN LOWER(nama) LIKE ? THEN 2
+                WHEN nama LIKE ? THEN 1
+                WHEN nama LIKE ? THEN 2
                 ELSE 3
             END ASC',
             [$phraseLower, "{$escapedPhrase}%", "%{$escapedPhrase}%"]
@@ -148,8 +148,26 @@ class InstitutionController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $normalized = preg_replace('/\s+/', ' ', trim((string) $request->input('q', ''))) ?? '';
         $kategori = $request->input('kategori'); // perguruan_tinggi | smk
+
+        // Mode preload ringkas untuk cache client-side agar ketikan terasa instan (< 5 ms)
+        if ($request->boolean('preload') && in_array($kategori, ['perguruan_tinggi', 'smk'], true)) {
+            $rows = ReferensiInstitusi::query()
+                ->where('kategori', $kategori)
+                ->orderByRaw("CASE WHEN provinsi LIKE '%Jawa Barat%' THEN 0 ELSE 1 END ASC")
+                ->orderByRaw('LENGTH(nama) ASC')
+                ->toBase()
+                ->get(['nama', 'provinsi', 'kab_kota'])
+                ->map(static fn ($row): array => [$row->nama, $row->provinsi, $row->kab_kota])
+                ->all();
+
+            return response()->json([
+                'success' => true,
+                'data'    => $rows,
+            ]);
+        }
+
+        $normalized = preg_replace('/\s+/', ' ', trim((string) $request->input('q', ''))) ?? '';
 
         if (mb_strlen($normalized) < 2) {
             return response()->json([
@@ -168,8 +186,8 @@ class InstitutionController extends Controller
             $escapedRaw = $this->escapeLike($lower);
 
             $builder->where(function (Builder $q) use ($escapedAlias, $escapedRaw): void {
-                $q->whereRaw('LOWER(nama) LIKE ?', ["%{$escapedAlias}%"])
-                  ->orWhereRaw('LOWER(nama) LIKE ?', ["%{$escapedRaw}%"]);
+                $q->where('nama', 'LIKE', "%{$escapedAlias}%")
+                  ->orWhere('nama', 'LIKE', "%{$escapedRaw}%");
             });
 
             $results = $this->applyRelevanceOrdering($builder, $aliasLower)
@@ -185,7 +203,7 @@ class InstitutionController extends Controller
 
             $builder->where(function (Builder $q) use ($expandedWords): void {
                 foreach ($expandedWords as $word) {
-                    $q->whereRaw('LOWER(nama) LIKE ?', ['%' . $this->escapeLike($word) . '%']);
+                    $q->where('nama', 'LIKE', '%' . $this->escapeLike($word) . '%');
                 }
             });
 
