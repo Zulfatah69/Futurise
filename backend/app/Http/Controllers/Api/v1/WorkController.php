@@ -9,6 +9,7 @@ use App\Models\Karya;
 use App\Models\KaryaFile;
 use App\Models\Peserta;
 use App\Models\User;
+use App\Services\KaryaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,9 @@ use Illuminate\Validation\Rule;
 
 class WorkController extends Controller
 {
+    public function __construct(
+        protected KaryaService $karyaService
+    ) {}
     private function jsonResponse(bool $success, string $message, mixed $data = null, mixed $meta = null, int $statusCode = 200): JsonResponse
     {
         return response()->json([
@@ -121,6 +125,7 @@ class WorkController extends Controller
             'pesertas',
             'anggotaTims',
             'files',
+            'versis.updater:id,name',
         ])->find($id);
 
         if (! $karya) {
@@ -150,8 +155,16 @@ class WorkController extends Controller
             'festival_id'           => ['nullable', Rule::exists('festival', 'id')->where('aktif', true)],
             'judul'                 => 'required|string|max:200',
             'deskripsi'             => 'required|string',
+            'masalah'               => 'nullable|string',
+            'pengguna_sasaran'      => 'nullable|string|max:255',
+            'solusi'                => 'nullable|string',
+            'fitur_utama'           => 'nullable|string',
             'kategori'              => 'required|string|max:50',
             'teknologi'             => 'required|string|max:255',
+            'tahap_kesiapan'        => 'nullable|string|max:100',
+            'hasil_uji'             => 'nullable|string',
+            'keterbatasan'          => 'nullable|string',
+            'kebutuhan_kolaborasi'  => 'nullable|string',
             'url_demo'              => 'nullable|url|max:255',
             'lisensi'               => 'nullable|string|max:50',
             'persetujuan_publikasi' => 'nullable|boolean',
@@ -169,19 +182,32 @@ class WorkController extends Controller
             return $this->jsonResponse(false, 'Tidak ada festival yang sedang aktif untuk pendaftaran karya.', null, null, 422);
         }
 
-        $karya = DB::transaction(function () use ($validated, $festivalId, $peserta) {
+        $karya = DB::transaction(function () use ($validated, $festivalId, $peserta, $request) {
+            // Batas maksimal 2 karya aktif per kampus/institusi pada edisi festival (spek web.txt §1, §4, §6)
+            $this->karyaService->assertInstitutionQuotaAvailable((int) $festivalId, $peserta);
+
             $karya = Karya::create([
                 'festival_id'           => $festivalId,
                 'peserta_id'            => $peserta->id,
                 'judul'                 => $validated['judul'],
                 'deskripsi'             => $validated['deskripsi'],
+                'masalah'               => $validated['masalah'] ?? null,
+                'pengguna_sasaran'      => $validated['pengguna_sasaran'] ?? null,
+                'solusi'                => $validated['solusi'] ?? null,
+                'fitur_utama'           => $validated['fitur_utama'] ?? null,
                 'kategori'              => $validated['kategori'],
                 'teknologi'             => $validated['teknologi'],
+                'tahap_kesiapan'        => $validated['tahap_kesiapan'] ?? null,
+                'hasil_uji'             => $validated['hasil_uji'] ?? null,
+                'keterbatasan'          => $validated['keterbatasan'] ?? null,
+                'kebutuhan_kolaborasi'  => $validated['kebutuhan_kolaborasi'] ?? null,
                 'url_demo'              => $validated['url_demo'] ?? null,
                 'lisensi'               => $validated['lisensi'] ?? null,
                 'persetujuan_publikasi' => $validated['persetujuan_publikasi'] ?? false,
                 'status'                => 'draft',
             ]);
+
+            $this->karyaService->recordRevision($karya, $request->user()?->id, null, 'draft', 'Draft karya awal dibuat.');
 
             // Daftarkan ketua tim di karya_peserta
             $karya->pesertas()->attach($peserta->id, [
@@ -242,14 +268,26 @@ class WorkController extends Controller
         $validated = $request->validate([
             'judul'                 => 'sometimes|required|string|max:200',
             'deskripsi'             => 'sometimes|required|string',
+            'masalah'               => 'nullable|string',
+            'pengguna_sasaran'      => 'nullable|string|max:255',
+            'solusi'                => 'nullable|string',
+            'fitur_utama'           => 'nullable|string',
             'kategori'              => 'sometimes|required|string|max:50',
             'teknologi'             => 'sometimes|required|string|max:255',
+            'tahap_kesiapan'        => 'nullable|string|max:100',
+            'hasil_uji'             => 'nullable|string',
+            'keterbatasan'          => 'nullable|string',
+            'kebutuhan_kolaborasi'  => 'nullable|string',
             'url_demo'              => 'nullable|url|max:255',
             'lisensi'               => 'nullable|string|max:50',
             'persetujuan_publikasi' => 'nullable|boolean',
         ]);
 
         $karya->update($validated);
+
+        if ($karya->status === 'perlu_revisi') {
+            $this->karyaService->recordRevision($karya, $user->id, 'perlu_revisi', 'perlu_revisi', 'Materi karya diperbarui setelah catatan revisi.');
+        }
 
         return $this->jsonResponse(true, 'Data karya berhasil diperbarui.', $karya);
     }
@@ -274,11 +312,25 @@ class WorkController extends Controller
             return $this->jsonResponse(false, 'Karya ini sudah diajukan sebelumnya.', null, null, 422);
         }
 
-        $karya->update([
-            'status' => 'diajukan',
-        ]);
+        $statusLama = $karya->status;
 
-        return $this->jsonResponse(true, 'Karya berhasil diajukan untuk proses kurasi.', $karya);
+        DB::transaction(function () use ($karya, $statusLama, $request): void {
+            $karya->update([
+                'status' => 'diajukan',
+            ]);
+
+            $this->karyaService->recordRevision(
+                $karya,
+                $request->user()->id,
+                $statusLama,
+                'diajukan',
+                $statusLama === 'perlu_revisi'
+                    ? 'Karya diajukan ulang setelah perbaikan revisi.'
+                    : 'Karya diajukan final untuk kurasi.'
+            );
+        });
+
+        return $this->jsonResponse(true, 'Karya berhasil diajukan untuk proses kurasi.', $karya->fresh('versis'));
     }
 
     /**
@@ -305,11 +357,24 @@ class WorkController extends Controller
             'catatan' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $karya->update([
-            'status' => $validated['status'],
-        ]);
+        $statusLama = $karya->status;
 
-        return $this->jsonResponse(true, 'Status kurasi karya berhasil diperbarui.', $karya->fresh(['festival', 'submitter']), [
+        DB::transaction(function () use ($karya, $validated, $statusLama, $request): void {
+            $karya->update([
+                'status'         => $validated['status'],
+                'catatan_kurasi' => $validated['catatan'] ?? $karya->catatan_kurasi,
+            ]);
+
+            $this->karyaService->recordRevision(
+                $karya,
+                $request->user()->id,
+                $statusLama,
+                $validated['status'],
+                $validated['catatan'] ?? null
+            );
+        });
+
+        return $this->jsonResponse(true, 'Status kurasi karya berhasil diperbarui.', $karya->fresh(['festival', 'submitter', 'versis']), [
             'catatan'     => $validated['catatan'] ?? null,
             'reviewed_by' => $request->user()->id,
         ]);

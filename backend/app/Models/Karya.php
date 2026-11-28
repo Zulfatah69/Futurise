@@ -21,14 +21,23 @@ class Karya extends Model
         'peserta_id',
         'judul',
         'deskripsi',
+        'masalah',
+        'pengguna_sasaran',
+        'solusi',
+        'fitur_utama',
         'kategori',
         'teknologi',
+        'tahap_kesiapan',
+        'hasil_uji',
+        'keterbatasan',
+        'kebutuhan_kolaborasi',
         'file_utama',
         'thumbnail',
         'url_demo',
         'lisensi',
         'persetujuan_publikasi',
         'status',
+        'catatan_kurasi',
         'skor_akhir',
     ];
 
@@ -71,6 +80,11 @@ class Karya extends Model
     public function files(): HasMany
     {
         return $this->hasMany(KaryaFile::class, 'karya_id')->orderBy('urutan');
+    }
+
+    public function versis(): HasMany
+    {
+        return $this->hasMany(KaryaVersi::class, 'karya_id')->orderByDesc('versi');
     }
 
     public function publikasis(): HasMany

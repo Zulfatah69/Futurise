@@ -286,31 +286,54 @@ class FilamentRoleAccessTest extends TestCase
             ->assertOk()
             ->assertSee('Portal Dewan Juri')
             ->assertSee('JURI')
+            ->assertSee('Karya Lolos Kurasi')
             ->assertDontSee('Lengkapi Data Peserta');
 
         $picKampus = User::where('email', 'pic.kampus@futurise.test')->firstOrFail();
         $this->actingAs($picKampus)->get('/dashboard')
             ->assertOk()
-            ->assertSee('Portal Koordinator Institusi')
-            ->assertSee('Ringkasan PIC Kampus')
+            ->assertSee('Portal Koordinator Kampus')
+            ->assertSee('Profil Kampus')
+            ->assertSee('Tim dan Karya Kampus')
+            ->assertDontSee('Portal Sekolah dan Tur Edukasi')
+            ->assertDontSee('Lengkapi Data Peserta');
+
+        $picSekolah = User::where('email', 'pic.sekolah@futurise.test')->firstOrFail();
+        $this->actingAs($picSekolah)->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Portal Sekolah dan Tur Edukasi')
+            ->assertSee('Slot Tur &amp; Arahan', false)
+            ->assertDontSee('Portal Koordinator Kampus')
+            ->assertDontSee('Lengkapi Data Peserta');
+
+        $picIndustri = User::where('email', 'pic.industri@futurise.test')->firstOrFail();
+        $this->actingAs($picIndustri)->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Portal Organisasi Industri dan Mitra')
+            ->assertSee('Katalog Inovasi')
+            ->assertDontSee('Portal Kemitraan dan Sponsor Resmi')
             ->assertDontSee('Lengkapi Data Peserta');
 
         $picSponsor = User::where('email', 'pic.sponsor@futurise.test')->firstOrFail();
         $this->actingAs($picSponsor)->get('/dashboard')
             ->assertOk()
-            ->assertSee('Portal Kemitraan')
+            ->assertSee('Portal Kemitraan dan Sponsor Resmi')
             ->assertSee('PIC Sponsor')
+            ->assertSee('Kesepakatan &amp; Paket', false)
+            ->assertDontSee('Portal Organisasi Industri dan Mitra')
             ->assertDontSee('Lengkapi Data Peserta');
 
         $pengunjung = User::where('email', 'pengunjung@futurise.test')->firstOrFail();
         $this->actingAs($pengunjung)->get('/dashboard')
             ->assertOk()
-            ->assertSee('Portal Pengunjung')
+            ->assertSee('Portal Pengunjung Festival')
+            ->assertSee('Pendaftaran Peserta Lomba')
             ->assertSee('Lengkapi Data Peserta');
 
         $mahasiswa = User::where('email', 'mahasiswa@futurise.test')->firstOrFail();
         $this->actingAs($mahasiswa)->get('/dashboard')
             ->assertOk()
+            ->assertSee('Portal Tim Karya Mahasiswa')
             ->assertSee('Karya yang Didaftarkan')
             ->assertSee('Pendaftaran Karya Inovasi Baru');
     }

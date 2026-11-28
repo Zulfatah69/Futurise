@@ -3,13 +3,16 @@
 namespace App\Filament\Resources\Karyas\Tables;
 
 use App\Models\Karya;
+use App\Services\KaryaService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
 
 class KaryasTable
 {
@@ -72,18 +75,39 @@ class KaryasTable
                     ->modalHeading('Nyatakan Lolos Kurasi?')
                     ->modalDescription('Karya ini akan dinyatakan lolos kurasi tahap administrasi dan berhak dinilai oleh juri.')
                     ->visible(fn (Karya $record): bool => in_array($record->status, ['diajukan', 'dalam_pemeriksaan', 'perlu_revisi']))
-                    ->action(fn (Karya $record) => $record->update(['status' => 'lolos'])),
+                    ->action(function (Karya $record): void {
+                        DB::transaction(function () use ($record): void {
+                            $statusLama = $record->status;
+                            $record->update(['status' => 'lolos']);
+                            app(KaryaService::class)->recordRevision($record, auth()->id(), $statusLama, 'lolos', 'Dinyatakan lolos kurasi via panel panitia.');
+                        });
+                    }),
 
                 Action::make('requestRevision')
                     ->label('Minta Revisi')
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
                     ->authorize('update')
-                    ->requiresConfirmation()
                     ->modalHeading('Kembalikan untuk Revisi?')
-                    ->modalDescription('Peserta akan dapat memperbaiki proposal dan berkas karyanya.')
+                    ->modalDescription('Tulis catatan perbaikan yang wajib ditindaklanjuti peserta sebelum pengajuan ulang (BR-09).')
+                    ->form([
+                        Textarea::make('catatan')
+                            ->label('Catatan Revisi untuk Peserta')
+                            ->rows(3)
+                            ->required()
+                            ->maxLength(500),
+                    ])
                     ->visible(fn (Karya $record): bool => in_array($record->status, ['diajukan', 'dalam_pemeriksaan']))
-                    ->action(fn (Karya $record) => $record->update(['status' => 'perlu_revisi'])),
+                    ->action(function (Karya $record, array $data): void {
+                        DB::transaction(function () use ($record, $data): void {
+                            $statusLama = $record->status;
+                            $record->update([
+                                'status'         => 'perlu_revisi',
+                                'catatan_kurasi' => $data['catatan'],
+                            ]);
+                            app(KaryaService::class)->recordRevision($record, auth()->id(), $statusLama, 'perlu_revisi', $data['catatan']);
+                        });
+                    }),
 
                 EditAction::make(),
             ])

@@ -39,22 +39,55 @@ class PublikasiKaryaResource extends JsonResource
             'updated_at'        => $this->updated_at?->toIso8601String(),
             'karya'             => $this->whenLoaded('karya', function () {
                 return [
-                    'id'          => $this->karya->id,
-                    'festival_id' => $this->karya->festival_id,
-                    'judul'       => $this->karya->judul,
-                    'kategori'    => $this->karya->kategori,
-                    'teknologi'   => $this->karya->teknologi,
-                    'url_demo'    => $this->karya->url_demo,
-                    'status'      => $this->karya->status,
-                    'skor_akhir'  => $this->karya->skor_akhir,
-                    'submitter'   => $this->whenLoaded('karya.submitter', function () {
+                    'id'                   => $this->karya->id,
+                    'festival_id'          => $this->karya->festival_id,
+                    'judul'                => $this->karya->judul,
+                    'deskripsi'            => $this->karya->deskripsi,
+                    'masalah'              => $this->karya->masalah,
+                    'pengguna_sasaran'     => $this->karya->pengguna_sasaran,
+                    'solusi'               => $this->karya->solusi,
+                    'fitur_utama'          => $this->karya->fitur_utama,
+                    'kategori'             => $this->karya->kategori,
+                    'teknologi'            => $this->karya->teknologi,
+                    'tahap_kesiapan'       => $this->karya->tahap_kesiapan,
+                    'hasil_uji'            => $this->karya->hasil_uji,
+                    'keterbatasan'         => $this->karya->keterbatasan,
+                    'kebutuhan_kolaborasi' => $this->karya->kebutuhan_kolaborasi,
+                    'lisensi'              => $this->karya->lisensi,
+                    'url_demo'             => $this->karya->url_demo,
+                    'status'               => $this->karya->status,
+                    'skor_akhir'           => $this->karya->skor_akhir,
+                    'submitter'            => $this->whenLoaded('karya.submitter', function () {
                         return [
                             'id'           => $this->karya->submitter?->id,
                             'nama_lengkap' => $this->karya->submitter?->nama_lengkap,
                             'institusi'    => $this->karya->submitter?->institusi,
                         ];
                     }),
-                    'files'       => $this->whenLoaded('karya.files', function () {
+                    // Hanya tampilkan nama & peran tim ke publik (tanpa email/telepon/identitas pribadi)
+                    'tim'                  => $this->when(
+                        $this->karya->relationLoaded('anggotaTims') || $this->karya->relationLoaded('pesertas'),
+                        function () {
+                            $leaders = $this->karya->relationLoaded('pesertas')
+                                ? $this->karya->pesertas->map(fn ($p) => [
+                                    'nama_lengkap' => $p->nama_lengkap,
+                                    'peran'        => $p->pivot?->peran ?? 'Ketua Tim',
+                                    'is_ketua'     => (bool) ($p->pivot?->is_ketua ?? false),
+                                ])
+                                : collect();
+
+                            $members = $this->karya->relationLoaded('anggotaTims')
+                                ? $this->karya->anggotaTims->map(fn ($m) => [
+                                    'nama_lengkap' => $m->nama_lengkap,
+                                    'peran'        => $m->peran ?? 'Anggota',
+                                    'is_ketua'     => (bool) $m->is_ketua,
+                                ])
+                                : collect();
+
+                            return $leaders->concat($members)->values();
+                        }
+                    ),
+                    'files'                => $this->whenLoaded('karya.files', function () {
                         return $this->karya->files->map(fn ($f) => [
                             'id'            => $f->id,
                             'jenis'         => $f->jenis,

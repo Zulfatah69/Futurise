@@ -154,4 +154,121 @@ class WorkWebSubmissionTest extends TestCase
             'status' => 'diajukan',
         ]);
     }
+
+    /**
+     * PIC Kampus dapat mengaktifkan & memperbarui profil kampus, mengedit draft karya,
+     * mengelola anggota tim, serta mengajukan publikasi Showcase ketika karya lolos kurasi.
+     */
+    public function test_pic_kampus_can_manage_profile_work_team_members_and_request_publication(): void
+    {
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+
+        $picUser = User::factory()->create([
+            'name'              => 'Koordinator Polban',
+            'email'             => 'koordinator.polban@futurise.test',
+            'email_verified_at' => now(),
+            'account_type'      => 'pic',
+            'account_status'    => 'active',
+            'pic_category'      => 'kampus-sekolah',
+        ]);
+        $picUser->assignRole('pic-kampus');
+
+        $this->actingAs($picUser)->post('/peserta/daftar', [
+            'institusi'       => 'Politeknik Negeri Bandung',
+            'jenis_peserta'   => 'pic',
+            'nomor_identitas' => '0412058801',
+            'no_telepon'      => '081234567890',
+        ])->assertRedirect('/dashboard');
+
+        $this->assertTrue($picUser->fresh()->hasRole('pic-kampus'));
+
+        $this->actingAs($picUser)->post('/peserta/profil', [
+            'nama_lengkap'    => 'Dr. Koordinator Polban',
+            'institusi'       => 'Politeknik Negeri Bandung',
+            'nomor_identitas' => '0412058801',
+            'no_telepon'      => '081299900011',
+        ])->assertRedirect('/dashboard?tab=profil');
+
+        $this->assertDatabaseHas('peserta', [
+            'user_id'      => $picUser->id,
+            'nama_lengkap' => 'Dr. Koordinator Polban',
+            'no_telepon'   => '081299900011',
+        ]);
+
+        $this->actingAs($picUser)->post('/karya/simpan', [
+            'judul'        => 'Platform Analitik Energi Kampus',
+            'kategori'     => 'IoT, Robotics & Embedded Systems',
+            'teknologi'    => 'ESP32, MQTT, Laravel',
+            'deskripsi'    => 'Pemantauan konsumsi listrik gedung kampus secara real-time.',
+            'action_type'  => 'draft',
+            'redirect_tab' => 'karya',
+        ])->assertRedirect('/dashboard?tab=karya');
+
+        $karya = Karya::where('judul', 'Platform Analitik Energi Kampus')->firstOrFail();
+
+        $this->actingAs($picUser)->post("/karya/{$karya->id}/update", [
+            'judul'             => 'Platform Analitik Energi Kampus v2',
+            'kategori'          => 'IoT, Robotics & Embedded Systems',
+            'teknologi'         => 'ESP32, MQTT, TimescaleDB',
+            'deskripsi'         => 'Versi diperbarui dengan prediksi beban puncak.',
+            'masalah'           => 'Pemborosan beban idle ruang kelas.',
+            'solusi'            => 'Deteksi okupansi berbasis sensor pintar.',
+            'catatan_perbaikan' => 'Menambahkan detail masalah & solusi.',
+            'redirect_tab'      => 'karya',
+        ])->assertRedirect('/dashboard?tab=karya');
+
+        $this->assertDatabaseHas('karya', [
+            'id'      => $karya->id,
+            'judul'   => 'Platform Analitik Energi Kampus v2',
+            'masalah' => 'Pemborosan beban idle ruang kelas.',
+        ]);
+
+        $this->actingAs($picUser)->post("/karya/{$karya->id}/anggota", [
+            'nama_lengkap' => 'Nadia Putri',
+            'peran'        => 'Firmware Engineer',
+            'email'        => 'nadia@polban.ac.id',
+            'redirect_tab' => 'karya',
+        ])->assertRedirect('/dashboard?tab=karya');
+
+        $member = $karya->anggotaTims()->where('nama_lengkap', 'Nadia Putri')->firstOrFail();
+
+        $this->actingAs($picUser)->post("/karya/{$karya->id}/anggota/{$member->id}/hapus", [
+            'redirect_tab' => 'karya',
+        ])->assertRedirect('/dashboard?tab=karya');
+
+        $this->assertDatabaseMissing('anggota_tim', ['id' => $member->id]);
+
+        // Isolasi akses: mahasiswa lain tidak dapat mengedit karya milik Polban
+        $otherUser = User::factory()->create(['account_status' => 'active']);
+        $otherPeserta = Peserta::create([
+            'user_id'       => $otherUser->id,
+            'nama_lengkap'  => $otherUser->name,
+            'email'         => $otherUser->email,
+            'institusi'     => 'Universitas Lain',
+            'jenis_peserta' => 'mahasiswa',
+        ]);
+        $this->actingAs($otherUser)->post("/karya/{$karya->id}/update", [
+            'judul'     => 'Percobaan Ubah Karya Tim Lain',
+            'kategori'  => 'Web',
+            'teknologi' => 'PHP',
+            'deskripsi' => 'Tidak sah.',
+        ])->assertNotFound();
+
+        // Ketika kurator meloloskan karya, PIC dapat mengajukan publikasi ke Showcase
+        $karya->update(['status' => 'lolos']);
+
+        $this->actingAs($picUser)->post("/karya/{$karya->id}/publikasi", [
+            'judul_publik'     => 'Energi Pintar Kampus Polban',
+            'ringkasan_publik' => 'Ringkasan untuk publik showcase.',
+            'izin_peserta'     => '1',
+            'redirect_tab'     => 'kurasi',
+        ])->assertRedirect('/dashboard?tab=kurasi');
+
+        $this->assertDatabaseHas('publikasi_karya', [
+            'karya_id'     => $karya->id,
+            'judul_publik' => 'Energi Pintar Kampus Polban',
+            'status'       => 'menunggu_persetujuan',
+            'izin_peserta' => true,
+        ]);
+    }
 }

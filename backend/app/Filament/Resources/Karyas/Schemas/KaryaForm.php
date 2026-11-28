@@ -83,9 +83,46 @@ class KaryaForm
 
                 Textarea::make('deskripsi')
                     ->label('Deskripsi Lengkap Karya')
-                    ->rows(5)
+                    ->rows(4)
                     ->columnSpanFull()
                     ->required(),
+
+                Textarea::make('masalah')
+                    ->label('Latar Belakang Masalah')
+                    ->rows(3),
+
+                Textarea::make('solusi')
+                    ->label('Solusi yang Ditawarkan')
+                    ->rows(3),
+
+                TextInput::make('pengguna_sasaran')
+                    ->label('Pengguna Sasaran')
+                    ->maxLength(255),
+
+                TextInput::make('tahap_kesiapan')
+                    ->label('Tahap Kesiapan (TRL / Prototipe / Siap Uji)')
+                    ->maxLength(100),
+
+                Textarea::make('fitur_utama')
+                    ->label('Fitur Utama')
+                    ->rows(3),
+
+                Textarea::make('hasil_uji')
+                    ->label('Hasil Uji / Validasi')
+                    ->rows(3),
+
+                Textarea::make('keterbatasan')
+                    ->label('Keterbatasan Saat Ini')
+                    ->rows(2),
+
+                Textarea::make('kebutuhan_kolaborasi')
+                    ->label('Kebutuhan Kolaborasi / Tindak Lanjut')
+                    ->rows(2),
+
+                Textarea::make('catatan_kurasi')
+                    ->label('Catatan Kurator / Alasan Revisi')
+                    ->rows(3)
+                    ->columnSpanFull(),
             ]);
     }
 }

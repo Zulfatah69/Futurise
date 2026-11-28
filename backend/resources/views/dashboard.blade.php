@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - FUTURISE</title>
+    <title>Portal Pengguna - FUTURiSE</title>
 
-    <!-- FONT KUMBH SANS (APTIKOM DESIGN SYSTEM) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,14 +17,36 @@
             --color-cyan: #00CDE5;
             --color-canvas: #FFFFFF;
             --color-surface: #F8FAFC;
-            --color-surface-hover: #F1F5F9;
-            --color-ink: #64748B;
-            --color-ink-dark: #1E293B;
+            --color-ink: #1E293B;
+            --color-muted: #64748B;
             --color-hairline: #E2E8F0;
-            --color-hairline-dark: #CBD5E1;
+            --color-success-bg: #ECFDF5;
+            --color-success-border: #A7F3D0;
+            --color-success-ink: #065F46;
+            --color-warn-bg: #FFFBEB;
+            --color-warn-border: #FDE68A;
+            --color-warn-ink: #92400E;
+            --color-danger-bg: #FEF2F2;
+            --color-danger-border: #FECACA;
+            --color-danger-ink: #991B1B;
             --font-family: 'Kumbh Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --radius-btn: 8px;
-            --radius-card: 0px;
+            --role-accent: #017DC7;
+            --role-accent-soft: #EFF6FF;
+            --role-banner-start: #2B2B5E;
+            --role-banner-end: #017DC7;
+        }
+
+        .theme-pic-kampus,
+        .theme-tim-mahasiswa,
+        .theme-pic-sekolah,
+        .theme-pic-industri,
+        .theme-pic-sponsor,
+        .theme-juri,
+        .theme-pengunjung {
+            --role-accent: #017DC7;
+            --role-accent-soft: #EFF6FF;
+            --role-banner-start: #2B2B5E;
+            --role-banner-end: #017DC7;
         }
 
         * {
@@ -38,251 +59,577 @@
         body {
             min-height: 100vh;
             background-color: var(--color-surface);
-            color: var(--color-ink-dark);
+            color: var(--color-ink);
             -webkit-font-smoothing: antialiased;
         }
 
-        /* NAVBAR */
-        .navbar {
-            width: 100%;
+        /* Top Navigation Bar (APTIKOM Deep Navy + Cyan Border) */
+        .topbar {
             background: var(--color-primary);
-            padding: 16px 7%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             border-bottom: 3px solid var(--color-cyan);
+            position: sticky;
+            top: 0;
+            z-index: 40;
         }
 
-        .brand {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--color-canvas);
+        .topbar-inner {
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 14px 24px;
             display: flex;
             align-items: center;
-            gap: 2px;
+            justify-content: space-between;
+            gap: 16px;
         }
 
-        .brand span {
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: rgba(0, 205, 229, 0.14);
+            border: 1px solid rgba(0, 205, 229, 0.4);
+            color: var(--color-cyan);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .brand-title span {
             color: var(--color-cyan);
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .user-greeting {
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 13px;
+        .brand-sub {
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.78);
             font-weight: 500;
         }
 
-        .user-greeting strong {
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .festival-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.12);
             color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+        }
+
+        .role-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: rgba(0, 205, 229, 0.18);
+            color: var(--color-cyan);
+            border: 1px solid rgba(0, 205, 229, 0.45);
+        }
+
+        .user-chip {
+            text-align: right;
+            line-height: 1.25;
+        }
+
+        .user-chip strong {
+            display: block;
+            font-size: 13px;
+            color: #FFFFFF;
+        }
+
+        .user-chip span {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.75);
         }
 
         .logout-btn {
             background: transparent;
-            color: var(--color-canvas);
+            color: #FFFFFF;
             border: 1px solid rgba(255, 255, 255, 0.35);
-            padding: 7px 16px;
-            border-radius: var(--radius-btn);
+            padding: 7px 14px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
-            font-family: var(--font-family);
             transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .logout-btn:hover {
-            background: var(--color-canvas);
+            background: #FFFFFF;
             color: var(--color-primary);
-            border-color: var(--color-canvas);
+            border-color: #FFFFFF;
         }
 
-        /* CONTAINER */
-        .container {
-            max-width: 980px;
-            margin: 36px auto 60px;
-            padding: 0 20px;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 9px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.18s ease;
         }
 
-        /* ALERTS */
-        .alert {
-            padding: 14px 18px;
-            border-radius: var(--radius-btn);
-            margin-bottom: 24px;
-            font-size: 14px;
-            line-height: 1.5;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
+        .btn-sm {
+            padding: 6px 11px;
+            font-size: 12px;
         }
 
-        .alert-success {
-            background: #F0FDF4;
-            color: #166534;
-            border: 1px solid #BBF7D0;
+        .btn-primary {
+            background: var(--role-accent);
+            color: #FFFFFF;
         }
 
-        .alert-error {
-            background: #FEF2F2;
-            color: #991B1B;
-            border: 1px solid #FECACA;
+        .btn-primary:hover {
+            filter: brightness(0.92);
         }
 
-        /* CARD */
-        .card {
-            background: var(--color-canvas);
-            padding: 32px 36px;
-            border-radius: var(--radius-card);
-            border: 1px solid var(--color-hairline);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-            margin-bottom: 24px;
+        .btn-navy {
+            background: var(--color-primary);
+            color: #FFFFFF;
         }
 
-        .card-header {
-            margin-bottom: 22px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--color-hairline);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 16px;
+        .btn-navy:hover {
+            filter: brightness(1.1);
         }
 
-        .card-tag {
+        .btn-outline {
+            background: #FFFFFF;
+            border-color: var(--color-hairline);
             color: var(--color-ink);
-            font-size: 11px;
+        }
+
+        .btn-outline:hover {
+            background: var(--color-surface);
+            border-color: var(--role-accent);
+            color: var(--role-accent);
+        }
+
+        .btn-danger-outline {
+            background: #FFFFFF;
+            border-color: #FECACA;
+            color: #B91C1C;
+        }
+
+        .btn-danger-outline:hover {
+            background: #FEF2F2;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+        }
+
+        /* App Shell Layout */
+        .app-shell {
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .sidebar {
+            background: var(--color-canvas);
+            border: 1px solid var(--color-hairline);
+            border-radius: 14px;
+            padding: 16px;
+            position: sticky;
+            top: 84px;
+        }
+
+        .sidebar-role-card {
+            padding: 14px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--role-banner-start), var(--role-banner-end));
+            color: #FFFFFF;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-role-tag {
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 1.2px;
             text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.85;
             margin-bottom: 4px;
         }
 
-        .card-title {
-            font-size: 20px;
+        .sidebar-role-title {
+            font-size: 15px;
             font-weight: 700;
-            letter-spacing: -0.4px;
+            line-height: 1.3;
+        }
+
+        .sidebar-section-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--color-muted);
+            padding: 6px 10px;
+            margin-top: 8px;
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-item {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 9px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--color-ink);
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.16s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--color-surface);
+        }
+
+        .nav-item.active {
+            background: var(--role-accent-soft);
+            color: var(--role-accent);
+            border-color: rgba(1, 125, 199, 0.22);
+        }
+
+        .nav-item-left {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+        }
+
+        .nav-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: var(--color-surface);
+            color: var(--color-muted);
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-badge {
+            background: var(--role-accent);
+            color: #FFFFFF;
+        }
+
+        .nav-badge-dev2 {
+            background: #F1F5F9;
+            color: #64748B;
+            font-weight: 600;
+        }
+
+        /* Main Workspace */
+        .main-col {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .hero-banner {
+            border-radius: 16px;
+            padding: 24px 28px;
+            background: linear-gradient(125deg, var(--role-banner-start) 0%, var(--role-banner-end) 100%);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hero-eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.88;
+            margin-bottom: 6px;
+        }
+
+        .hero-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .hero-desc {
+            font-size: 13.5px;
+            line-height: 1.55;
+            opacity: 0.92;
+            max-width: 680px;
+        }
+
+        .hero-stat-box {
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 12px;
+            padding: 14px 18px;
+            min-width: 190px;
+        }
+
+        .hero-stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            opacity: 0.85;
+            margin-bottom: 4px;
+        }
+
+        .hero-stat-value {
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .hero-stat-sub {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            border: 1px solid transparent;
+        }
+
+        .alert-success {
+            background: var(--color-success-bg);
+            border-color: var(--color-success-border);
+            color: var(--color-success-ink);
+        }
+
+        .alert-info {
+            background: #EFF6FF;
+            border-color: #BFDBFE;
+            color: #1E40AF;
+        }
+
+        .alert-warning {
+            background: var(--color-warn-bg);
+            border-color: var(--color-warn-border);
+            color: var(--color-warn-ink);
+        }
+
+        .alert-error {
+            background: var(--color-danger-bg);
+            border-color: var(--color-danger-border);
+            color: var(--color-danger-ink);
+        }
+
+        .alert ul {
+            margin-left: 18px;
+            margin-top: 6px;
+        }
+
+        /* Cards & Grids */
+        .panel-section {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-section.active {
+            display: flex;
+        }
+
+        .card {
+            background: var(--color-canvas);
+            border: 1px solid var(--color-hairline);
+            border-radius: 14px;
+            padding: 22px 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 700;
             color: var(--color-primary);
+            margin-bottom: 4px;
         }
 
         .card-subtitle {
             font-size: 13px;
-            color: var(--color-ink);
-            margin-top: 4px;
-            line-height: 1.6;
+            color: var(--color-muted);
+            line-height: 1.5;
         }
 
-        /* STATS / INFO GRID */
-        .info-grid {
+        .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 14px;
         }
 
-        .info-box {
+        .kpi-card {
+            background: var(--color-canvas);
+            border: 1px solid var(--color-hairline);
+            border-radius: 12px;
+            padding: 16px 18px;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-muted);
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--color-primary);
+        }
+
+        .kpi-note {
+            font-size: 11.5px;
+            color: var(--color-muted);
+            margin-top: 4px;
+        }
+
+        .two-col-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .three-col-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .info-kv {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .kv-item {
+            padding: 12px 14px;
             background: var(--color-surface);
-            padding: 14px 16px;
-            border-radius: 4px;
+            border-radius: 10px;
             border: 1px solid var(--color-hairline);
         }
 
-        .info-box-label {
-            display: block;
-            color: var(--color-ink);
+        .kv-label {
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.04em;
+            color: var(--color-muted);
             margin-bottom: 4px;
         }
 
-        .info-box-value {
-            color: var(--color-primary);
-            font-size: 14px;
-            font-weight: 700;
-            overflow-wrap: anywhere;
+        .kv-value {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--color-ink);
+            word-break: break-word;
         }
 
-        /* STATUS PILLS */
-        .status-pill {
+        /* Status Pills */
+        .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
             padding: 4px 10px;
-            border-radius: 9999px;
-            font-size: 11px;
+            border-radius: 999px;
+            font-size: 11.5px;
             font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            text-transform: capitalize;
         }
 
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
+        .status-draft { background: #F1F5F9; color: #475569; }
+        .status-diajukan { background: #EFF6FF; color: #1D4ED8; }
+        .status-perlu_revisi { background: #FFFBEB; color: #B45309; }
+        .status-lolos { background: #ECFDF5; color: #047857; }
+        .status-tidak_lolos { background: #FEF2F2; color: #B91C1C; }
+        .status-menunggu_persetujuan { background: #FEF3C7; color: #92400E; }
+        .status-terjadwal { background: #E0F2FE; color: #0369A1; }
+        .status-terbit { background: #ECFDF5; color: #047857; }
+        .status-ditarik { background: #F3F4F6; color: #4B5563; }
 
-        .pill-draft {
-            background: #F1F5F9;
-            color: #475569;
-            border: 1px solid #CBD5E1;
-        }
-        .pill-draft .status-dot { background: #64748B; }
-
-        .pill-diajukan {
-            background: #EFF6FF;
-            color: #1E40AF;
-            border: 1px solid #BFDBFE;
-        }
-        .pill-diajukan .status-dot { background: #3B82F6; }
-
-        .pill-pemeriksaan {
-            background: #FFFBEB;
-            color: #B45309;
-            border: 1px solid #FDE68A;
-        }
-        .pill-pemeriksaan .status-dot { background: #F59E0B; }
-
-        .pill-revisi {
-            background: #FEF2F2;
-            color: #B91C1C;
-            border: 1px solid #FECACA;
-        }
-        .pill-revisi .status-dot { background: #EF4444; }
-
-        .pill-lolos {
-            background: #F0FDF4;
-            color: #15803D;
-            border: 1px solid #BBF7D0;
-        }
-        .pill-lolos .status-dot { background: #16A34A; }
-
-        /* FORM ELEMENTS */
-        .form-row {
+        /* Forms */
+        .form-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-            margin-bottom: 18px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
             position: relative;
         }
 
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
         label {
-            display: block;
-            color: var(--color-ink-dark);
             font-size: 13px;
             font-weight: 600;
-            margin-bottom: 6px;
+            color: var(--color-ink);
         }
 
         .req {
@@ -291,1473 +638,1892 @@
 
         input[type="text"],
         input[type="email"],
-        input[type="tel"],
         input[type="url"],
+        input[type="file"],
+        select,
         textarea {
             width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--color-hairline-dark);
-            border-radius: var(--radius-btn);
+            padding: 10px 13px;
+            border: 1px solid var(--color-hairline);
+            border-radius: 8px;
+            font-size: 13.5px;
+            color: var(--color-ink);
+            background: #FFFFFF;
             outline: none;
-            font-size: 14px;
-            font-family: var(--font-family);
-            background: var(--color-canvas);
-            color: var(--color-ink-dark);
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease;
         }
 
-        input:focus,
-        textarea:focus,
-        select:focus {
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(43, 43, 94, 0.08);
-        }
-
-        /* CUSTOM SELECT DROPDOWN */
         select {
-            width: 100%;
-            padding: 10px 38px 10px 14px;
-            border: 1px solid var(--color-hairline-dark);
-            border-radius: var(--radius-btn);
-            outline: none;
-            font-size: 14px;
-            font-family: var(--font-family);
-            background-color: var(--color-canvas);
-            color: var(--color-ink-dark);
             appearance: none;
             -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232B2B5E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            padding-right: 36px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235C6282' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 14px center;
-            background-size: 15px;
-            cursor: pointer;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            background-position: right 12px center;
         }
 
-        /* CUSTOM FILE DROPZONE */
-        .file-dropzone {
-            border: 2px dashed var(--color-hairline-dark);
-            border-radius: var(--radius-btn);
-            padding: 22px 18px;
-            text-align: center;
-            cursor: pointer;
-            background: var(--color-surface);
-            transition: all 0.2s ease;
-            position: relative;
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--role-accent);
+            box-shadow: 0 0 0 3px rgba(1, 125, 199, 0.12);
         }
 
-        .file-dropzone:hover,
-        .file-dropzone.dragover {
-            border-color: var(--color-primary);
-            background: rgba(43, 43, 94, 0.02);
+        textarea {
+            resize: vertical;
+            min-height: 84px;
         }
 
-        .file-dropzone input[type="file"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .dropzone-icon {
-            color: var(--color-ink);
-            margin-bottom: 8px;
-        }
-
-        .dropzone-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--color-primary);
-        }
-
-        .dropzone-hint {
-            font-size: 11px;
-            color: var(--color-ink);
-            margin-top: 3px;
-        }
-
-        .dropzone-file-preview {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 14px;
-            background: var(--color-canvas);
-            border: 1px solid var(--color-hairline);
-            border-radius: var(--radius-btn);
-            margin-top: 8px;
-            font-size: 13px;
-        }
-
-        .dropzone-file-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--color-primary);
-            font-weight: 600;
-        }
-
-        .dropzone-remove-btn {
-            background: transparent;
-            border: none;
-            color: #DC2626;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            display: inline-flex;
-            align-items: center;
-            transition: background 0.15s ease;
-        }
-
-        .dropzone-remove-btn:hover {
-            background: #FEE2E2;
-        }
-
-        /* BUTTONS */
-        .btn-primary {
-            background: var(--color-primary);
-            color: var(--color-canvas);
-            border: none;
-            padding: 11px 24px;
-            border-radius: var(--radius-btn);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .btn-primary:hover {
-            background: var(--color-primary-dark);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--color-primary);
-            border: 1px solid var(--color-primary);
-            padding: 10px 22px;
-            border-radius: var(--radius-btn);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            text-decoration: none;
-        }
-
-        .btn-outline:hover {
-            background: var(--color-primary);
-            color: var(--color-canvas);
-        }
-
-        .btn-secondary {
-            background: var(--color-surface);
-            color: var(--color-ink-dark);
-            border: 1px solid var(--color-hairline-dark);
-            padding: 8px 16px;
-            border-radius: var(--radius-btn);
+        .field-hint {
             font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            color: var(--color-muted);
         }
 
-        .btn-secondary:hover {
-            background: var(--color-surface-hover);
-            border-color: var(--color-ink);
-        }
-
-        /* KARYA SUBMISSION ITEMS */
-        .karya-card {
-            border: 1px solid var(--color-hairline);
-            border-radius: var(--radius-btn);
-            padding: 20px 22px;
-            margin-bottom: 16px;
-            background: var(--color-canvas);
-            transition: border-color 0.15s ease;
-        }
-
-        .karya-card:hover {
-            border-color: var(--color-hairline-dark);
-        }
-
-        .karya-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 16px;
-            margin-bottom: 8px;
-        }
-
-        .karya-heading {
-            font-size: 17px;
-            font-weight: 700;
-            color: var(--color-primary);
-            line-height: 1.4;
-        }
-
-        .karya-category-tag {
-            display: inline-block;
-            color: var(--color-ink);
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .karya-desc {
-            font-size: 13px;
-            color: var(--color-ink);
-            line-height: 1.6;
-            margin-bottom: 14px;
-        }
-
-        .karya-meta-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 16px;
-            font-size: 12px;
-            color: var(--color-ink-dark);
-            padding: 10px 14px;
-            background: var(--color-surface);
-            border-radius: 4px;
-            margin-bottom: 14px;
-        }
-
-        .karya-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .karya-meta-item strong {
-            color: var(--color-primary);
-        }
-
-        .karya-actions-row {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 10px;
-            padding-top: 14px;
-            border-top: 1px solid var(--color-hairline);
-        }
-
-        /* TEAM MEMBERS FORM ROW */
-        .member-input-row {
-            display: grid;
-            grid-template-columns: 2fr 1.5fr 2fr auto;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .btn-remove-row {
-            background: transparent;
-            border: 1px solid var(--color-hairline-dark);
-            color: #DC2626;
-            padding: 9px 12px;
-            border-radius: var(--radius-btn);
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s ease;
-        }
-
-        .btn-remove-row:hover {
-            background: #FEF2F2;
-            border-color: #F87171;
-        }
-
-        /* AUTOCOMPLETE DROPDOWN */
-        .suggestions-dropdown {
+        /* Autocomplete Dropdown */
+        .autocomplete-list {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
-            background: var(--color-canvas);
-            border: 1px solid var(--color-hairline);
             margin-top: 4px;
+            background: #FFFFFF;
+            border: 1px solid var(--color-hairline);
+            border-radius: 10px;
+            box-shadow: 0 12px 28px rgba(43, 43, 94, 0.14);
             max-height: 240px;
             overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-radius: 4px;
+            z-index: 60;
+            display: none;
         }
 
-        .suggestion-item {
-            padding: 10px 14px;
+        .autocomplete-list.open {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 10px 13px;
             cursor: pointer;
-            border-bottom: 1px solid var(--color-surface);
-            transition: background 0.1s ease;
-        }
-
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
-
-        .suggestion-item:hover {
-            background: var(--color-surface-hover);
-        }
-
-        .suggestion-name {
-            font-weight: 600;
-            color: var(--color-primary);
+            border-bottom: 1px solid #F1EFF7;
             font-size: 13px;
         }
 
-        .suggestion-meta {
-            font-size: 11px;
-            color: var(--color-ink);
-            margin-top: 2px;
+        .autocomplete-item:last-child {
+            border-bottom: none;
         }
 
-        .footer {
-            text-align: center;
-            color: var(--color-ink);
+        .autocomplete-item:hover {
+            background: var(--role-accent-soft);
+        }
+
+        .autocomplete-item strong {
+            display: block;
+            color: var(--color-primary);
+        }
+
+        .autocomplete-item span {
+            font-size: 11.5px;
+            color: var(--color-muted);
+        }
+
+        /* Work Card & Sub-tabs */
+        .work-box {
+            border: 1px solid var(--color-hairline);
+            border-radius: 12px;
+            padding: 18px 20px;
+            background: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .work-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .work-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
             font-size: 12px;
-            margin: 40px 0;
+            color: var(--color-muted);
         }
 
-        @media (max-width: 768px) {
-            .card {
-                padding: 24px 20px;
-            }
-            .info-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .form-row,
-            .member-input-row {
+        .member-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-hairline);
+            font-size: 13px;
+        }
+
+        .timeline-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .timeline-item {
+            padding: 12px 14px;
+            border-left: 3px solid var(--role-accent);
+            background: var(--color-surface);
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+
+        .dev2-box {
+            border: 1px dashed #CBD5E1;
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .dev2-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #E2E8F0;
+            color: #334155;
+            margin-bottom: 10px;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 11px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-hairline);
+        }
+
+        th {
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--color-muted);
+            background: var(--color-surface);
+        }
+
+        .collapse-panel {
+            display: none;
+            margin-top: 8px;
+            padding-top: 14px;
+            border-top: 1px solid var(--color-hairline);
+        }
+
+        .collapse-panel.open {
+            display: block;
+        }
+
+        @media (max-width: 980px) {
+            .app-shell {
                 grid-template-columns: 1fr;
+                padding: 16px;
             }
-            .navbar {
-                padding: 14px 20px;
+            .sidebar {
+                position: static;
+                display: none;
+            }
+            .sidebar.mobile-open {
+                display: block;
+            }
+            .mobile-menu-toggle {
+                display: inline-flex;
+            }
+            .kpi-grid, .two-col-grid, .three-col-grid, .form-grid, .info-kv {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+@php
+    $portalRole = match (true) {
+        $isAdminRole => 'admin',
+        $isPicKampus => 'pic-kampus',
+        $isTimMahasiswa => 'tim-mahasiswa',
+        $isPicSekolah => 'pic-sekolah',
+        $isPicIndustri => 'pic-industri',
+        $isPicSponsor => 'pic-sponsor',
+        $isJuri => 'juri',
+        default => 'pengunjung',
+    };
 
-<body>
+    $roleMeta = match ($portalRole) {
+        'admin' => [
+            'label' => 'Panitia Admin',
+            'portalTitle' => 'Akses Panitia Admin',
+            'subtitle' => 'Gunakan panel Filament untuk pengelolaan operasional panitia, kurasi, dan publikasi resmi.',
+            'defaultTab' => 'ringkasan',
+        ],
+        'pic-kampus' => [
+            'label' => 'PIC Kampus',
+            'portalTitle' => 'Portal Koordinator Kampus',
+            'subtitle' => 'Kelola profil institusi, anggota tim pengusul, dokumen proposal, revisi kurasi, dan pengajuan publikasi (maksimal 2 karya per edisi festival).',
+            'defaultTab' => 'ringkasan',
+        ],
+        'tim-mahasiswa' => [
+            'label' => 'Tim Mahasiswa',
+            'portalTitle' => 'Portal Tim Karya Mahasiswa',
+            'subtitle' => 'Kelola karya inovasi yang ditugaskan kepada tim Anda, lengkapi anggota, unggah berkas, pantau catatan kurasi, dan ajukan showcase.',
+            'defaultTab' => 'ringkasan',
+        ],
+        'pic-sekolah' => [
+            'label' => 'PIC Sekolah',
+            'portalTitle' => 'Portal Sekolah dan Tur Edukasi',
+            'subtitle' => 'Ruang khusus koordinator sekolah untuk persiapan data sekolah, rombongan siswa, dan jadwal slot tur kunjungan pameran.',
+            'defaultTab' => 'ringkasan',
+        ],
+        'pic-industri' => [
+            'label' => 'PIC Industri / Mitra',
+            'portalTitle' => 'Portal Organisasi Industri dan Mitra',
+            'subtitle' => 'Pantau karya inovasi terpublikasi yang sesuai kebutuhan kolaborasi industri serta persiapan modul kemitraan.',
+            'defaultTab' => 'ringkasan',
+        ],
+        'pic-sponsor' => [
+            'label' => 'PIC Sponsor',
+            'portalTitle' => 'Portal Kemitraan dan Sponsor Resmi',
+            'subtitle' => 'Tinjau showcase inovasi festival serta persiapan ruang pengelolaan kesepakatan, materi sponsor, dan pemenuhan manfaat.',
+            'defaultTab' => 'ringkasan',
+        ],
+        'juri' => [
+            'label' => 'Dewan Juri',
+            'portalTitle' => 'Portal Dewan Juri',
+            'subtitle' => 'Daftar karya yang telah lolos kurasi tahap awal untuk referensi penilaian serta ruang penugasan juri.',
+            'defaultTab' => 'ringkasan',
+        ],
+        default => [
+            'label' => 'Pengunjung',
+            'portalTitle' => 'Portal Pengunjung Festival',
+            'subtitle' => 'Jelajahi showcase karya inovasi terpublikasi, informasi acara resmi, atau daftarkan diri sebagai peserta kompetisi bila memenuhi syarat.',
+            'defaultTab' => 'ringkasan',
+        ],
+    };
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="brand">
-            FUTURI<span>SE</span>
-        </div>
+    $requestedTab = old('redirect_tab', request()->query('tab'));
+    $allowedTabsByRole = match ($portalRole) {
+        'pic-kampus', 'tim-mahasiswa' => ['ringkasan', 'profil', 'karya', 'dokumen', 'kurasi', 'dev2_modul'],
+        'pic-sekolah' => ['ringkasan', 'profil_sekolah', 'rombongan', 'slot_tur'],
+        'pic-industri' => ['ringkasan', 'showcase_katalog', 'organisasi_mitra', 'pertemuan_booth'],
+        'pic-sponsor' => ['ringkasan', 'kesepakatan', 'tagihan_materi', 'showcase_sponsor'],
+        'juri' => ['ringkasan', 'daftar_karya', 'penilaian_juri'],
+        'pengunjung' => ['ringkasan', 'showcase', 'tiket_aktivitas', 'daftar_peserta'],
+        default => ['ringkasan'],
+    };
 
-        <div class="nav-right">
-            <span class="user-greeting">
-                Masuk sebagai: <strong>{{ $user->name }}</strong>
-            </span>
+    $activeTab = in_array($requestedTab, $allowedTabsByRole, true) ? $requestedTab : $roleMeta['defaultTab'];
+    if (! $requestedTab && $errors->any() && in_array($portalRole, ['pic-kampus', 'tim-mahasiswa'], true)) {
+        if ($errors->has('peran') || $errors->hasAny(['judul', 'kategori', 'teknologi', 'deskripsi'])) {
+            $activeTab = 'karya';
+        } elseif ($errors->has('file')) {
+            $activeTab = 'dokumen';
+        } elseif ($errors->hasAny(['institusi', 'nomor_identitas', 'nama_lengkap'])) {
+            $activeTab = 'profil';
+        }
+    }
 
-            <form method="POST" action="{{ route('logout') }}" style="display: inline;">
-                @csrf
-                <button type="submit" class="logout-btn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                        <polyline points="16 17 21 12 16 7"/>
-                        <line x1="21" y1="12" x2="9" y2="12"/>
-                    </svg>
-                    Keluar
+    $peserta = $user->peserta;
+    $statusLabels = [
+        'draft' => 'Draft',
+        'diajukan' => 'Diajukan ke Kurasi',
+        'perlu_revisi' => 'Perlu Revisi',
+        'lolos' => 'Lolos Kurasi',
+        'tidak_lolos' => 'Tidak Lolos',
+    ];
+    $pubStatusLabels = [
+        'draft' => 'Draft Publikasi',
+        'menunggu_persetujuan' => 'Menunggu Persetujuan',
+        'terjadwal' => 'Terjadwal Terbit',
+        'terbit' => 'Terbit di Showcase',
+        'ditarik' => 'Ditarik',
+    ];
+    $workCategories = $activeFestival?->kategoris?->pluck('nama')->filter()->values()
+        ?? collect([
+            'Artificial Intelligence & Big Data',
+            'IoT, Robotics & Embedded Systems',
+            'Web, Mobile & Cloud Computing',
+            'Cybersecurity & Digital Forensics',
+            'UI/UX, Game & Digital Media',
+            'Sistem Informasi & Enterprise Software',
+        ]);
+    $quotaRemaining = max(0, $maxWorksQuota - $institutionActiveWorksCount);
+@endphp
+<body class="theme-{{ $portalRole }}">
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand-group">
+                <button type="button" class="logout-btn mobile-menu-toggle" onclick="toggleMobileSidebar()">
+                    Menu
                 </button>
-            </form>
-        </div>
-    </nav>
-
-    <!-- MAIN CONTENT -->
-    <main class="container">
-
-        <!-- STATUS ALERTS -->
-        @if (session('status'))
-            <div class="alert alert-success">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                <div>{{ session('status') }}</div>
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="alert alert-error">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
+                <div class="brand-mark" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
                 <div>
-                    <strong style="display: block; margin-bottom: 4px;">Periksa kembali input Anda:</strong>
-                    <ul style="padding-left: 18px;">
+                    <div class="brand-title">FUTU<span>RiSE</span></div>
+                    <div class="brand-sub">APTIKOM Innovation Festival Portal</div>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                @if ($activeFestival)
+                    <span class="festival-pill">{{ $activeFestival->nama }}</span>
+                @endif
+                <span class="role-pill">{{ $roleMeta['label'] }}</span>
+                <div class="user-chip">
+                    <strong>{{ $user->name }}</strong>
+                    <span>{{ $user->email }}</span>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="logout-btn">Keluar</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <div class="app-shell">
+        <aside class="sidebar" id="portalSidebar">
+            <div class="sidebar-role-card">
+                <div class="sidebar-role-tag">Peran Aktif</div>
+                <div class="sidebar-role-title">{{ $roleMeta['portalTitle'] }}</div>
+            </div>
+
+            @if ($portalRole === 'pic-kampus' || $portalRole === 'tim-mahasiswa')
+                <div class="sidebar-section-label">Menu Utama (Dev 1)</div>
+                <nav class="nav-list">
+                    <button type="button" class="nav-item {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-tab-btn="ringkasan">
+                        <span class="nav-item-left">Dashboard</span>
+                        <span class="nav-badge">{{ $institutionActiveWorksCount }}/{{ $maxWorksQuota }}</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'profil' ? 'active' : '' }}" data-tab-btn="profil">
+                        <span class="nav-item-left">{{ $isPicKampus ? 'Profil Kampus' : 'Profil Peserta' }}</span>
+                        <span class="nav-badge">{{ $peserta ? 'Aktif' : 'Belum' }}</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'karya' ? 'active' : '' }}" data-tab-btn="karya">
+                        <span class="nav-item-left">{{ $isPicKampus ? 'Tim dan Karya Kampus' : 'Karya Ditugaskan' }}</span>
+                        <span class="nav-badge">{{ $managedWorks->count() }}</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'dokumen' ? 'active' : '' }}" data-tab-btn="dokumen">
+                        <span class="nav-item-left">Dokumen dan Media</span>
+                        <span class="nav-badge">{{ $managedWorks->sum(fn ($w) => $w->files->count()) }}</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'kurasi' ? 'active' : '' }}" data-tab-btn="kurasi">
+                        <span class="nav-item-left">Hasil Kurasi dan Showcase</span>
+                        <span class="nav-badge">{{ $managedWorks->where('status', 'lolos')->count() }}</span>
+                    </button>
+                </nav>
+
+                <div class="sidebar-section-label">Operasional Lanjutan</div>
+                <nav class="nav-list">
+                    <button type="button" class="nav-item {{ $activeTab === 'dev2_modul' ? 'active' : '' }}" data-tab-btn="dev2_modul">
+                        <span class="nav-item-left">Booth, Jadwal &amp; Tagihan</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                </nav>
+            @elseif ($portalRole === 'pic-sekolah')
+                <div class="sidebar-section-label">Menu PIC Sekolah</div>
+                <nav class="nav-list">
+                    <button type="button" class="nav-item {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-tab-btn="ringkasan">
+                        <span class="nav-item-left">Ringkasan Sekolah</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'profil_sekolah' ? 'active' : '' }}" data-tab-btn="profil_sekolah">
+                        <span class="nav-item-left">Profil Sekolah</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'rombongan' ? 'active' : '' }}" data-tab-btn="rombongan">
+                        <span class="nav-item-left">Rombongan &amp; Pendamping</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'slot_tur' ? 'active' : '' }}" data-tab-btn="slot_tur">
+                        <span class="nav-item-left">Slot Tur &amp; Arahan</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                </nav>
+            @elseif ($portalRole === 'pic-industri')
+                <div class="sidebar-section-label">Menu Industri &amp; Mitra</div>
+                <nav class="nav-list">
+                    <button type="button" class="nav-item {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-tab-btn="ringkasan">
+                        <span class="nav-item-left">Ringkasan Mitra</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'showcase_katalog' ? 'active' : '' }}" data-tab-btn="showcase_katalog">
+                        <span class="nav-item-left">Katalog Inovasi</span>
+                        <span class="nav-badge">{{ $publishedWorks->count() }}</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'organisasi_mitra' ? 'active' : '' }}" data-tab-btn="organisasi_mitra">
+                        <span class="nav-item-left">Profil Organisasi &amp; Kebutuhan</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'pertemuan_booth' ? 'active' : '' }}" data-tab-btn="pertemuan_booth">
+                        <span class="nav-item-left">Booth, Pertemuan &amp; Tagihan</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                </nav>
+            @elseif ($portalRole === 'pic-sponsor')
+                <div class="sidebar-section-label">Menu Sponsor</div>
+                <nav class="nav-list">
+                    <button type="button" class="nav-item {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-tab-btn="ringkasan">
+                        <span class="nav-item-left">Ringkasan Sponsor</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'kesepakatan' ? 'active' : '' }}" data-tab-btn="kesepakatan">
+                        <span class="nav-item-left">Kesepakatan &amp; Paket</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'tagihan_materi' ? 'active' : '' }}" data-tab-btn="tagihan_materi">
+                        <span class="nav-item-left">Tagihan, Materi &amp; Manfaat</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'showcase_sponsor' ? 'active' : '' }}" data-tab-btn="showcase_sponsor">
+                        <span class="nav-item-left">Showcase Karya Pilihan</span>
+                        <span class="nav-badge">{{ $publishedWorks->count() }}</span>
+                    </button>
+                </nav>
+            @elseif ($portalRole === 'juri')
+                <div class="sidebar-section-label">Menu Dewan Juri</div>
+                <nav class="nav-list">
+                    <button type="button" class="nav-item {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-tab-btn="ringkasan">
+                        <span class="nav-item-left">Ringkasan Juri</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'daftar_karya' ? 'active' : '' }}" data-tab-btn="daftar_karya">
+                        <span class="nav-item-left">Karya Lolos Kurasi</span>
+                        <span class="nav-badge">{{ $curatedWorks->count() }}</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'penilaian_juri' ? 'active' : '' }}" data-tab-btn="penilaian_juri">
+                        <span class="nav-item-left">Rubrik &amp; Skor Penilaian</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                </nav>
+            @elseif ($portalRole === 'pengunjung')
+                <div class="sidebar-section-label">Menu Pengunjung</div>
+                <nav class="nav-list">
+                    <button type="button" class="nav-item {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-tab-btn="ringkasan">
+                        <span class="nav-item-left">Beranda Pengunjung</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'showcase' ? 'active' : '' }}" data-tab-btn="showcase">
+                        <span class="nav-item-left">Showcase Karya</span>
+                        <span class="nav-badge">{{ $publishedWorks->count() }}</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'tiket_aktivitas' ? 'active' : '' }}" data-tab-btn="tiket_aktivitas">
+                        <span class="nav-item-left">Tiket QR, Voting &amp; Survei</span>
+                        <span class="nav-badge nav-badge-dev2">Dev 2</span>
+                    </button>
+                    <button type="button" class="nav-item {{ $activeTab === 'daftar_peserta' ? 'active' : '' }}" data-tab-btn="daftar_peserta">
+                        <span class="nav-item-left">Pendaftaran Peserta Lomba</span>
+                    </button>
+                </nav>
+            @endif
+        </aside>
+
+        <main class="main-col">
+            {{-- Role Hero Header --}}
+            <section class="hero-banner">
+                <div>
+                    <div class="hero-eyebrow">{{ $roleMeta['label'] }} @if($activeFestival) &bull; {{ $activeFestival->tema ?? $activeFestival->nama }} @endif</div>
+                    <h1 class="hero-title">{{ $roleMeta['portalTitle'] }}</h1>
+                    <p class="hero-desc">{{ $roleMeta['subtitle'] }}</p>
+                </div>
+
+                @if ($portalRole === 'pic-kampus' || $portalRole === 'tim-mahasiswa')
+                    <div class="hero-stat-box">
+                        <div class="hero-stat-label">Kuota Karya Institusi</div>
+                        <div class="hero-stat-value">{{ $institutionActiveWorksCount }} / {{ $maxWorksQuota }}</div>
+                        <div class="hero-stat-sub">
+                            {{ $peserta?->institusi ? $peserta->institusi : 'Lengkapi profil institusi' }}
+                        </div>
+                    </div>
+                @elseif ($portalRole === 'juri')
+                    <div class="hero-stat-box">
+                        <div class="hero-stat-label">Karya Siap Dinilai</div>
+                        <div class="hero-stat-value">{{ $curatedWorks->count() }}</div>
+                        <div class="hero-stat-sub">Status Lolos Kurasi</div>
+                    </div>
+                @elseif ($portalRole === 'pic-sekolah')
+                    <div class="hero-stat-box">
+                        <div class="hero-stat-label">Status Akun Sekolah</div>
+                        <div class="hero-stat-value">{{ strtoupper($user->account_status) }}</div>
+                        <div class="hero-stat-sub">Kategori Kunjungan Tur</div>
+                    </div>
+                @elseif ($portalRole === 'pic-industri' || $portalRole === 'pic-sponsor')
+                    <div class="hero-stat-box">
+                        <div class="hero-stat-label">Karya di Showcase</div>
+                        <div class="hero-stat-value">{{ $publishedWorks->count() }}</div>
+                        <div class="hero-stat-sub">Terbit di Website Resmi</div>
+                    </div>
+                @elseif ($portalRole === 'pengunjung')
+                    <div class="hero-stat-box">
+                        <div class="hero-stat-label">Karya Terpublikasi</div>
+                        <div class="hero-stat-value">{{ $publishedWorks->count() }}</div>
+                        <div class="hero-stat-sub">Akses Terbuka Pengunjung</div>
+                    </div>
+                @endif
+            </section>
+
+            {{-- Global Session Alerts & Validation Errors --}}
+            @if (session('status'))
+                <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
+            @if (session('info'))
+                <div class="alert alert-info">{{ session('info') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-error">{{ session('error') }}</div>
+            @endif
+            @if ($errors->any())
+                <div class="alert alert-error">
+                    <strong>Periksa kembali isian formulir berikut:</strong>
+                    <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
-            </div>
-        @endif
+            @endif
 
-        <!-- OVERVIEW / USER PROFILE -->
-        <section class="card">
-            <div class="card-header">
-                <div>
-                    <div class="card-tag">Informasi Akun</div>
-                    <h1 class="card-title">{{ $user->name }}</h1>
-                    <p class="card-subtitle">{{ $user->email }}</p>
-                </div>
-
-                <div>
-                    <span class="status-pill pill-lolos">
-                        <span class="status-dot"></span>
-                        Akun Aktif
-                    </span>
-                </div>
-            </div>
-
-            <div class="info-grid">
-                <div class="info-box">
-                    <span class="info-box-label">Status Email</span>
-                    <div class="info-box-value">Terverifikasi</div>
-                </div>
-
-                <div class="info-box">
-                    <span class="info-box-label">Nomor Telepon</span>
-                    <div class="info-box-value">{{ $user->peserta?->no_telepon ?? $user->person?->phone ?? '-' }}</div>
-                </div>
-
-                <div class="info-box">
-                    <span class="info-box-label">Institusi / Afiliasi</span>
-                    <div class="info-box-value">
-                        @if ($user->peserta)
-                            {{ $user->peserta->institusi }}
-                        @elseif ($user->hasRole('juri'))
-                            Dewan Juri FUTURiSE
-                        @elseif ($user->hasAnyRole(['pic-industri', 'pic-sponsor']))
-                            Mitra / Sponsor Industri
-                        @elseif ($user->hasAnyRole(['pic-kampus', 'pic-sekolah']))
-                            Koordinator Institusi Pendidikan
-                        @else
-                            Belum terdaftar
-                        @endif
-                    </div>
-                </div>
-
-                <div class="info-box">
-                    <span class="info-box-label">Peran</span>
-                    <div class="info-box-value">
-                        @php
-                            $roleName = $user->getRoleNames()->first();
-                            $displayRole = match (true) {
-                                $user->peserta !== null => strtoupper($user->peserta->jenis_peserta),
-                                $roleName !== null      => strtoupper(str_replace('-', ' ', $roleName)),
-                                default                 => 'PENGUNJUNG',
-                            };
-                        @endphp
-                        {{ $displayRole }}
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        @if ($user->peserta)
-
-            <!-- SECTION: SUBMISI KARYA SAYA -->
-            <section class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-tag">Proyek Inovasi</div>
-                        <h2 class="card-title">Karya yang Didaftarkan</h2>
-                        <p class="card-subtitle">
-                            Daftar inovasi yang Anda ajukan pada {{ $activeFestival->nama ?? 'FUTURiSE 2026' }}.
-                        </p>
-                    </div>
-
-                    <a href="#form-submisi" class="btn-outline">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                        </svg>
-                        Submisi Baru
-                    </a>
-                </div>
-
-                @if ($user->peserta->karyasAsLeader->count() > 0)
-                    @foreach ($user->peserta->karyasAsLeader as $karya)
-                        <div class="karya-card">
-                            <div class="karya-category-tag">{{ $karya->kategori }}</div>
-
-                            <div class="karya-header-row">
-                                <h3 class="karya-heading">{{ $karya->judul }}</h3>
-
-                                <div>
-                                    @php
-                                        $pillClass = match ($karya->status) {
-                                            'diajukan'          => 'pill-diajukan',
-                                            'dalam_pemeriksaan' => 'pill-pemeriksaan',
-                                            'perlu_revisi'      => 'pill-revisi',
-                                            'lolos'             => 'pill-lolos',
-                                            default             => 'pill-draft',
-                                        };
-                                        $statusLabel = match ($karya->status) {
-                                            'diajukan'          => 'Diajukan',
-                                            'dalam_pemeriksaan' => 'Dalam Pemeriksaan',
-                                            'perlu_revisi'      => 'Perlu Revisi',
-                                            'lolos'             => 'Lolos Kurasi',
-                                            'tidak_lolos'       => 'Tidak Lolos',
-                                            default             => 'Draft',
-                                        };
-                                    @endphp
-                                    <span class="status-pill {{ $pillClass }}">
-                                        <span class="status-dot"></span>
-                                        {{ $statusLabel }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <p class="karya-desc">{{ $karya->deskripsi }}</p>
-
-                            <!-- META ROW -->
-                            <div class="karya-meta-row">
-                                <div class="karya-meta-item">
-                                    <span style="color: var(--color-ink);">Teknologi:</span>
-                                    <strong>{{ $karya->teknologi }}</strong>
-                                </div>
-
-                                @if ($karya->url_demo)
-                                    <div class="karya-meta-item">
-                                        <span style="color: var(--color-ink);">Demo:</span>
-                                        <a href="{{ $karya->url_demo }}" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 600; text-decoration: none;">
-                                            Tautan Demo
-                                        </a>
-                                    </div>
-                                @endif
-
-                                @if ($karya->files->count() > 0)
-                                    <div class="karya-meta-item">
-                                        <span style="color: var(--color-ink);">Proposal:</span>
-                                        @foreach ($karya->files as $file)
-                                            <a href="{{ asset('storage/' . $file->path) }}" target="_blank" style="color: var(--color-accent); font-weight: 600; text-decoration: none;">
-                                                {{ $file->nama_asli }}
-                                            </a>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
-
-                            <!-- ANGGOTA TIM -->
-                            <div style="font-size: 12px; color: var(--color-ink); margin-bottom: 12px;">
-                                Susunan Tim:
-                                <strong style="color: var(--color-primary);">{{ $user->peserta->nama_lengkap }} (Ketua)</strong>
-                                @foreach ($karya->anggotaTims as $anggota)
-                                    &bull; <span>{{ $anggota->nama_lengkap }} ({{ $anggota->peran ?? 'Anggota' }})</span>
-                                @endforeach
-                            </div>
-
-                            <!-- ACTIONS -->
-                            @if (in_array($karya->status, ['draft', 'perlu_revisi']))
-                                <div class="karya-actions-row">
-                                    <form method="POST" action="{{ route('karya.submit', $karya->id) }}" onsubmit="return confirm('Ajukan karya ini untuk proses kurasi?');">
-                                        @csrf
-                                        <button type="submit" class="btn-primary" style="padding: 8px 16px; font-size: 12px;">
-                                            Ajukan Karya ke Kurasi
-                                        </button>
-                                    </form>
-                                </div>
-                            @endif
-                        </div>
-                    @endforeach
-                @else
-                    <div style="text-align: center; padding: 36px 20px; background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: 4px;">
-                        <p style="color: var(--color-ink); font-size: 14px; margin-bottom: 14px;">
-                            Belum ada karya yang didaftarkan.
-                        </p>
-                        <a href="#form-submisi" class="btn-outline">
-                            Mulai Submisi Karya
-                        </a>
-                    </div>
-                @endif
-            </section>
-
-            <!-- SECTION: FORM SUBMISI BARU -->
-            <section id="form-submisi" class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-tag">Formulir Submisi</div>
-                        <h2 class="card-title">Pendaftaran Karya Inovasi Baru</h2>
-                        <p class="card-subtitle">
-                            Lengkapi informasi proyek karya yang akan diikutsertakan pada {{ $activeFestival->nama ?? 'FUTURiSE 2026' }}.
-                        </p>
-                    </div>
-                </div>
-
-                <form method="POST" action="{{ route('karya.store') }}" enctype="multipart/form-data">
-                    @csrf
-
-                    <!-- JUDUL KARYA -->
-                    <div class="form-group">
-                        <label for="judul">Judul Karya <span class="req">*</span></label>
-                        <input
-                            type="text"
-                            id="judul"
-                            name="judul"
-                            value="{{ old('judul') }}"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-row">
-                        <!-- KATEGORI LOMBA -->
-                        <div class="form-group">
-                            <label for="kategori">Kategori Lomba <span class="req">*</span></label>
-                            <select id="kategori" name="kategori" required>
-                                <option value="">Pilih kategori lomba</option>
-                                @if (isset($activeFestival) && $activeFestival->kategoris->count() > 0)
-                                    @foreach ($activeFestival->kategoris as $kat)
-                                        <option value="{{ $kat->nama }}" @selected(old('kategori') === $kat->nama)>
-                                            {{ $kat->nama }}
-                                        </option>
-                                    @endforeach
-                                @else
-                                    <option value="Web & Mobile App Innovation">Web & Mobile App Innovation</option>
-                                    <option value="Artificial Intelligence & Big Data">Artificial Intelligence & Big Data</option>
-                                    <option value="IoT, Robotics & Embedded Systems">IoT, Robotics & Embedded Systems</option>
-                                    <option value="Game Development & Interactive Media">Game Development & Interactive Media</option>
-                                    <option value="Cybersecurity & Infrastructure">Cybersecurity & Infrastructure</option>
-                                @endif
-                            </select>
-                        </div>
-
-                        <!-- STACK TEKNOLOGI -->
-                        <div class="form-group">
-                            <label for="teknologi">Stack Teknologi Utama <span class="req">*</span></label>
-                            <input
-                                type="text"
-                                id="teknologi"
-                                name="teknologi"
-                                value="{{ old('teknologi') }}"
-                                required
-                            >
-                        </div>
-                    </div>
-
-                    <!-- DESKRIPSI -->
-                    <div class="form-group">
-                        <label for="deskripsi">Deskripsi Karya <span class="req">*</span></label>
-                        <textarea
-                            id="deskripsi"
-                            name="deskripsi"
-                            rows="4"
-                            required
-                        >{{ old('deskripsi') }}</textarea>
-                    </div>
-
-                    <div class="form-row">
-                        <!-- URL DEMO -->
-                        <div class="form-group">
-                            <label for="url_demo">Tautan Demo atau Video (Opsional)</label>
-                            <input
-                                type="url"
-                                id="url_demo"
-                                name="url_demo"
-                                value="{{ old('url_demo') }}"
-                            >
-                        </div>
-
-                        <!-- BERKAS PROPOSAL (CUSTOM DROPZONE) -->
-                        <div class="form-group">
-                            <label>Berkas Proposal (PDF, Maks. 20 MB)</label>
-                            <div class="file-dropzone" id="proposal-dropzone">
-                                <input type="file" id="proposal" name="proposal" accept=".pdf">
-                                <div id="dropzone-empty">
-                                    <div class="dropzone-icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                            <polyline points="17 8 12 3 7 8"/>
-                                            <line x1="12" y1="3" x2="12" y2="15"/>
-                                        </svg>
-                                    </div>
-                                    <div class="dropzone-title">Pilih berkas PDF atau seret ke area ini</div>
-                                    <div class="dropzone-hint">Maksimal 20 MB</div>
-                                </div>
-
-                                <div class="dropzone-file-preview" id="dropzone-preview" style="display: none;">
-                                    <div class="dropzone-file-info">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                            <polyline points="14 2 14 8 20 8"/>
-                                        </svg>
-                                        <span id="preview-filename"></span>
-                                        <span id="preview-filesize" style="font-size: 11px; color: var(--color-ink); font-weight: 400;"></span>
-                                    </div>
-                                    <button type="button" class="dropzone-remove-btn" id="btn-remove-proposal" title="Hapus">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <line x1="18" y1="6" x2="6" y2="18"/>
-                                            <line x1="6" y1="6" x2="18" y2="18"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ANGGOTA TIM -->
-                    <div class="form-group" style="margin-top: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <label style="margin-bottom: 0;">Anggota Tim Tambahan (Opsional)</label>
-                            <button type="button" id="btn-add-member" class="btn-secondary">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="12" y1="5" x2="12" y2="19"/>
-                                    <line x1="5" y1="12" x2="19" y2="12"/>
-                                </svg>
-                                Tambah Anggota
-                            </button>
-                        </div>
-
-                        <div style="padding: 10px 14px; background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: var(--radius-btn); margin-bottom: 10px; font-size: 13px; color: var(--color-ink-dark);">
-                            Ketua Tim: <strong>{{ $user->peserta->nama_lengkap }}</strong> ({{ $user->peserta->institusi }})
-                        </div>
-
-                        <div id="team-members-container"></div>
-                    </div>
-
-                    <!-- PERSETUJUAN PUBLIKASI -->
-                    <div class="form-group" style="margin: 22px 0;">
-                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; font-size: 13px; color: var(--color-ink-dark);">
-                            <input
-                                type="checkbox"
-                                name="persetujuan_publikasi"
-                                value="1"
-                                style="width: 16px; height: 16px; accent-color: var(--color-primary); cursor: pointer;"
-                                @checked(old('persetujuan_publikasi', true))
-                            >
-                            Izinkan karya ini untuk dipamerkan pada Showcase Expo jika dinyatakan lolos kurasi.
-                        </label>
-                    </div>
-
-                    <!-- SUBMIT BUTTONS -->
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px;">
-                        <button type="submit" name="action_type" value="submit" class="btn-primary">
-                            Ajukan Karya
-                        </button>
-                        <button type="submit" name="action_type" value="draft" class="btn-outline">
-                            Simpan Sebagai Draft
-                        </button>
-                    </div>
-                </form>
-            </section>
-
-        @elseif ($user->hasRole('juri'))
-
-            <!-- PORTAL KHUSUS JURI -->
-            <section class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-tag">Portal Dewan Juri</div>
-                        <h2 class="card-title">Daftar Karya Lolos Kurasi untuk Penilaian</h2>
-                        <p class="card-subtitle">
-                            Daftar karya peserta pada {{ $activeFestival->nama ?? 'FUTURiSE 2026' }} yang telah lolos tahap kurasi administrasi.
-                        </p>
-                    </div>
-                    <span class="status-pill pill-pemeriksaan">
-                        <span class="status-dot"></span>
-                        Mode Tinjauan Juri
-                    </span>
-                </div>
-
-                @if ($curatedWorks->count() > 0)
-                    @foreach ($curatedWorks as $karya)
-                        <div class="karya-card">
-                            <div class="karya-category-tag">{{ $karya->kategori }}</div>
-                            <div class="karya-header-row">
-                                <h3 class="karya-heading">{{ $karya->judul }}</h3>
-                                <span class="status-pill pill-lolos">
-                                    <span class="status-dot"></span>
-                                    Lolos Kurasi
-                                </span>
-                            </div>
-                            <p class="karya-desc">{{ $karya->deskripsi }}</p>
-                            <div class="karya-meta-row">
-                                <div class="karya-meta-item">
-                                    <span style="color: var(--color-ink);">Ketua / Institusi:</span>
-                                    <strong>{{ $karya->submitter?->nama_lengkap ?? '-' }} ({{ $karya->submitter?->institusi ?? '-' }})</strong>
-                                </div>
-                                <div class="karya-meta-item">
-                                    <span style="color: var(--color-ink);">Teknologi:</span>
-                                    <strong>{{ $karya->teknologi }}</strong>
-                                </div>
-                                @if ($karya->url_demo)
-                                    <div class="karya-meta-item">
-                                        <span style="color: var(--color-ink);">Demo:</span>
-                                        <a href="{{ $karya->url_demo }}" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); font-weight: 600; text-decoration: none;">
-                                            Buka Demo
-                                        </a>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div style="padding: 28px 20px; background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: 4px; text-align: center; color: var(--color-ink); font-size: 14px;">
-                        Belum ada karya berstatus lolos kurasi yang siap dinilai saat ini.
-                    </div>
-                @endif
-            </section>
-
-            @if ($activeFestival && $activeFestival->periodes->count() > 0)
-                <section class="card">
+            {{-- ================================================================ --}}
+            {{-- ADMIN REDIRECT BANNER                                            --}}
+            {{-- ================================================================ --}}
+            @if ($portalRole === 'admin')
+                <div class="card">
                     <div class="card-header">
                         <div>
-                            <div class="card-tag">Jadwal Festival</div>
-                            <h2 class="card-title">Tahapan Pelaksanaan &amp; Penjurian</h2>
+                            <h2 class="card-title">Akun Panitia Terdeteksi</h2>
+                            <p class="card-subtitle">Akun Anda memiliki otoritas panel panitia Filament untuk mengelola data operasional sesuai divisi.</p>
+                        </div>
+                        <a href="/admin" class="btn btn-primary">Buka Panel Admin Filament</a>
+                    </div>
+                    <div class="info-kv">
+                        <div class="kv-item">
+                            <div class="kv-label">Nama Pengguna</div>
+                            <div class="kv-value">{{ $user->name }}</div>
+                        </div>
+                        <div class="kv-item">
+                            <div class="kv-label">Peran Sistem</div>
+                            <div class="kv-value">{{ $user->getRoleNames()->implode(', ') }}</div>
                         </div>
                     </div>
-                    <div class="info-grid">
-                        @foreach ($activeFestival->periodes as $periode)
-                            <div class="info-box">
-                                <span class="info-box-label">{{ strtoupper(str_replace('_', ' ', $periode->tahap)) }}</span>
-                                <div class="info-box-value" style="font-size: 13px;">
-                                    {{ \Carbon\Carbon::parse($periode->mulai)->format('d M Y') }} &ndash; {{ \Carbon\Carbon::parse($periode->selesai)->format('d M Y') }}
+                </div>
+
+            {{-- ================================================================ --}}
+            {{-- PORTAL PIC KAMPUS & TIM MAHASISWA (DEV 1 FUNCTIONAL)             --}}
+            {{-- ================================================================ --}}
+            @elseif ($portalRole === 'pic-kampus' || $portalRole === 'tim-mahasiswa')
+
+                {{-- TAB: RINGKASAN --}}
+                <section class="panel-section {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-panel="ringkasan">
+                    @if (! $peserta)
+                        <div class="alert alert-warning">
+                            <strong>Profil {{ $isPicKampus ? 'Kampus' : 'Peserta' }} Belum Dilengkapi.</strong>
+                            Silakan buka menu <strong>{{ $isPicKampus ? 'Profil Kampus' : 'Profil Peserta' }}</strong> untuk mengisi nama institusi dan nomor identitas sebelum mendaftarkan tim serta karya inovasi.
+                        </div>
+                    @endif
+
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Kuota Karya Aktif</div>
+                            <div class="kpi-value">{{ $institutionActiveWorksCount }} / {{ $maxWorksQuota }}</div>
+                            <div class="kpi-note">Sisa slot pengajuan: {{ $quotaRemaining }} karya</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Draft &amp; Revisi</div>
+                            <div class="kpi-value">{{ $managedWorks->whereIn('status', ['draft', 'perlu_revisi'])->count() }}</div>
+                            <div class="kpi-note">Masih dapat disunting tim</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Dalam Kurasi / Lolos</div>
+                            <div class="kpi-value">{{ $managedWorks->whereIn('status', ['diajukan', 'lolos'])->count() }}</div>
+                            <div class="kpi-note">{{ $managedWorks->where('status', 'lolos')->count() }} karya lolos kurasi</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Total Lampiran</div>
+                            <div class="kpi-value">{{ $managedWorks->sum(fn ($w) => $w->files->count()) }}</div>
+                            <div class="kpi-note">Proposal, demo, gambar &amp; pendukung</div>
+                        </div>
+                    </div>
+
+                    <div class="two-col-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Identitas {{ $isPicKampus ? 'Koordinator Kampus' : 'Ketua / Anggota Tim' }}</h2>
+                                    <p class="card-subtitle">Data utama yang tertaut dengan kuota pengajuan institusi pada festival aktif.</p>
+                                </div>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="switchPortalTab('profil')">Kelola Profil</button>
+                            </div>
+                            <div class="info-kv">
+                                <div class="kv-item">
+                                    <div class="kv-label">Nama Lengkap</div>
+                                    <div class="kv-value">{{ $peserta?->nama_lengkap ?? $user->name }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Institusi / Kampus</div>
+                                    <div class="kv-value">{{ $peserta?->institusi ?? 'Belum diisi' }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Nomor Identitas</div>
+                                    <div class="kv-value">{{ $peserta?->nomor_identitas ?? 'Belum diisi' }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Nomor Telepon / WA</div>
+                                    <div class="kv-value">{{ $peserta?->no_telepon ?? $user->person?->phone ?? '-' }}</div>
                                 </div>
                             </div>
-                        @endforeach
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Status &amp; Batas Periode Festival</h2>
+                                    <p class="card-subtitle">{{ $activeFestival?->nama ?? 'Belum ada festival aktif' }}</p>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="switchPortalTab('karya')">Kelola Karya</button>
+                            </div>
+                            @if ($activeFestival && $activeFestival->periodes->isNotEmpty())
+                                <div class="timeline-list">
+                                    @foreach ($activeFestival->periodes->take(4) as $periode)
+                                        <div class="timeline-item">
+                                            <strong>{{ $periode->nama }}</strong>
+                                            <div class="field-hint">
+                                                {{ $periode->mulai?->format('d M Y') }} &ndash; {{ $periode->selesai?->format('d M Y') }}
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="card-subtitle">Jadwal lini masa periode submisi dan kurasi akan tampil setelah ditetapkan oleh panitia.</p>
+                            @endif
+                        </div>
+                    </div>
+                </section>
+
+                {{-- TAB: PROFIL KAMPUS / PESERTA --}}
+                <section class="panel-section {{ $activeTab === 'profil' ? 'active' : '' }}" data-panel="profil">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">{{ $isPicKampus ? 'Profil Institusi Kampus' : 'Profil Peserta dan Ketua Tim' }}</h2>
+                                <p class="card-subtitle">
+                                    @if ($peserta)
+                                        Perbarui nama penanggung jawab, kontak aktif, nama kampus terverifikasi, dan nomor identitas.
+                                    @else
+                                        Lengkapi data institusi dan identitas terlebih dahulu untuk mengaktifkan pendaftaran tim dan karya inovasi.
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+
+                        @if (! $peserta)
+                            <form method="POST" action="{{ route('participant.register') }}">
+                                @csrf
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="jenis_peserta_reg">Kategori Pendaftar <span class="req">*</span></label>
+                                        <select name="jenis_peserta" id="jenis_peserta_reg" required>
+                                            @if ($isPicKampus)
+                                                <option value="pic" selected>PIC / Koordinator Kampus</option>
+                                                <option value="mahasiswa">Mahasiswa Pengusul</option>
+                                            @else
+                                                <option value="mahasiswa" selected>Mahasiswa / Tim Perguruan Tinggi</option>
+                                                <option value="siswa_smk">Siswa SMK / Sederajat</option>
+                                                <option value="umum">Inovator Umum</option>
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="nomor_identitas_reg">{{ $isPicKampus ? 'NIDN / NIP / Kode PIC' : 'NIM / NISN / NIK' }} <span class="req">*</span></label>
+                                        <input type="text" name="nomor_identitas" id="nomor_identitas_reg" value="{{ old('nomor_identitas') }}" placeholder="Contoh: 0412058801 atau 152026001" required>
+                                    </div>
+                                    <div class="form-group full">
+                                        <label for="institusi_input_profil">Asal Kampus / Institusi Resmi <span class="req">*</span></label>
+                                        <input type="text" name="institusi" id="institusi_input_profil" class="js-institusi-autocomplete" data-list="institusiListProfil" value="{{ old('institusi') }}" placeholder="Ketik minimal 2 huruf nama perguruan tinggi..." autocomplete="off" required>
+                                        <div class="autocomplete-list" id="institusiListProfil"></div>
+                                    </div>
+                                    <div class="form-group full">
+                                        <label for="no_telepon_reg">Nomor Telepon / WhatsApp Aktif</label>
+                                        <input type="text" name="no_telepon" id="no_telepon_reg" value="{{ old('no_telepon', $user->person?->phone) }}" placeholder="Contoh: 081234567890">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 18px;">
+                                    <button type="submit" class="btn btn-primary">Simpan &amp; Aktifkan Profil</button>
+                                </div>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('participant.profile.update') }}">
+                                @csrf
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="nama_lengkap_upd">Nama Lengkap Penanggung Jawab <span class="req">*</span></label>
+                                        <input type="text" name="nama_lengkap" id="nama_lengkap_upd" value="{{ old('nama_lengkap', $peserta->nama_lengkap) }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="no_telepon_upd">Nomor Telepon / WhatsApp</label>
+                                        <input type="text" name="no_telepon" id="no_telepon_upd" value="{{ old('no_telepon', $peserta->no_telepon) }}" placeholder="08xxxxxxxxxx">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="institusi_input_upd">Asal Kampus / Institusi <span class="req">*</span></label>
+                                        <input type="text" name="institusi" id="institusi_input_upd" class="js-institusi-autocomplete" data-list="institusiListUpdate" value="{{ old('institusi', $peserta->institusi) }}" autocomplete="off" required>
+                                        <div class="autocomplete-list" id="institusiListUpdate"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="nomor_identitas_upd">Nomor Identitas ({{ strtoupper($peserta->jenis_peserta) }}) <span class="req">*</span></label>
+                                        <input type="text" name="nomor_identitas" id="nomor_identitas_upd" value="{{ old('nomor_identitas', $peserta->nomor_identitas) }}" required>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 18px;">
+                                    <button type="submit" class="btn btn-primary">Simpan Perubahan Profil</button>
+                                </div>
+                            </form>
+                        @endif
+                    </div>
+                </section>
+
+                {{-- TAB: TIM & KARYA --}}
+                <section class="panel-section {{ $activeTab === 'karya' ? 'active' : '' }}" data-panel="karya">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Karya yang Didaftarkan ({{ $managedWorks->count() }})</h2>
+                                <p class="card-subtitle">
+                                    @if ($isPicKampus)
+                                        Menampilkan seluruh karya yang tertaut dengan {{ $peserta?->institusi ?? 'kampus Anda' }}.
+                                    @else
+                                        Tim mahasiswa hanya dapat menyunting karya yang dipimpin atau ditugaskan kepada akun Anda.
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+
+                        @if ($managedWorks->isEmpty())
+                            <div class="alert alert-info">
+                                Belum ada karya yang terdaftar pada portal ini. Gunakan formulir Pendaftaran Karya Inovasi Baru di bawah setelah melengkapi profil.
+                            </div>
+                        @else
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                @foreach ($managedWorks as $karya)
+                                    @php
+                                        $canEditWork = in_array($karya->status, ['draft', 'perlu_revisi'], true);
+                                    @endphp
+                                    <div class="work-box">
+                                        <div class="work-head">
+                                            <div>
+                                                <div style="font-size: 16px; font-weight: 700; color: var(--color-primary); margin-bottom: 4px;">
+                                                    {{ $karya->judul }}
+                                                </div>
+                                                <div class="work-meta">
+                                                    <span>Kategori: <strong>{{ $karya->kategori }}</strong></span>
+                                                    <span>Teknologi: <strong>{{ $karya->teknologi }}</strong></span>
+                                                    <span>Pengusul: <strong>{{ $karya->submitter?->nama_lengkap ?? '-' }}</strong></span>
+                                                </div>
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                                <span class="status-badge status-{{ $karya->status }}">
+                                                    {{ $statusLabels[$karya->status] ?? $karya->status }}
+                                                </span>
+                                                @if ($canEditWork)
+                                                    <button type="button" class="btn btn-outline btn-sm" onclick="toggleCollapse('edit-work-{{ $karya->id }}')">Edit Karya</button>
+                                                    <button type="button" class="btn btn-outline btn-sm" onclick="toggleCollapse('team-work-{{ $karya->id }}')">Anggota Tim ({{ $karya->anggotaTims->count() }})</button>
+                                                    <form method="POST" action="{{ route('karya.submit', $karya->id) }}">
+                                                        @csrf
+                                                        <input type="hidden" name="redirect_tab" value="karya">
+                                                        <button type="submit" class="btn btn-primary btn-sm">Ajukan Kurasi</button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <p style="font-size: 13px; color: var(--color-muted); line-height: 1.55;">
+                                            {{ $karya->deskripsi }}
+                                        </p>
+
+                                        @if ($karya->catatan_kurasi)
+                                            <div class="alert alert-warning" style="padding: 10px 14px;">
+                                                <strong>Catatan Kurator Terbaru:</strong> {{ $karya->catatan_kurasi }}
+                                            </div>
+                                        @endif
+
+                                        {{-- Panel Kelola Anggota Tim --}}
+                                        <div class="collapse-panel {{ $canEditWork ? '' : '' }}" id="team-work-{{ $karya->id }}">
+                                            <div style="font-size: 13.5px; font-weight: 700; color: var(--color-primary); margin-bottom: 10px;">
+                                                Daftar Anggota Tim Karya
+                                            </div>
+                                            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
+                                                <div class="member-row">
+                                                    <div>
+                                                        <strong>{{ $karya->submitter?->nama_lengkap ?? $user->name }}</strong>
+                                                        <span class="field-hint">&mdash; Ketua Tim ({{ $karya->submitter?->institusi ?? '-' }})</span>
+                                                    </div>
+                                                    <span class="status-badge status-lolos">Ketua</span>
+                                                </div>
+                                                @foreach ($karya->anggotaTims as $member)
+                                                    <div class="member-row">
+                                                        <div>
+                                                            <strong>{{ $member->nama_lengkap }}</strong>
+                                                            <span class="field-hint">&mdash; {{ $member->peran }} @if($member->email) ({{ $member->email }}) @endif</span>
+                                                        </div>
+                                                        @if ($canEditWork && ! $member->is_ketua)
+                                                            <form method="POST" action="{{ route('karya.members.destroy', [$karya->id, $member->id]) }}">
+                                                                @csrf
+                                                                <input type="hidden" name="redirect_tab" value="karya">
+                                                                <button type="submit" class="btn btn-danger-outline btn-sm">Hapus</button>
+                                                            </form>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                            @if ($canEditWork)
+                                                <form method="POST" action="{{ route('karya.members.store', $karya->id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="redirect_tab" value="karya">
+                                                    <div class="form-grid">
+                                                        <div class="form-group">
+                                                            <label>Nama Anggota Baru <span class="req">*</span></label>
+                                                            <input type="text" name="nama_lengkap" required placeholder="Nama lengkap mahasiswa">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Peran di Tim <span class="req">*</span></label>
+                                                            <input type="text" name="peran" required placeholder="Contoh: Backend Developer / UI Designer">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Email Anggota</label>
+                                                            <input type="email" name="email" placeholder="nama@kampus.ac.id">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>NIM / Nomor Identitas</label>
+                                                            <input type="text" name="nomor_identitas" placeholder="Opsional">
+                                                        </div>
+                                                    </div>
+                                                    <div style="margin-top: 10px;">
+                                                        <button type="submit" class="btn btn-navy btn-sm">Tambah Anggota Tim</button>
+                                                    </div>
+                                                </form>
+                                            @endif
+                                        </div>
+
+                                        {{-- Panel Edit Detail Karya --}}
+                                        @if ($canEditWork)
+                                            <div class="collapse-panel" id="edit-work-{{ $karya->id }}">
+                                                <form method="POST" action="{{ route('karya.update', $karya->id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="redirect_tab" value="karya">
+                                                    <div class="form-grid">
+                                                        <div class="form-group full">
+                                                            <label>Judul Karya <span class="req">*</span></label>
+                                                            <input type="text" name="judul" value="{{ $karya->judul }}" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Kategori <span class="req">*</span></label>
+                                                            <select name="kategori" required>
+                                                                @foreach ($workCategories as $cat)
+                                                                    <option value="{{ $cat }}" {{ $karya->kategori === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Teknologi / Stack <span class="req">*</span></label>
+                                                            <input type="text" name="teknologi" value="{{ $karya->teknologi }}" required>
+                                                        </div>
+                                                        <div class="form-group full">
+                                                            <label>Ringkasan Karya <span class="req">*</span></label>
+                                                            <textarea name="deskripsi" required>{{ $karya->deskripsi }}</textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Masalah yang Diangkat</label>
+                                                            <textarea name="masalah">{{ $karya->masalah }}</textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Solusi yang Ditawarkan</label>
+                                                            <textarea name="solusi">{{ $karya->solusi }}</textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Pengguna Sasaran</label>
+                                                            <input type="text" name="pengguna_sasaran" value="{{ $karya->pengguna_sasaran }}">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Tahap Kesiapan</label>
+                                                            <input type="text" name="tahap_kesiapan" value="{{ $karya->tahap_kesiapan }}" placeholder="Contoh: Prototipe / Pilot">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Fitur Utama</label>
+                                                            <textarea name="fitur_utama">{{ $karya->fitur_utama }}</textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Hasil Uji</label>
+                                                            <textarea name="hasil_uji">{{ $karya->hasil_uji }}</textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Keterbatasan Karya</label>
+                                                            <textarea name="keterbatasan">{{ $karya->keterbatasan }}</textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Kebutuhan Kolaborasi</label>
+                                                            <textarea name="kebutuhan_kolaborasi">{{ $karya->kebutuhan_kolaborasi }}</textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Tautan Demo / Repositori</label>
+                                                            <input type="url" name="url_demo" value="{{ $karya->url_demo }}" placeholder="https://...">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Catatan Pembaruan Versi</label>
+                                                            <input type="text" name="catatan_perbaikan" placeholder="Ringkasan perubahan yang dilakukan">
+                                                        </div>
+                                                    </div>
+                                                    <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                                                        <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 500;">
+                                                            <input type="checkbox" name="persetujuan_publikasi" value="1" {{ $karya->persetujuan_publikasi ? 'checked' : '' }}>
+                                                            Izinkan kurasi &amp; publikasi di Showcase jika lolos
+                                                        </label>
+                                                        <button type="submit" class="btn btn-primary">Simpan Perubahan Karya</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Form Pendaftaran Karya Inovasi Baru --}}
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Pendaftaran Karya Inovasi Baru</h2>
+                                <p class="card-subtitle">
+                                    Kuota aktif institusi: <strong>{{ $institutionActiveWorksCount }} dari {{ $maxWorksQuota }} karya</strong>.
+                                </p>
+                            </div>
+                        </div>
+
+                        @if (! $peserta)
+                            <div class="alert alert-warning">
+                                Silakan lengkapi profil pada menu <strong>{{ $isPicKampus ? 'Profil Kampus' : 'Profil Peserta' }}</strong> terlebih dahulu sebelum mendaftarkan karya baru.
+                            </div>
+                        @elseif ($quotaRemaining <= 0)
+                            <div class="alert alert-warning">
+                                Kuota maksimal {{ $maxWorksQuota }} karya aktif untuk institusi <strong>{{ $peserta->institusi }}</strong> pada edisi festival ini telah tercapai.
+                            </div>
+                        @else
+                            <form method="POST" action="{{ route('karya.store') }}" enctype="multipart/form-data">
+                                @csrf
+                                <input type="hidden" name="redirect_tab" value="karya">
+                                <div class="form-grid">
+                                    <div class="form-group full">
+                                        <label for="judul">Judul Karya Inovasi <span class="req">*</span></label>
+                                        <input type="text" name="judul" id="judul" value="{{ old('judul') }}" placeholder="Contoh: Sistem Pemantauan Kualitas Air Berbasis Sensor LoRa" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="kategori">Bidang / Kategori <span class="req">*</span></label>
+                                        <select name="kategori" id="kategori" required>
+                                            <option value="">-- Pilih Bidang Karya --</option>
+                                            @foreach ($workCategories as $cat)
+                                                <option value="{{ $cat }}" {{ old('kategori') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="teknologi">Teknologi Utama <span class="req">*</span></label>
+                                        <input type="text" name="teknologi" id="teknologi" value="{{ old('teknologi') }}" placeholder="Contoh: Python, TensorFlow, Laravel, ESP32" required>
+                                    </div>
+                                    <div class="form-group full">
+                                        <label for="deskripsi">Deskripsi Singkat Karya <span class="req">*</span></label>
+                                        <textarea name="deskripsi" id="deskripsi" placeholder="Jelaskan ringkasan konsep inovasi dan manfaat utama karya..." required>{{ old('deskripsi') }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="masalah">Masalah yang Diselesaikan</label>
+                                        <textarea name="masalah" id="masalah" placeholder="Latar belakang persoalan di lapangan...">{{ old('masalah') }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="solusi">Solusi yang Ditawarkan</label>
+                                        <textarea name="solusi" id="solusi" placeholder="Pendekatan dan mekanisme kerja solusi...">{{ old('solusi') }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pengguna_sasaran">Pengguna Sasaran</label>
+                                        <input type="text" name="pengguna_sasaran" id="pengguna_sasaran" value="{{ old('pengguna_sasaran') }}" placeholder="Contoh: Puskesmas, UMKM Kuliner, Dinas Lingkungan">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tahap_kesiapan">Tahap Kesiapan</label>
+                                        <input type="text" name="tahap_kesiapan" id="tahap_kesiapan" value="{{ old('tahap_kesiapan') }}" placeholder="Contoh: Prototipe Teruji / Uji Lapangan">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fitur_utama">Fitur Utama</label>
+                                        <textarea name="fitur_utama" id="fitur_utama">{{ old('fitur_utama') }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="hasil_uji">Hasil Uji Awal</label>
+                                        <textarea name="hasil_uji" id="hasil_uji">{{ old('hasil_uji') }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="keterbatasan">Keterbatasan Karya</label>
+                                        <textarea name="keterbatasan" id="keterbatasan">{{ old('keterbatasan') }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="kebutuhan_kolaborasi">Kebutuhan Kolaborasi Industri</label>
+                                        <textarea name="kebutuhan_kolaborasi" id="kebutuhan_kolaborasi">{{ old('kebutuhan_kolaborasi') }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="url_demo">Tautan Demo / Video</label>
+                                        <input type="url" name="url_demo" id="url_demo" value="{{ old('url_demo') }}" placeholder="https://...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="proposal">Proposal PDF (Opsional, Maks 20 MB)</label>
+                                        <input type="file" name="proposal" id="proposal" accept=".pdf">
+                                    </div>
+
+                                    <div class="form-group full">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                                            <label>Anggota Tim Pendamping (Opsional)</label>
+                                            <button type="button" class="btn btn-outline btn-sm" onclick="addTeamRow()">Tambah Baris Anggota</button>
+                                        </div>
+                                        <div id="teamRowsContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                                            <div class="two-col-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                                                <input type="text" name="anggota_nama[]" placeholder="Nama lengkap anggota">
+                                                <input type="text" name="anggota_peran[]" placeholder="Peran (mis. Frontend)">
+                                                <input type="email" name="anggota_email[]" placeholder="Email anggota">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group full">
+                                        <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 500;">
+                                            <input type="checkbox" name="persetujuan_publikasi" value="1" checked>
+                                            Bersedia menampilkan profil ringkas karya di Showcase publik apabila lolos kurasi.
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button type="submit" name="action_type" value="draft" class="btn btn-outline">Simpan Sebagai Draft</button>
+                                    <button type="submit" name="action_type" value="submit" class="btn btn-primary">Simpan &amp; Ajukan Kurasi</button>
+                                </div>
+                            </form>
+                        @endif
+                    </div>
+                </section>
+
+                {{-- TAB: DOKUMEN & BERKAS --}}
+                <section class="panel-section {{ $activeTab === 'dokumen' ? 'active' : '' }}" data-panel="dokumen">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Unggah Berkas &amp; Media Pendukung Karya</h2>
+                                <p class="card-subtitle">Unggah proposal PDF, thumbnail poster, tangkapan layar aplikasi, video demo, atau dokumen teknis (maksimal 25 MB).</p>
+                            </div>
+                        </div>
+
+                        @if ($managedWorks->isEmpty())
+                            <div class="alert alert-info">Anda perlu mendaftarkan minimal satu karya terlebih dahulu sebelum mengunggah dokumen pendukung.</div>
+                        @else
+                            <div style="display: flex; flex-direction: column; gap: 18px;">
+                                @foreach ($managedWorks as $karya)
+                                    <div class="work-box">
+                                        <div class="work-head">
+                                            <div>
+                                                <strong>{{ $karya->judul }}</strong>
+                                                <div class="field-hint">{{ $karya->files->count() }} berkas tersimpan</div>
+                                            </div>
+                                            <span class="status-badge status-{{ $karya->status }}">{{ $statusLabels[$karya->status] ?? $karya->status }}</span>
+                                        </div>
+
+                                        @if ($karya->files->isNotEmpty())
+                                            <div class="table-wrap">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Nama Berkas</th>
+                                                            <th>Jenis</th>
+                                                            <th>Ukuran</th>
+                                                            <th>Keterangan</th>
+                                                            <th>Aksi</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($karya->files as $file)
+                                                            <tr>
+                                                                <td><strong>{{ $file->nama_asli }}</strong></td>
+                                                                <td>{{ ucfirst($file->jenis) }}</td>
+                                                                <td>{{ number_format(($file->ukuran_byte ?? 0) / 1024, 1) }} KB</td>
+                                                                <td>{{ $file->keterangan ?? '-' }}</td>
+                                                                <td>
+                                                                    @if ($file->path)
+                                                                        <a href="{{ asset('storage/' . ltrim($file->path, '/')) }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Lihat Berkas</a>
+                                                                    @else
+                                                                        <span>-</span>
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
+
+                                        <form method="POST" action="{{ route('karya.upload', $karya->id) }}" enctype="multipart/form-data">
+                                            @csrf
+                                            <input type="hidden" name="redirect_tab" value="dokumen">
+                                            <div class="form-grid" style="grid-template-columns: 1fr 1.2fr 1fr auto; align-items: end;">
+                                                <div class="form-group">
+                                                    <label>Jenis Berkas</label>
+                                                    <select name="jenis" required>
+                                                        <option value="dokumen">Dokumen / Proposal</option>
+                                                        <option value="thumbnail">Thumbnail Showcase</option>
+                                                        <option value="utama">Berkas Utama</option>
+                                                        <option value="galeri">Galeri Gambar</option>
+                                                        <option value="video">Video Demo</option>
+                                                        <option value="lainnya">Lampiran Lainnya</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Pilih Berkas</label>
+                                                    <input type="file" name="file" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Keterangan</label>
+                                                    <input type="text" name="keterangan" placeholder="Mis. Deck Presentasi v2">
+                                                </div>
+                                                <button type="submit" class="btn btn-primary btn-sm">Unggah</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+                {{-- TAB: HASIL KURASI, RIWAYAT REVISI & PUBLIKASI SHOWCASE --}}
+                <section class="panel-section {{ $activeTab === 'kurasi' ? 'active' : '' }}" data-panel="kurasi">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Hasil Kurasi, Riwayat Revisi &amp; Pengajuan Showcase</h2>
+                                <p class="card-subtitle">Pantau catatan kurator, riwayat versi perbaikan karya, serta ajukan persetujuan publikasi showcase untuk karya yang telah lolos kurasi.</p>
+                            </div>
+                        </div>
+
+                        @if ($managedWorks->isEmpty())
+                            <div class="alert alert-info">Belum ada karya untuk ditinjau status kurasinya.</div>
+                        @else
+                            <div style="display: flex; flex-direction: column; gap: 18px;">
+                                @foreach ($managedWorks as $karya)
+                                    @php
+                                        $pub = $karya->publikasiWeb;
+                                    @endphp
+                                    <div class="work-box">
+                                        <div class="work-head">
+                                            <div>
+                                                <div style="font-size: 16px; font-weight: 700; color: var(--color-primary);">{{ $karya->judul }}</div>
+                                                <div class="work-meta">
+                                                    <span>Status Kurasi: <strong>{{ $statusLabels[$karya->status] ?? $karya->status }}</strong></span>
+                                                    @if ($pub)
+                                                        <span>Status Showcase: <strong>{{ $pubStatusLabels[$pub->status] ?? $pub->status }}</strong></span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <span class="status-badge status-{{ $karya->status }}">{{ $statusLabels[$karya->status] ?? $karya->status }}</span>
+                                        </div>
+
+                                        @if ($karya->catatan_kurasi)
+                                            <div class="alert alert-warning" style="padding: 12px 14px;">
+                                                <strong>Catatan Kurator:</strong> {{ $karya->catatan_kurasi }}
+                                            </div>
+                                        @endif
+
+                                        <div>
+                                            <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--color-primary);">Riwayat Versi Karya</div>
+                                            @if ($karya->versis->isEmpty())
+                                                <p class="field-hint">Belum ada catatan perubahan versi.</p>
+                                            @else
+                                                <div class="timeline-list">
+                                                    @foreach ($karya->versis as $versi)
+                                                        <div class="timeline-item">
+                                                            <strong>Versi {{ $versi->versi }} &mdash; {{ $statusLabels[$versi->status_baru] ?? $versi->status_baru }}</strong>
+                                                            <div>{{ $versi->catatan ?? 'Pembaruan data karya.' }}</div>
+                                                            <div class="field-hint">
+                                                                Oleh: {{ $versi->updater?->name ?? 'Sistem' }} &bull; {{ $versi->created_at?->format('d M Y H:i') }}
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        {{-- Pengajuan Publikasi Showcase (Dev 1) --}}
+                                        <div style="padding-top: 12px; border-top: 1px solid var(--color-hairline);">
+                                            <div style="font-size: 13.5px; font-weight: 700; margin-bottom: 8px; color: var(--color-primary);">
+                                                Publikasi Showcase Resmi
+                                            </div>
+                                            @if ($karya->status !== 'lolos')
+                                                <p class="field-hint">Pengajuan publikasi Showcase terbuka setelah karya berstatus <strong>Lolos Kurasi</strong>.</p>
+                                            @else
+                                                @if ($pub)
+                                                    <div class="alert {{ $pub->status === 'terbit' ? 'alert-success' : 'alert-info' }}" style="margin-bottom: 12px;">
+                                                        Status publikasi saat ini: <strong>{{ $pubStatusLabels[$pub->status] ?? $pub->status }}</strong>
+                                                        @if ($pub->status === 'terbit')
+                                                            &bull; Slug publik: <code>/showcase/{{ $pub->slug }}</code>
+                                                        @endif
+                                                    </div>
+                                                @endif
+
+                                                @if (! $pub || in_array($pub->status, ['draft', 'ditarik'], true))
+                                                    <form method="POST" action="{{ route('karya.publication.request', $karya->id) }}">
+                                                        @csrf
+                                                        <input type="hidden" name="redirect_tab" value="kurasi">
+                                                        <div class="form-grid">
+                                                            <div class="form-group">
+                                                                <label>Judul Tampil di Showcase</label>
+                                                                <input type="text" name="judul_publik" value="{{ $pub?->judul_publik ?? $karya->judul }}" maxlength="180">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Ringkasan Singkat Publik</label>
+                                                                <input type="text" name="ringkasan_publik" value="{{ $pub?->ringkasan_publik ?? \Illuminate\Support\Str::limit($karya->deskripsi, 220) }}" maxlength="500">
+                                                            </div>
+                                                            <div class="form-group full">
+                                                                <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 500;">
+                                                                    <input type="checkbox" name="izin_peserta" value="1" required checked>
+                                                                    Saya menyetujui publikasi karya ini di Showcase resmi FUTURiSE (kontak pribadi tidak ditampilkan ke publik).
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div style="margin-top: 10px;">
+                                                            <button type="submit" class="btn btn-primary btn-sm">Ajukan Publikasi ke Showcase</button>
+                                                        </div>
+                                                    </form>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+                {{-- TAB: MODUL DEV 2 (TERPISAH JELAS) --}}
+                <section class="panel-section {{ $activeTab === 'dev2_modul' ? 'active' : '' }}" data-panel="dev2_modul">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Modul Operasional Lanjutan (Tahap Developer 2)</h2>
+                                <p class="card-subtitle">Menu berikut merupakan ruang integrasi untuk fitur yang sedang dibangun oleh tim Developer 2.</p>
+                            </div>
+                        </div>
+                        <div class="two-col-grid">
+                            <div class="dev2-box">
+                                <span class="dev2-tag">Menunggu Dev 2</span>
+                                <h3 class="card-title">Alokasi Booth &amp; Kebutuhan Teknis</h3>
+                                <p class="card-subtitle">Pengajuan daya listrik, area demo, perangkat pameran, dan penempatan nomor booth pameran.</p>
+                            </div>
+                            <div class="dev2-box">
+                                <span class="dev2-tag">Menunggu Dev 2</span>
+                                <h3 class="card-title">Jadwal Pitching &amp; Penjurian</h3>
+                                <p class="card-subtitle">Jadwal sesi pitching finalis, penempatan meja temu industri, serta rubrik hasil penilaian dewan juri.</p>
+                            </div>
+                            <div class="dev2-box">
+                                <span class="dev2-tag">Menunggu Dev 2</span>
+                                <h3 class="card-title">Tagihan &amp; Administrasi Pembayaran</h3>
+                                <p class="card-subtitle">Penerbitan tagihan partisipasi, unggah bukti transfer, dan status verifikasi dari Divisi Keuangan.</p>
+                            </div>
+                            <div class="dev2-box">
+                                <span class="dev2-tag">Menunggu Dev 2</span>
+                                <h3 class="card-title">Feedback Pengunjung &amp; Tindak Lanjut</h3>
+                                <p class="card-subtitle">Komentar masukan dari mitra industri/pengunjung serta pencatatan rencana tindak lanjut H+30.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            {{-- ================================================================ --}}
+            {{-- PORTAL PIC SEKOLAH (TERPISAH DARI PIC KAMPUS)                    --}}
+            {{-- ================================================================ --}}
+            @elseif ($portalRole === 'pic-sekolah')
+                <section class="panel-section {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-panel="ringkasan">
+                    <div class="two-col-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Identitas Koordinator Sekolah</h2>
+                                    <p class="card-subtitle">Portal ini dikhususkan bagi perwakilan SMA/SMK yang mengoordinasikan kunjungan siswa ke area pameran.</p>
+                                </div>
+                            </div>
+                            <div class="info-kv">
+                                <div class="kv-item">
+                                    <div class="kv-label">Nama Koordinator</div>
+                                    <div class="kv-value">{{ $user->name }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Email Akun</div>
+                                    <div class="kv-value">{{ $user->email }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Status Verifikasi</div>
+                                    <div class="kv-value">{{ ucfirst($user->account_status) }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Jenis Akses</div>
+                                    <div class="kv-value">Kunjungan Rombongan &amp; Tur Sekolah</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dev2-box">
+                            <span class="dev2-tag">Modul Sekolah &amp; Tur (Dev 2)</span>
+                            <h2 class="card-title">Status Kesiapan Portal Sekolah</h2>
+                            <p class="card-subtitle">
+                                Akun PIC Sekolah Anda telah terverifikasi pada sistem autentikasi (Dev 1). Modul penjadwalan slot tur, kuota siswa pendamping, pemandu lapangan, dan konfirmasi kedatangan akan tersedia melalui fitur <strong>Sekolah &amp; Tur</strong> dari Developer 2.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'profil_sekolah' ? 'active' : '' }}" data-panel="profil_sekolah">
+                    <div class="dev2-box">
+                        <span class="dev2-tag">Menunggu Dev 2</span>
+                        <h2 class="card-title">Profil Sekolah &amp; Pendamping</h2>
+                        <p class="card-subtitle">Pengisian profil resmi sekolah, NPSN, jumlah rombongan guru pendamping, serta kontak darurat kunjungan akan disediakan pada modul Sekolah (Dev 2).</p>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'rombongan' ? 'active' : '' }}" data-panel="rombongan">
+                    <div class="dev2-box">
+                        <span class="dev2-tag">Menunggu Dev 2</span>
+                        <h2 class="card-title">Daftar Rombongan Siswa</h2>
+                        <p class="card-subtitle">Pendataan daftar rombongan siswa per kloter dan surat konfirmasi sekolah ditangani pada modul Sekolah &amp; Tur (Dev 2).</p>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'slot_tur' ? 'active' : '' }}" data-panel="slot_tur">
+                    <div class="dev2-box">
+                        <span class="dev2-tag">Menunggu Dev 2</span>
+                        <h2 class="card-title">Pemilihan Slot Tur &amp; Arahan Kedatangan</h2>
+                        <p class="card-subtitle">Pemilihan slot waktu tur pameran, konfirmasi kehadiran, dan titik kumpul kedatangan bus sekolah akan aktif pada modul Developer 2.</p>
+                    </div>
+                </section>
+
+            {{-- ================================================================ --}}
+            {{-- PORTAL PIC INDUSTRI / MITRA (TERPISAH DARI SPONSOR)              --}}
+            {{-- ================================================================ --}}
+            @elseif ($portalRole === 'pic-industri')
+                <section class="panel-section {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-panel="ringkasan">
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Karya di Showcase</div>
+                            <div class="kpi-value">{{ $publishedWorks->count() }}</div>
+                            <div class="kpi-note">Inovasi siap dikaji untuk kolaborasi</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Status Akun Mitra</div>
+                            <div class="kpi-value">{{ ucfirst($user->account_status) }}</div>
+                            <div class="kpi-note">Terverifikasi panitia</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Permintaan Pertemuan</div>
+                            <div class="kpi-value">Dev 2</div>
+                            <div class="kpi-note">Modul Meeting &amp; Booth</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Tindak Lanjut</div>
+                            <div class="kpi-value">Dev 2</div>
+                            <div class="kpi-note">Agenda kolaborasi H+30</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Sorotan Inovasi untuk Mitra Industri</h2>
+                                <p class="card-subtitle">Karya berikut telah lolos kurasi dan diterbitkan di Showcase resmi FUTURiSE beserta kebutuhan kolaborasinya.</p>
+                            </div>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="switchPortalTab('showcase_katalog')">Lihat Semua Pratinjau</button>
+                        </div>
+                        @if ($publishedWorks->isEmpty())
+                            <p class="card-subtitle">Belum ada karya yang berstatus terbit di showcase pada festival saat ini.</p>
+                        @else
+                            <div class="three-col-grid">
+                                @foreach ($publishedWorks->take(3) as $pub)
+                                    <div class="work-box">
+                                        <div style="font-size: 14.5px; font-weight: 700; color: var(--color-primary);">{{ $pub->judul_publik }}</div>
+                                        <div class="field-hint">{{ $pub->karya?->submitter?->institusi ?? '-' }} &bull; {{ $pub->karya?->kategori }}</div>
+                                        <p class="field-hint">{{ \Illuminate\Support\Str::limit($pub->ringkasan_publik, 110) }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'showcase_katalog' ? 'active' : '' }}" data-panel="showcase_katalog">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Katalog Inovasi Terpublikasi</h2>
+                                <p class="card-subtitle">Daftar karya mahasiswa yang terbuka untuk penjajakan adopsi dan kemitraan teknologi.</p>
+                            </div>
+                        </div>
+                        @if ($publishedWorks->isEmpty())
+                            <div class="alert alert-info">Belum ada karya terbit di showcase.</div>
+                        @else
+                            <div class="two-col-grid">
+                                @foreach ($publishedWorks as $pub)
+                                    <div class="work-box">
+                                        <div class="work-head">
+                                            <strong>{{ $pub->judul_publik }}</strong>
+                                            <span class="status-badge status-terbit">Terbit</span>
+                                        </div>
+                                        <div class="work-meta">
+                                            <span>Kampus: {{ $pub->karya?->submitter?->institusi ?? '-' }}</span>
+                                            <span>Bidang: {{ $pub->karya?->kategori ?? '-' }}</span>
+                                        </div>
+                                        <p class="card-subtitle">{{ $pub->ringkasan_publik }}</p>
+                                        @if ($pub->karya?->kebutuhan_kolaborasi)
+                                            <div class="alert alert-info" style="padding: 8px 12px;">
+                                                <strong>Kebutuhan Kolaborasi:</strong> {{ $pub->karya->kebutuhan_kolaborasi }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'organisasi_mitra' ? 'active' : '' }}" data-panel="organisasi_mitra">
+                    <div class="dev2-box">
+                        <span class="dev2-tag">Menunggu Dev 2</span>
+                        <h2 class="card-title">Profil Organisasi Industri &amp; Kebutuhan Masalah</h2>
+                        <p class="card-subtitle">Pengelolaan profil sektor industri, direktori solusi/kebutuhan bisnis, serta daftar kontak teknis organisasi akan disediakan pada modul Mitra Industri (Dev 2).</p>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'pertemuan_booth' ? 'active' : '' }}" data-panel="pertemuan_booth">
+                    <div class="dev2-box">
+                        <span class="dev2-tag">Menunggu Dev 2</span>
+                        <h2 class="card-title">Partisipasi, Booth, Jadwal Pertemuan &amp; Tagihan</h2>
+                        <p class="card-subtitle">Reservasi booth organisasi, permintaan pertemuan langsung dengan tim inovator di venue, tagihan kemitraan, dan tindak lanjut H+30 berada di cakupan Developer 2.</p>
+                    </div>
+                </section>
+
+            {{-- ================================================================ --}}
+            {{-- PORTAL PIC SPONSOR (TERPISAH DARI INDUSTRI)                      --}}
+            {{-- ================================================================ --}}
+            @elseif ($portalRole === 'pic-sponsor')
+                <section class="panel-section {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-panel="ringkasan">
+                    <div class="two-col-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Profil Akun Sponsor</h2>
+                                    <p class="card-subtitle">Ruang representatif lembaga sponsor resmi untuk memantau publikasi inovasi dan paket sponsorship.</p>
+                                </div>
+                            </div>
+                            <div class="info-kv">
+                                <div class="kv-item">
+                                    <div class="kv-label">Nama PIC Sponsor</div>
+                                    <div class="kv-value">{{ $user->name }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Email Terdaftar</div>
+                                    <div class="kv-value">{{ $user->email }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Status Akun</div>
+                                    <div class="kv-value">{{ ucfirst($user->account_status) }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Showcase Terbit</div>
+                                    <div class="kv-value">{{ $publishedWorks->count() }} Karya</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dev2-box">
+                            <span class="dev2-tag">Modul Sponsorship &amp; Keuangan (Dev 2)</span>
+                            <h2 class="card-title">Status Fitur Kemitraan Sponsor</h2>
+                            <p class="card-subtitle">
+                                Akun Sponsor Anda sudah aktif untuk otentikasi portal dan pemantauan showcase (Dev 1). Pengelolaan paket sponsorship, kontrak kesepakatan, materi promosi, tagihan, dan laporan pemenuhan manfaat akan tersedia pada modul Developer 2.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'kesepakatan' ? 'active' : '' }}" data-panel="kesepakatan">
+                    <div class="dev2-box">
+                        <span class="dev2-tag">Menunggu Dev 2</span>
+                        <h2 class="card-title">Kesepakatan &amp; Paket Sponsorship</h2>
+                        <p class="card-subtitle">Rincian tingkat paket (Platinum/Gold/Silver/In-Kind), nilai dukungan, serta dokumen kesepakatan akan dikelola melalui modul Sponsorship (Dev 2).</p>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'tagihan_materi' ? 'active' : '' }}" data-panel="tagihan_materi">
+                    <div class="dev2-box">
+                        <span class="dev2-tag">Menunggu Dev 2</span>
+                        <h2 class="card-title">Tagihan, Materi Sponsor &amp; Bukti Manfaat</h2>
+                        <p class="card-subtitle">Unggah aset logo dan materi brand sponsor, status tagihan pembayaran, serta bukti pemenuhan hak manfaat pameran disediakan pada modul Developer 2.</p>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'showcase_sponsor' ? 'active' : '' }}" data-panel="showcase_sponsor">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Karya Terpublikasi yang Didukung Festival</h2>
+                                <p class="card-subtitle">Daftar karya mahasiswa yang tampil di Showcase resmi.</p>
+                            </div>
+                        </div>
+                        @if ($publishedWorks->isEmpty())
+                            <div class="alert alert-info">Belum ada karya terpublikasi di showcase.</div>
+                        @else
+                            <div class="three-col-grid">
+                                @foreach ($publishedWorks as $pub)
+                                    <div class="work-box">
+                                        <strong>{{ $pub->judul_publik }}</strong>
+                                        <div class="field-hint">{{ $pub->karya?->submitter?->institusi ?? '-' }}</div>
+                                        <p class="field-hint">{{ \Illuminate\Support\Str::limit($pub->ringkasan_publik, 100) }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+            {{-- ================================================================ --}}
+            {{-- PORTAL DEWAN JURI                                                --}}
+            {{-- ================================================================ --}}
+            @elseif ($portalRole === 'juri')
+                <section class="panel-section {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-panel="ringkasan">
+                    <div class="two-col-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Ringkasan Tugas Dewan Juri</h2>
+                                    <p class="card-subtitle">Status kesiapan evaluasi karya pada festival aktif.</p>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="switchPortalTab('daftar_karya')">Lihat Daftar Karya</button>
+                            </div>
+                            <div class="info-kv">
+                                <div class="kv-item">
+                                    <div class="kv-label">Nama Juri</div>
+                                    <div class="kv-value">{{ $user->name }}</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Peran Sistem</div>
+                                    <div class="kv-value">JURI</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Karya Lolos Kurasi</div>
+                                    <div class="kv-value">{{ $curatedWorks->count() }} Karya</div>
+                                </div>
+                                <div class="kv-item">
+                                    <div class="kv-label">Festival Aktif</div>
+                                    <div class="kv-value">{{ $activeFestival?->nama ?? '-' }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dev2-box">
+                            <span class="dev2-tag">Modul Penilaian Juri (Dev 2)</span>
+                            <h2 class="card-title">Form Input Skor &amp; Penguncian Nilai</h2>
+                            <p class="card-subtitle">
+                                Dewan Juri dapat membaca daftar karya yang telah lolos kurasi pada tab <strong>Karya Lolos Kurasi</strong> (data Dev 1). Formulir input skor per rubrik berbobot dan penguncian final penilaian berada pada modul Developer 2.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'daftar_karya' ? 'active' : '' }}" data-panel="daftar_karya">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Daftar Karya Lolos Kurasi ({{ $curatedWorks->count() }})</h2>
+                                <p class="card-subtitle">Karya inovasi yang telah melewati tahap kurasi administrasi dan substansi oleh panitia.</p>
+                            </div>
+                        </div>
+
+                        @if ($curatedWorks->isEmpty())
+                            <div class="alert alert-info">Belum ada karya dengan status Lolos Kurasi untuk dinilai saat ini.</div>
+                        @else
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Judul Karya</th>
+                                            <th>Asal Kampus / Institusi</th>
+                                            <th>Kategori</th>
+                                            <th>Teknologi</th>
+                                            <th>Berkas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($curatedWorks as $karya)
+                                            <tr>
+                                                <td><strong>{{ $karya->judul }}</strong></td>
+                                                <td>{{ $karya->submitter?->institusi ?? '-' }}</td>
+                                                <td>{{ $karya->kategori }}</td>
+                                                <td>{{ $karya->teknologi }}</td>
+                                                <td>{{ $karya->files->count() }} file</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'penilaian_juri' ? 'active' : '' }}" data-panel="penilaian_juri">
+                    <div class="dev2-box">
+                        <span class="dev2-tag">Menunggu Dev 2</span>
+                        <h2 class="card-title">Rubrik Berversi, Penugasan &amp; Rekap Nilai Juri</h2>
+                        <p class="card-subtitle">Penugasan spesifik karya per juri, penyimpanan draft nilai kriteria, rekap bobot skor, dan penguncian hasil akan disediakan oleh Developer 2.</p>
+                    </div>
+                </section>
+
+            {{-- ================================================================ --}}
+            {{-- PORTAL PENGUNJUNG                                                --}}
+            {{-- ================================================================ --}}
+            @else
+                <section class="panel-section {{ $activeTab === 'ringkasan' ? 'active' : '' }}" data-panel="ringkasan">
+                    <div class="two-col-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Selamat Datang di Portal Pengunjung</h2>
+                                    <p class="card-subtitle">Jelajahi katalog karya inovasi terpublikasi atau daftar sebagai peserta lomba apabila Anda merupakan mahasiswa atau siswa pengusul.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-primary" onclick="switchPortalTab('showcase')">Jelajahi Showcase ({{ $publishedWorks->count() }})</button>
+                                <button type="button" class="btn btn-outline" onclick="switchPortalTab('daftar_peserta')">Daftar Sebagai Peserta Lomba</button>
+                            </div>
+                        </div>
+
+                        <div class="dev2-box">
+                            <span class="dev2-tag">Menunggu Dev 2</span>
+                            <h2 class="card-title">Tiket QR, Check-in &amp; Voting Pengunjung</h2>
+                            <p class="card-subtitle">Fitur pemesanan tiket kunjungan QR, agenda sesi acara, voting karya favorit, feedback langsung, dan survei kepuasan akan tersedia melalui modul Pengunjung (Dev 2).</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'showcase' ? 'active' : '' }}" data-panel="showcase">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Showcase Karya Inovasi Terbaru</h2>
+                                <p class="card-subtitle">Menampilkan karya-karya terbaik yang sudah mendapatkan persetujuan publikasi resmi.</p>
+                            </div>
+                        </div>
+                        @if ($publishedWorks->isEmpty())
+                            <div class="alert alert-info">Belum ada karya terpublikasi di showcase pada periode ini.</div>
+                        @else
+                            <div class="three-col-grid">
+                                @foreach ($publishedWorks as $pub)
+                                    <div class="work-box">
+                                        <strong>{{ $pub->judul_publik }}</strong>
+                                        <div class="field-hint">{{ $pub->karya?->submitter?->institusi ?? '-' }} &bull; {{ $pub->karya?->kategori }}</div>
+                                        <p class="field-hint">{{ \Illuminate\Support\Str::limit($pub->ringkasan_publik, 120) }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'tiket_aktivitas' ? 'active' : '' }}" data-panel="tiket_aktivitas">
+                    <div class="dev2-box">
+                        <span class="dev2-tag">Menunggu Dev 2</span>
+                        <h2 class="card-title">Tiket QR, Pertemuan, Voting &amp; Survei</h2>
+                        <p class="card-subtitle">Pengambilan kode QR kunjungan venue, riwayat aktivitas stan pameran, pemberian voting &amp; feedback karya, serta pengisian survei acara disiapkan pada modul Developer 2.</p>
+                    </div>
+                </section>
+
+                <section class="panel-section {{ $activeTab === 'daftar_peserta' ? 'active' : '' }}" data-panel="daftar_peserta">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Lengkapi Data Peserta Lomba</h2>
+                                <p class="card-subtitle">Khusus pengunjung yang ingin beralih peran menjadi peserta pengusul karya kompetisi FUTURiSE.</p>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{{ route('participant.register') }}">
+                            @csrf
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="jenis_peserta_vis">Kategori Peserta <span class="req">*</span></label>
+                                    <select name="jenis_peserta" id="jenis_peserta_vis" required>
+                                        <option value="mahasiswa" {{ old('jenis_peserta') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa Perguruan Tinggi</option>
+                                        <option value="siswa_smk" {{ old('jenis_peserta') === 'siswa_smk' ? 'selected' : '' }}>Siswa SMK / Sederajat</option>
+                                        <option value="umum" {{ old('jenis_peserta') === 'umum' ? 'selected' : '' }}>Inovator Umum</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="nomor_identitas_vis">NIM / NISN / NIK <span class="req">*</span></label>
+                                    <input type="text" name="nomor_identitas" id="nomor_identitas_vis" value="{{ old('nomor_identitas') }}" placeholder="Masukkan NIM (Mahasiswa), NISN 10 digit, atau NIK 16 digit" required>
+                                </div>
+                                <div class="form-group full">
+                                    <label for="institusi_input_vis">Asal Kampus / Sekolah / Instansi <span class="req">*</span></label>
+                                    <input type="text" name="institusi" id="institusi_input_vis" class="js-institusi-autocomplete" data-list="institusiListVis" value="{{ old('institusi') }}" placeholder="Ketik minimal 2 huruf nama kampus atau sekolah..." autocomplete="off" required>
+                                    <div class="autocomplete-list" id="institusiListVis"></div>
+                                </div>
+                                <div class="form-group full">
+                                    <label for="no_telepon_vis">Nomor Telepon / WhatsApp</label>
+                                    <input type="text" name="no_telepon" id="no_telepon_vis" value="{{ old('no_telepon', $user->person?->phone) }}" placeholder="Contoh: 081234567890">
+                                </div>
+                            </div>
+                            <div style="margin-top: 18px;">
+                                <button type="submit" class="btn btn-primary">Simpan Data Peserta &amp; Gabung Kompetisi</button>
+                            </div>
+                        </form>
                     </div>
                 </section>
             @endif
+        </main>
+    </div>
 
-        @elseif ($user->hasAnyRole(['pic-kampus', 'pic-sekolah']))
-
-            <!-- PORTAL PIC KAMPUS / SEKOLAH -->
-            <section class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-tag">Portal Koordinator Institusi</div>
-                        <h2 class="card-title">Ringkasan {{ $user->hasRole('pic-sekolah') ? 'PIC Sekolah' : 'PIC Kampus' }}</h2>
-                        <p class="card-subtitle">
-                            Pantau kategori kompetisi, kuota peserta, dan karya inovasi terdaftar pada {{ $activeFestival->nama ?? 'FUTURiSE 2026' }}.
-                        </p>
-                    </div>
-                    <span class="status-pill pill-diajukan">
-                        <span class="status-dot"></span>
-                        {{ $user->hasRole('pic-sekolah') ? 'PIC Sekolah' : 'PIC Kampus' }}
-                    </span>
-                </div>
-
-                @if ($activeFestival && $activeFestival->kategoris->count() > 0)
-                    <div class="info-grid" style="margin-bottom: 20px;">
-                        @foreach ($activeFestival->kategoris as $kat)
-                            <div class="info-box">
-                                <span class="info-box-label">Kategori Lomba</span>
-                                <div class="info-box-value" style="font-size: 13px;">{{ $kat->nama }}</div>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-
-                @if ($institutionWorks->count() > 0)
-                    @foreach ($institutionWorks as $karya)
-                        <div class="karya-card">
-                            <div class="karya-category-tag">{{ $karya->kategori }}</div>
-                            <div class="karya-header-row">
-                                <h3 class="karya-heading">{{ $karya->judul }}</h3>
-                                <span class="status-pill pill-draft">
-                                    <span class="status-dot"></span>
-                                    {{ strtoupper(str_replace('_', ' ', $karya->status)) }}
-                                </span>
-                            </div>
-                            <div class="karya-meta-row" style="margin-bottom: 0;">
-                                <div class="karya-meta-item">
-                                    <span style="color: var(--color-ink);">Ketua Tim:</span>
-                                    <strong>{{ $karya->submitter?->nama_lengkap ?? '-' }}</strong>
-                                </div>
-                                <div class="karya-meta-item">
-                                    <span style="color: var(--color-ink);">Institusi:</span>
-                                    <strong>{{ $karya->submitter?->institusi ?? '-' }}</strong>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div style="padding: 28px 20px; background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: 4px; text-align: center; color: var(--color-ink); font-size: 14px;">
-                        Belum ada karya yang terdaftar pada edisi festival ini.
-                    </div>
-                @endif
-            </section>
-
-        @elseif ($user->hasAnyRole(['pic-industri', 'pic-sponsor']))
-
-            <!-- PORTAL MITRA INDUSTRI & SPONSOR -->
-            <section class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-tag">Portal Kemitraan</div>
-                        <h2 class="card-title">Etalase Karya &amp; Kemitraan {{ $user->hasRole('pic-sponsor') ? 'Sponsor' : 'Industri' }}</h2>
-                        <p class="card-subtitle">
-                            Informasi penyelenggaraan {{ $activeFestival->nama ?? 'FUTURiSE 2026' }} dan karya inovasi terbit yang siap dikolaborasikan.
-                        </p>
-                    </div>
-                    <span class="status-pill pill-lolos">
-                        <span class="status-dot"></span>
-                        {{ $user->hasRole('pic-sponsor') ? 'PIC Sponsor' : 'PIC Industri' }}
-                    </span>
-                </div>
-
-                @if ($activeFestival)
-                    <div class="info-grid" style="margin-bottom: 22px;">
-                        <div class="info-box">
-                            <span class="info-box-label">Nama Festival</span>
-                            <div class="info-box-value">{{ $activeFestival->nama }}</div>
-                        </div>
-                        <div class="info-box">
-                            <span class="info-box-label">Format &amp; Lokasi</span>
-                            <div class="info-box-value">{{ ucfirst($activeFestival->format ?? 'Hibrida') }} &bull; {{ $activeFestival->lokasi_utama ?? 'Bandung' }}</div>
-                        </div>
-                        <div class="info-box">
-                            <span class="info-box-label">Penyelenggara</span>
-                            <div class="info-box-value">{{ $activeFestival->penyelenggara ?? 'APTIKOM Jawa Barat' }}</div>
-                        </div>
-                        <div class="info-box">
-                            <span class="info-box-label">Kontak Resmi</span>
-                            <div class="info-box-value">{{ $activeFestival->email_kontak ?? 'futurise@aptikom.org' }}</div>
-                        </div>
-                    </div>
-                @endif
-
-                @if ($publishedWorks->count() > 0)
-                    @foreach ($publishedWorks as $pub)
-                        <div class="karya-card">
-                            <div class="karya-category-tag">{{ $pub->karya?->kategori ?? 'Showcase' }}</div>
-                            <div class="karya-header-row">
-                                <h3 class="karya-heading">{{ $pub->judul_publik }}</h3>
-                                <span class="status-pill pill-lolos">
-                                    <span class="status-dot"></span>
-                                    Terbit di Showcase
-                                </span>
-                            </div>
-                            <p class="karya-desc">{{ $pub->ringkasan_publik ?? $pub->karya?->deskripsi }}</p>
-                            <div class="karya-meta-row" style="margin-bottom: 0;">
-                                <div class="karya-meta-item">
-                                    <span style="color: var(--color-ink);">Institusi:</span>
-                                    <strong>{{ $pub->karya?->submitter?->institusi ?? '-' }}</strong>
-                                </div>
-                                <div class="karya-meta-item">
-                                    <span style="color: var(--color-ink);">Tayangan / Apresiasi:</span>
-                                    <strong>{{ $pub->jumlah_dilihat }} / {{ $pub->jumlah_suka }}</strong>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div style="padding: 28px 20px; background: var(--color-surface); border: 1px solid var(--color-hairline); border-radius: 4px; text-align: center; color: var(--color-ink); font-size: 14px;">
-                        Etalase karya showcase terbit akan tampil di sini setelah kurasi publikasi disetujui panitia.
-                    </div>
-                @endif
-            </section>
-
-        @else
-
-            <!-- PORTAL PENGUNJUNG: INFO FESTIVAL + OPSIONAL PENDAFTARAN PESERTA LOMBA -->
-            <section class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-tag">Portal Pengunjung</div>
-                        <h2 class="card-title">Informasi &amp; Showcase {{ $activeFestival->nama ?? 'FUTURiSE 2026' }}</h2>
-                        <p class="card-subtitle">
-                            Selamat datang di portal pengunjung. Anda dapat memantau jadwal acara, melihat etalase karya terbit, atau mendaftar sebagai peserta lomba di bawah ini.
-                        </p>
-                    </div>
-                </div>
-
-                @if ($activeFestival && $activeFestival->periodes->count() > 0)
-                    <div class="info-grid" style="margin-bottom: 18px;">
-                        @foreach ($activeFestival->periodes as $periode)
-                            <div class="info-box">
-                                <span class="info-box-label">{{ strtoupper(str_replace('_', ' ', $periode->tahap)) }}</span>
-                                <div class="info-box-value" style="font-size: 13px;">
-                                    {{ \Carbon\Carbon::parse($periode->mulai)->format('d M Y') }} &ndash; {{ \Carbon\Carbon::parse($periode->selesai)->format('d M Y') }}
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-
-                @if ($publishedWorks->count() > 0)
-                    @foreach ($publishedWorks as $pub)
-                        <div class="karya-card">
-                            <div class="karya-category-tag">{{ $pub->karya?->kategori ?? 'Showcase' }}</div>
-                            <h3 class="karya-heading" style="margin-bottom: 6px;">{{ $pub->judul_publik }}</h3>
-                            <p class="karya-desc" style="margin-bottom: 0;">{{ $pub->ringkasan_publik ?? $pub->karya?->deskripsi }}</p>
-                        </div>
-                    @endforeach
-                @endif
-            </section>
-
-            <!-- FORM PENDAFTARAN PESERTA (KHUSUS PENGUNJUNG YANG INGIN IKUT LOMBA) -->
-            <section class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-tag">Pendaftaran Peserta</div>
-                        <h2 class="card-title">Lengkapi Data Peserta</h2>
-                        <p class="card-subtitle">
-                            Masukkan data institusi dan identitas untuk mendaftar sebagai peserta lomba resmi.
-                        </p>
-                    </div>
-                </div>
-
-                <form method="POST" action="{{ route('participant.register') }}">
-                    @csrf
-
-                    <div class="form-row">
-                        <!-- AUTOCOMPLETE INSTITUSI -->
-                        <div class="form-group">
-                            <label for="institusi">Asal Kampus / Sekolah / Institusi <span class="req">*</span></label>
-                            <div style="position: relative;">
-                                <input
-                                    type="text"
-                                    id="institusi"
-                                    name="institusi"
-                                    value="{{ old('institusi') }}"
-                                    autocomplete="off"
-                                    autocorrect="off"
-                                    autocapitalize="none"
-                                    spellcheck="false"
-                                    required
-                                >
-                                <div id="institusi-spinner" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: none; font-size: 11px; color: var(--color-ink);">
-                                    Memuat...
-                                </div>
-                            </div>
-                            <div id="institusi-suggestions" class="suggestions-dropdown" style="display: none;"></div>
-                        </div>
-
-                        <!-- KATEGORI PESERTA -->
-                        <div class="form-group">
-                            <label for="jenis_peserta">Kategori Peserta <span class="req">*</span></label>
-                            <select id="jenis_peserta" name="jenis_peserta" required>
-                                <option value="mahasiswa" @selected(old('jenis_peserta') === 'mahasiswa')>Mahasiswa (Perguruan Tinggi)</option>
-                                <option value="siswa" @selected(old('jenis_peserta') === 'siswa')>Siswa (SMA / SMK / Sederajat)</option>
-                                <option value="umum" @selected(old('jenis_peserta') === 'umum')>Umum</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nomor_identitas"><span id="identity-label-text">Nomor Induk Mahasiswa (NIM)</span> <span class="req">*</span></label>
-                            <input
-                                type="text"
-                                id="nomor_identitas"
-                                name="nomor_identitas"
-                                value="{{ old('nomor_identitas') }}"
-                                aria-describedby="identity-hint"
-                                autocorrect="off"
-                                autocapitalize="none"
-                                spellcheck="false"
-                                inputmode="text"
-                                required
-                            >
-                            <small id="identity-hint" style="display: block; margin-top: 5px; font-size: 11px; color: var(--color-ink);">
-                                Gunakan NIM resmi dari perguruan tinggi Anda.
-                            </small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="no_telepon">Nomor WhatsApp / Telepon</label>
-                            <input
-                                type="tel"
-                                id="no_telepon"
-                                name="no_telepon"
-                                value="{{ old('no_telepon', $user->person?->phone) }}"
-                            >
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary">
-                        Simpan Profil Peserta
-                    </button>
-                </form>
-            </section>
-
-        @endif
-
-    </main>
-
-    <footer class="footer">
-        &copy; {{ date('Y') }} FUTURISE. Hak Cipta Dilindungi.
-    </footer>
-
-    <!-- JAVASCRIPT: AUTOCOMPLETE & DROPZONE & TEAM BUILDER -->
     <script>
-        // 1. AUTOCOMPLETE INSTITUSI (Preload Client-Side + AbortController Anti-Stale)
-        const institusiInput = document.getElementById('institusi');
-        const suggestionsBox = document.getElementById('institusi-suggestions');
-        const spinner = document.getElementById('institusi-spinner');
-        const jenisPesertaSelect = document.getElementById('jenis_peserta');
+        function switchPortalTab(tabKey) {
+            const buttons = document.querySelectorAll('[data-tab-btn]');
+            const panels = document.querySelectorAll('[data-panel]');
 
-        const INSTITUTION_ALIASES = {
-            'itenas': 'institut teknologi nasional',
-            'itb': 'institut teknologi bandung',
-            'ui': 'universitas indonesia',
-            'ugm': 'universitas gadjah mada',
-            'unpad': 'universitas padjadjaran',
-            'its': 'institut teknologi sepuluh nopember',
-            'undip': 'universitas diponegoro',
-            'unair': 'universitas airlangga',
-            'ub': 'universitas brawijaya',
-            'upi': 'universitas pendidikan indonesia',
-            'ipb': 'institut pertanian bogor',
-            'uny': 'universitas negeri yogyakarta',
-            'unesa': 'universitas negeri surabaya',
-            'uns': 'universitas sebelas maret',
-            'unhas': 'universitas hasanuddin',
-            'usu': 'universitas sumatera utara',
-            'unand': 'universitas andalas',
-            'unsri': 'universitas sriwijaya',
-            'binus': 'universitas bina nusantara',
-            'telkom': 'universitas telkom',
-            'telkom university': 'universitas telkom',
-            'polban': 'politeknik negeri bandung',
-            'pens': 'politeknik elektronika negeri surabaya',
-            'unikom': 'universitas komputer indonesia',
-            'unpar': 'universitas katolik parahyangan',
-            'maranatha': 'universitas kristen maranatha',
-            'unisba': 'universitas islam bandung',
-            'widyatama': 'universitas widyatama',
-            'unjani': 'universitas jenderal achmad yani',
-            'uin bandung': 'universitas islam negeri sunan gunung djati',
-        };
-        const WORD_EXPANSIONS = {
-            'univ': 'universitas',
-            'poltek': 'politeknik',
-            'inst': 'institut',
-        };
-
-        const preloadedInstitutions = { perguruan_tinggi: null, smk: null };
-        const preloadPromises = {};
-        const queryCache = new Map();
-        let debounceTimer = null;
-        let activeAbortController = null;
-        let requestSeq = 0;
-
-        function getSelectedCategory() {
-            const jenis = jenisPesertaSelect ? jenisPesertaSelect.value : '';
-            if (jenis === 'mahasiswa') return 'perguruan_tinggi';
-            if (jenis === 'siswa') return 'smk';
-            return '';
-        }
-
-        function escapeHtml(text) {
-            return String(text)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
-
-        function preloadCategory(kategori) {
-            if (!kategori || preloadedInstitutions[kategori] || preloadPromises[kategori]) {
-                return preloadPromises[kategori] || Promise.resolve(preloadedInstitutions[kategori]);
-            }
-
-            preloadPromises[kategori] = fetch(`/api/v1/institusi/search?preload=1&kategori=${encodeURIComponent(kategori)}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.success && Array.isArray(res.data)) {
-                        preloadedInstitutions[kategori] = res.data.map(row => ({
-                            nama: row[0],
-                            namaLower: row[0].toLowerCase(),
-                            provinsi: row[1] || '',
-                            kab_kota: row[2] || '',
-                            isJabar: (row[1] || '').includes('Jawa Barat') ? 0 : 1,
-                        }));
-                    }
-                    return preloadedInstitutions[kategori];
-                })
-                .catch(() => null);
-
-            return preloadPromises[kategori];
-        }
-
-        function searchLocal(dataset, rawQuery) {
-            const lower = rawQuery.replace(/\s+/g, ' ').trim().toLowerCase();
-            const alias = INSTITUTION_ALIASES[lower];
-            const phrase = alias || lower.split(' ').map(w => WORD_EXPANSIONS[w] || w).join(' ');
-            const words = phrase.split(' ').filter(Boolean);
-
-            const matches = [];
-            for (let i = 0; i < dataset.length; i++) {
-                const item = dataset[i];
-                const name = item.namaLower;
-                let tier = -1;
-
-                if (alias) {
-                    if (name.includes(alias) || name.includes(lower)) {
-                        tier = name === alias ? 0 : (name.startsWith(alias) ? 1 : 2);
-                    }
-                } else if (words.every(w => name.includes(w))) {
-                    tier = name === phrase ? 0 : (name.startsWith(phrase) ? 1 : (name.includes(phrase) ? 2 : 3));
-                }
-
-                if (tier !== -1) {
-                    matches.push({ item, tier });
-                }
-            }
-
-            // Ringan typo fallback jika hasil ketat kosong
-            if (matches.length === 0 && phrase.length >= 4) {
-                const prefixes = words.map(w => w.slice(0, Math.min(3, w.length))).filter(Boolean);
-                if (prefixes.length > 0) {
-                    for (let i = 0; i < dataset.length; i++) {
-                        const item = dataset[i];
-                        if (prefixes.every(p => item.namaLower.includes(p))) {
-                            const tier = item.namaLower.startsWith(phrase.slice(0, 4)) ? 1 : 3;
-                            matches.push({ item, tier });
-                        }
-                    }
-                }
-            }
-
-            matches.sort((a, b) => {
-                if (a.tier !== b.tier) return a.tier - b.tier;
-                if (a.item.isJabar !== b.item.isJabar) return a.item.isJabar - b.item.isJabar;
-                if (a.item.nama.length !== b.item.nama.length) return a.item.nama.length - b.item.nama.length;
-                return a.item.nama.localeCompare(b.item.nama);
+            buttons.forEach(function (btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-tab-btn') === tabKey);
             });
 
-            return matches.slice(0, 15).map(m => m.item);
+            panels.forEach(function (panel) {
+                panel.classList.toggle('active', panel.getAttribute('data-panel') === tabKey);
+            });
+
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tabKey);
+                window.history.replaceState({}, '', url.toString());
+            } catch (e) {}
+
+            const sidebar = document.getElementById('portalSidebar');
+            if (sidebar) {
+                sidebar.classList.remove('mobile-open');
+            }
         }
 
-        function renderSuggestions(items) {
-            if (items && items.length > 0) {
-                suggestionsBox.innerHTML = items.map(item => {
-                    const location = [item.kab_kota, item.provinsi].filter(Boolean).join(', ');
-                    return `
-                        <div class="suggestion-item" data-name="${escapeHtml(item.nama)}">
-                            <div class="suggestion-name">${escapeHtml(item.nama)}</div>
-                            ${location ? `<div class="suggestion-meta">${escapeHtml(location)}</div>` : ''}
-                        </div>
-                    `;
-                }).join('');
-                suggestionsBox.style.display = 'block';
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('portalSidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('mobile-open');
+            }
+        }
 
-                suggestionsBox.querySelectorAll('.suggestion-item').forEach(el => {
-                    el.addEventListener('click', function() {
-                        institusiInput.value = this.dataset.name;
-                        suggestionsBox.style.display = 'none';
-                    });
+        function toggleCollapse(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('open');
+            }
+        }
+
+        function addTeamRow() {
+            const container = document.getElementById('teamRowsContainer');
+            if (!container) return;
+            const row = document.createElement('div');
+            row.className = 'two-col-grid';
+            row.style.gridTemplateColumns = '1fr 1fr 1fr';
+            row.innerHTML =
+                '<input type="text" name="anggota_nama[]" placeholder="Nama lengkap anggota">' +
+                '<input type="text" name="anggota_peran[]" placeholder="Peran (mis. ML Engineer)">' +
+                '<input type="email" name="anggota_email[]" placeholder="Email anggota">';
+            container.appendChild(row);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-tab-btn]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    switchPortalTab(btn.getAttribute('data-tab-btn'));
                 });
-            } else {
-                suggestionsBox.innerHTML = `
-                    <div style="padding: 10px 14px; font-size: 12px; color: var(--color-ink);">
-                        Institusi tidak ditemukan. Anda dapat mengetikkannya secara manual.
-                    </div>
-                `;
-                suggestionsBox.style.display = 'block';
-            }
-        }
-
-        if (institusiInput && suggestionsBox) {
-            // Preload kategori aktif di latar belakang segera setelah halaman siap
-            const initialCategory = getSelectedCategory();
-            if (initialCategory) {
-                preloadCategory(initialCategory);
-            }
-
-            institusiInput.addEventListener('focus', function() {
-                const cat = getSelectedCategory();
-                if (cat) preloadCategory(cat);
             });
 
-            institusiInput.addEventListener('input', function() {
-                const query = this.value.trim();
-                clearTimeout(debounceTimer);
+            // Autocomplete Institusi Perguruan Tinggi / SMK
+            const inputs = document.querySelectorAll('.js-institusi-autocomplete');
+            inputs.forEach(function (input) {
+                const listId = input.getAttribute('data-list');
+                const dropdown = listId ? document.getElementById(listId) : null;
+                if (!dropdown) return;
 
-                if (activeAbortController) {
-                    activeAbortController.abort();
-                    activeAbortController = null;
-                }
-                const mySeq = ++requestSeq;
+                let debounceTimer = null;
 
-                if (query.length < 2) {
-                    if (spinner) spinner.style.display = 'none';
-                    suggestionsBox.style.display = 'none';
-                    suggestionsBox.innerHTML = '';
-                    return;
-                }
+                input.addEventListener('input', function () {
+                    const query = input.value.trim();
+                    clearTimeout(debounceTimer);
 
-                const kategori = getSelectedCategory();
-                const localDataset = kategori ? preloadedInstitutions[kategori] : null;
+                    if (query.length < 2) {
+                        dropdown.innerHTML = '';
+                        dropdown.classList.remove('open');
+                        return;
+                    }
 
-                // Jika preload sudah siap, saring & urutkan langsung di browser (< 5 ms)
-                if (localDataset) {
-                    if (spinner) spinner.style.display = 'none';
-                    renderSuggestions(searchLocal(localDataset, query));
-                    return;
-                }
+                    debounceTimer = setTimeout(function () {
+                        fetch('/institusi/search?q=' + encodeURIComponent(query))
+                            .then(function (res) { return res.json(); })
+                            .then(function (payload) {
+                                const items = Array.isArray(payload.data) ? payload.data : [];
+                                if (items.length === 0) {
+                                    dropdown.innerHTML = '';
+                                    dropdown.classList.remove('open');
+                                    return;
+                                }
 
-                const cacheKey = `${kategori}|${query.toLowerCase()}`;
-                if (queryCache.has(cacheKey)) {
-                    if (spinner) spinner.style.display = 'none';
-                    renderSuggestions(queryCache.get(cacheKey));
-                    return;
-                }
+                                dropdown.innerHTML = '';
+                                items.forEach(function (item) {
+                                    const row = document.createElement('div');
+                                    row.className = 'autocomplete-item';
+                                    const name = item.nama || '';
+                                    const loc = [item.kab_kota, item.provinsi].filter(Boolean).join(', ');
 
-                // Bersihkan dropdown hasil lama agar hasil query sebelumnya tidak menyesatkan
-                suggestionsBox.style.display = 'none';
-                if (spinner) spinner.style.display = 'block';
+                                    const strong = document.createElement('strong');
+                                    strong.textContent = name;
+                                    const span = document.createElement('span');
+                                    span.textContent = loc || 'Institusi Terdaftar';
 
-                debounceTimer = setTimeout(() => {
-                    activeAbortController = new AbortController();
+                                    row.appendChild(strong);
+                                    row.appendChild(span);
+                                    row.addEventListener('click', function () {
+                                        input.value = name;
+                                        dropdown.innerHTML = '';
+                                        dropdown.classList.remove('open');
+                                    });
+                                    dropdown.appendChild(row);
+                                });
+                                dropdown.classList.add('open');
+                            })
+                            .catch(function () {
+                                dropdown.classList.remove('open');
+                            });
+                    }, 220);
+                });
 
-                    fetch(`/api/v1/institusi/search?q=${encodeURIComponent(query)}&kategori=${encodeURIComponent(kategori)}`, {
-                        signal: activeAbortController.signal,
-                    })
-                        .then(res => res.json())
-                        .then(res => {
-                            if (mySeq !== requestSeq || institusiInput.value.trim() !== query) {
-                                return;
-                            }
-                            if (spinner) spinner.style.display = 'none';
-                            const items = (res.success && Array.isArray(res.data)) ? res.data : [];
-                            queryCache.set(cacheKey, items);
-                            renderSuggestions(items);
-                        })
-                        .catch(err => {
-                            if (err && err.name === 'AbortError') return;
-                            if (mySeq === requestSeq && spinner) spinner.style.display = 'none';
-                        });
-                }, 300);
-            });
-
-            if (jenisPesertaSelect) {
-                const identityLabelText = document.getElementById('identity-label-text');
-                const identityHint = document.getElementById('identity-hint');
-                const nomorIdentitasInput = document.getElementById('nomor_identitas');
-
-                const identityMeta = {
-                    mahasiswa: {
-                        label: 'Nomor Induk Mahasiswa (NIM)',
-                        hint: 'Gunakan NIM resmi dari perguruan tinggi Anda.',
-                        inputMode: 'text',
-                    },
-                    siswa: {
-                        label: 'Nomor Induk Siswa Nasional (NISN)',
-                        hint: 'Masukkan 10 digit angka NISN resmi Anda.',
-                        inputMode: 'numeric',
-                    },
-                    umum: {
-                        label: 'Nomor Induk Kependudukan (NIK / KTP)',
-                        hint: 'Masukkan 16 digit angka NIK sesuai KTP Anda.',
-                        inputMode: 'numeric',
-                    },
-                };
-
-                const updateIdentityField = () => {
-                    const meta = identityMeta[jenisPesertaSelect.value] || identityMeta.mahasiswa;
-                    if (identityLabelText) identityLabelText.textContent = meta.label;
-                    if (identityHint) identityHint.textContent = meta.hint;
-                    if (nomorIdentitasInput) nomorIdentitasInput.setAttribute('inputmode', meta.inputMode);
-                };
-                updateIdentityField();
-
-                jenisPesertaSelect.addEventListener('change', function() {
-                    updateIdentityField();
-                    const cat = getSelectedCategory();
-                    if (cat) preloadCategory(cat);
-                    if (institusiInput.value.trim().length >= 2) {
-                        institusiInput.dispatchEvent(new Event('input'));
+                document.addEventListener('click', function (evt) {
+                    if (!dropdown.contains(evt.target) && evt.target !== input) {
+                        dropdown.classList.remove('open');
                     }
                 });
-            }
-
-            document.addEventListener('click', function(e) {
-                if (!institusiInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-                    suggestionsBox.style.display = 'none';
-                }
             });
-        }
-
-        // 2. FILE DROPZONE PREVIEW & REMOVE
-        const proposalInput = document.getElementById('proposal');
-        const dropzoneEmpty = document.getElementById('dropzone-empty');
-        const dropzonePreview = document.getElementById('dropzone-preview');
-        const previewFilename = document.getElementById('preview-filename');
-        const previewFilesize = document.getElementById('preview-filesize');
-        const btnRemoveProposal = document.getElementById('btn-remove-proposal');
-        const proposalDropzone = document.getElementById('proposal-dropzone');
-
-        if (proposalInput) {
-            proposalInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    const file = this.files[0];
-                    previewFilename.textContent = file.name;
-                    previewFilesize.textContent = '(' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
-                    dropzoneEmpty.style.display = 'none';
-                    dropzonePreview.style.display = 'flex';
-                }
-            });
-
-            if (btnRemoveProposal) {
-                btnRemoveProposal.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    proposalInput.value = '';
-                    dropzoneEmpty.style.display = 'block';
-                    dropzonePreview.style.display = 'none';
-                });
-            }
-
-            // Drag and drop visual state
-            ['dragenter', 'dragover'].forEach(eventName => {
-                proposalDropzone.addEventListener(eventName, () => proposalDropzone.classList.add('dragover'), false);
-            });
-            ['dragleave', 'drop'].forEach(eventName => {
-                proposalDropzone.addEventListener(eventName, () => proposalDropzone.classList.remove('dragover'), false);
-            });
-        }
-
-        // 3. DYNAMIC TEAM BUILDER
-        const btnAddMember = document.getElementById('btn-add-member');
-        const teamContainer = document.getElementById('team-members-container');
-
-        if (btnAddMember && teamContainer) {
-            const maxMembers = 4;
-
-            btnAddMember.addEventListener('click', function() {
-                if (teamContainer.children.length >= maxMembers) {
-                    alert('Maksimal anggota tim tambahan adalah ' + maxMembers + ' orang.');
-                    return;
-                }
-
-                const rowId = 'member-' + Date.now();
-                const row = document.createElement('div');
-                row.className = 'member-input-row';
-                row.id = rowId;
-                row.innerHTML = `
-                    <input type="text" name="anggota_nama[]" placeholder="Nama Lengkap" required>
-                    <input type="text" name="anggota_peran[]" placeholder="Peran">
-                    <input type="email" name="anggota_email[]" placeholder="Alamat Email">
-                    <button type="button" class="btn-remove-row" onclick="document.getElementById('${rowId}').remove()" title="Hapus">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"/>
-                            <line x1="6" y1="6" x2="18" y2="18"/>
-                        </svg>
-                    </button>
-                `;
-                teamContainer.appendChild(row);
-            });
-        }
+        });
     </script>
-
 </body>
 </html>

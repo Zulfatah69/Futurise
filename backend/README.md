@@ -1,67 +1,41 @@
-# FUTURiSE — West Java Digital Innovation Festival
+# FUTURiSE Backend — Laravel 13 API, Portal & Filament 5 Admin
 
-Website resmi FUTURiSE, festival inovasi digital mahasiswa skala Jawa Barat yang diselenggarakan oleh **APTIKOM Jawa Barat**.
+Direktori `backend/` berisi REST API `/api/v1/*` untuk frontend Next.js, portal web peserta/non-admin (`/login`, `/register`, `/dashboard`), serta panel administrasi panitia berbasis **Filament 5** (`/admin`).
 
-## Tech Stack
+## Stack Aktual
 
-| Layer | Teknologi |
-|-------|-----------|
-| Backend | Laravel 11 (PHP 8.3+) |
-| Frontend | Next.js 14+ |
-| Database | MySQL 8.0+ |
-| Cache/Queue | Redis |
-| Auth | Laravel Sanctum |
+- **PHP:** `^8.3`
+- **Framework:** Laravel `^13.17`
+- **Admin Panel:** Filament `^5.11` (dengan 2FA App/Email MFA)
+- **Auth & RBAC:** Laravel Sanctum `^4.0`, Fortify `^1.41`, Spatie Laravel Permission `^8.4`
+- **Testing:** PHPUnit `^12.5` (SQLite `:memory:`)
+- **Database Produksi / Lokal:** MySQL `8.4.3`
 
-## Struktur Repository
-
-```
-Futurise/
-├── backend/     ← Laravel API
-├── frontend/    ← Next.js
-├── .gitignore
-└── README.md
-```
-
-## Setup Backend
+## Instalasi & Setup Lokal
 
 ```bash
 cd backend
 composer install
 cp .env.example .env
 php artisan key:generate
+```
+
+Konfigurasi `.env` lokal Anda:
+- Isi koneksi database (`DB_CONNECTION=mysql`, `DB_DATABASE=futurise`, dll.) atau gunakan SQLite untuk uji cepat.
+- Pastikan `FRONTEND_URL=http://localhost:3000` dan `CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000`.
+- Jalankan migrasi dan seeder:
+
+```bash
 php artisan migrate
 php artisan db:seed
+php artisan storage:link
 php artisan serve
 ```
 
-## Branch Strategy
+> Untuk kebutuhan pengujian role di lingkungan non-production, tersedia `php artisan db:seed --class=DemoAccountSeeder`.
 
-| Branch | Fungsi |
-|--------|--------|
-| `main` | Production — protected |
-| `staging` | UAT — protected |
-| `development` | Integrasi semua fitur — protected |
-| `feat/backend/*` | Fitur backend |
-| `feat/frontend/*` | Fitur frontend |
-| `fix/backend/*` | Bug fix backend |
-| `integration/*` | Testing integrasi FE-BE |
+## Menjalankan Automated Test
 
-## Tahapan Development
-
-| Tahap | Scope |
-|-------|-------|
-| 0 — Fondasi | Setup Laravel, convention, festival & auth |
-| 1 — Master Data | Festival, periode, kategori, panitia, divisi |
-| 2 — Registrasi & Karya | Peserta, karya, tim, file, submit |
-| 3 — Publikasi & Program | Publikasi karya, jadwal juri, penilaian |
-| 4 — Hari Acara | Pengunjung, QR, check-in, interaksi |
-| 5 — Finalisasi | UAT, bugfix, deployment |
-
-## Tim
-
-- **Dev1**: Backend (Festival, Panitia, Peserta, Karya, Publikasi) + Merge & Integration
-- **Dev2**: Backend (Juri, Booth, Sponsor, Mitra, Pengunjung) + Frontend
-
-## Lisensi
-
-Hak cipta © 2026 APTIKOM Jawa Barat. Seluruh hak dilindungi.
+```bash
+php vendor/bin/phpunit
+```

@@ -345,8 +345,10 @@ class PublicationController extends Controller
     {
         $pub = PublikasiKarya::published()
             ->with([
-                'karya.submitter',
+                'karya.submitter:id,nama_lengkap,institusi',
                 'karya.festival',
+                'karya.pesertas:id,nama_lengkap,institusi',
+                'karya.anggotaTims:id,karya_id,nama_lengkap,peran,is_ketua,urutan',
                 'karya.files' => fn ($q) => $q->where('is_publik', true),
                 'thumbnailFile',
             ])
