@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   backend-tests:
-    name: Backend Test Suite (Laravel 11 & PHP 8.3)
+    name: Backend Test Suite (Laravel 13 & PHP 8.3)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -76,7 +76,11 @@ jobs:
       - name: Install NPM Dependencies
         run: npm ci
 
+      - name: Run Next.js Lint Check
+        run: npm run lint
+
       - name: Run Next.js Build Check
         env:
           NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+          NEXT_PUBLIC_BACKEND_URL: http://localhost:8000
         run: npm run build
