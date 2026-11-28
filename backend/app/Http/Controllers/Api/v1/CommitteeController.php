@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\v1\UpdateAccessRoleRequest;
 use App\Models\Festival;
 use App\Models\Panitia;
 use App\Models\PanitiaFestival;
@@ -283,5 +284,35 @@ class CommitteeController extends Controller
         );
 
         return $this->jsonResponse(true, 'Peran akses berhasil diberikan kepada panitia.', $updated);
+    }
+
+    /**
+     * PUT/PATCH /api/v1/access-roles/{role}
+     * Perbarui definisi peran akses kepanitiaan.
+     */
+    public function updateAccessRole(UpdateAccessRoleRequest $request, PeranAkses $role): JsonResponse
+    {
+        if (! $request->user()?->hasAnyRole(User::ADMIN_ROLES)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator yang dapat memperbarui peran akses.', null, null, 403);
+        }
+
+        $updated = $this->panitiaService->updateAccessRole($role, $request->validated());
+
+        return $this->jsonResponse(true, 'Peran akses berhasil diperbarui.', $updated);
+    }
+
+    /**
+     * DELETE /api/v1/committee/{committee}/roles/{role}
+     * Cabut peran akses dari anggota panitia.
+     */
+    public function revokeRole(Request $request, Panitia $committee, PeranAkses $role): JsonResponse
+    {
+        if (! $request->user()?->hasAnyRole(User::ADMIN_ROLES)) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya administrator yang dapat mencabut peran akses.', null, null, 403);
+        }
+
+        $updated = $this->panitiaService->revokeAccessRole($committee, $role);
+
+        return $this->jsonResponse(true, 'Peran akses berhasil dicabut dari panitia.', $updated);
     }
 }

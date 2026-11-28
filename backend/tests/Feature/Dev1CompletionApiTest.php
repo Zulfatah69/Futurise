@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\CurationStatusMail;
 use App\Models\DivisiPanitia;
 use App\Models\Festival;
 use App\Models\Karya;
@@ -18,6 +19,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
@@ -505,6 +507,139 @@ class Dev1CompletionApiTest extends TestCase
             'institusi'       => 'SMKN 4 BANDUNG',
             'jenis_peserta'   => 'siswa',
             'nomor_identitas' => '0081234567',
+        ]);
+    }
+
+    public function test_dev1_completed_api_endpoints_for_participants_works_delete_access_roles_and_curation_mail(): void
+    {
+        Mail::fake();
+
+        $admin = User::factory()->create(['account_status' => 'active']);
+        $admin->assignRole('super-admin');
+
+        $festival = Festival::aktif()->firstOrFail();
+
+        $picUser = User::factory()->create([
+            'account_type'   => 'pic',
+            'account_status' => 'active',
+            'pic_category'   => 'kampus-sekolah',
+        ]);
+        $picUser->assignRole('pic-kampus');
+        $picPeserta = Peserta::create([
+            'user_id'         => $picUser->id,
+            'nama_lengkap'    => $picUser->name,
+            'email'           => $picUser->email,
+            'institusi'       => 'Politeknik Negeri Bandung',
+            'jenis_peserta'   => 'pic',
+            'nomor_identitas' => '0411112222',
+        ]);
+
+        $studentUser = User::factory()->create(['account_status' => 'active']);
+        $studentUser->assignRole('tim-mahasiswa');
+        $studentPeserta = Peserta::create([
+            'user_id'         => $studentUser->id,
+            'nama_lengkap'    => $studentUser->name,
+            'email'           => 'tim.polban@futurise.id',
+            'institusi'       => 'Politeknik Negeri Bandung',
+            'jenis_peserta'   => 'mahasiswa',
+            'nomor_identitas' => '221511099',
+        ]);
+
+        $orphanPeserta = Peserta::create([
+            'user_id'       => User::factory()->create(['account_status' => 'active'])->id,
+            'nama_lengkap'  => 'Peserta Kosong',
+            'email'         => 'kosong@futurise.id',
+            'institusi'     => 'Universitas Widyatama',
+            'jenis_peserta' => 'mahasiswa',
+        ]);
+
+        // 1. GET /participants & DELETE /participants/{id}
+        Sanctum::actingAs($studentUser);
+        $this->getJson('/api/v1/participants')->assertForbidden();
+        $this->deleteJson("/api/v1/participants/{$orphanPeserta->id}")->assertForbidden();
+
+        Sanctum::actingAs($admin);
+        $this->getJson('/api/v1/participants?q=Politeknik')
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
+
+        // 2. Karya draft dibuat oleh tim mahasiswa Polban; PIC Kampus Polban dapat mengakses/mengelola via API
+        $karya = Karya::create([
+            'festival_id' => $festival->id,
+            'peserta_id'  => $studentPeserta->id,
+            'judul'       => 'Sistem Sensor Kampus',
+            'deskripsi'   => 'Deskripsi karya Polban.',
+            'kategori'    => 'IoT',
+            'teknologi'   => 'ESP32',
+            'status'      => 'draft',
+        ]);
+
+        // Peserta yang memiliki karya aktif tidak boleh dihapus
+        $this->deleteJson("/api/v1/participants/{$studentPeserta->id}")->assertStatus(422);
+        $this->deleteJson("/api/v1/participants/{$orphanPeserta->id}")->assertOk();
+
+        // PIC Kampus melihat karya kampusnya di /api/v1/works dan dapat menghapus draft / submit
+        Sanctum::actingAs($picUser);
+        $this->getJson('/api/v1/works')
+            ->assertOk()
+            ->assertJsonCount(1, 'data');
+
+        $draftToDelete = Karya::create([
+            'festival_id' => $festival->id,
+            'peserta_id'  => $picPeserta->id,
+            'judul'       => 'Draft Dihapus',
+            'deskripsi'   => 'Draft sementara.',
+            'kategori'    => 'Web',
+            'teknologi'   => 'Laravel',
+            'status'      => 'draft',
+        ]);
+        $this->deleteJson("/api/v1/works/{$draftToDelete->id}")->assertOk();
+        $this->assertDatabaseMissing('karya', ['id' => $draftToDelete->id]);
+
+        // Submit karya -> tidak lagi boleh dihapus via DELETE oleh non-super-admin
+        $this->postJson("/api/v1/works/{$karya->id}/submit")->assertOk();
+        $this->deleteJson("/api/v1/works/{$karya->id}")->assertStatus(422);
+
+        // 3. Kurasi karya via API mengirim email CurationStatusMail ke email pengusul
+        Sanctum::actingAs($admin);
+        $this->postJson("/api/v1/works/{$karya->id}/review", [
+            'status'  => 'perlu_revisi',
+            'catatan' => 'Lengkapi hasil uji sensor pada suhu ruangan.',
+        ])->assertOk();
+
+        Mail::assertSent(CurationStatusMail::class, function (CurationStatusMail $mail) use ($karya): bool {
+            return $mail->hasTo('tim.polban@futurise.id')
+                && $mail->karya->id === $karya->id
+                && $mail->statusBaru === 'perlu_revisi';
+        });
+
+        // 4. PUT /access-roles/{role} & DELETE /committee/{committee}/roles/{role}
+        $panitia = Panitia::create([
+            'nama_lengkap' => 'Panitia Uji Akses',
+            'email'        => 'uji.akses@futurise.id',
+            'jenis'        => 'internal',
+            'aktif'        => true,
+        ]);
+        $role = PeranAkses::create([
+            'kode' => 'koordinator_uji',
+            'nama' => 'Koordinator Uji',
+            'izin' => ['karya.view'],
+        ]);
+
+        $this->postJson("/api/v1/committee/{$panitia->id}/roles", [
+            'peran_id' => $role->id,
+        ])->assertOk();
+
+        $this->putJson("/api/v1/access-roles/{$role->id}", [
+            'nama' => 'Koordinator Uji Final',
+            'izin' => ['karya.view', 'karya.review'],
+        ])->assertOk()
+            ->assertJsonPath('data.nama', 'Koordinator Uji Final');
+
+        $this->deleteJson("/api/v1/committee/{$panitia->id}/roles/{$role->id}")->assertOk();
+        $this->assertDatabaseMissing('panitia_peran', [
+            'panitia_id' => $panitia->id,
+            'peran_id'   => $role->id,
         ]);
     }
 }

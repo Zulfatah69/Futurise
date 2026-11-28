@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Panitias;
 use App\Filament\Resources\Panitias\Pages\CreatePanitia;
 use App\Filament\Resources\Panitias\Pages\EditPanitia;
 use App\Filament\Resources\Panitias\Pages\ListPanitias;
+use App\Filament\Resources\Panitias\RelationManagers\AssignmentsRelationManager;
+use App\Filament\Resources\Panitias\RelationManagers\PeranAksesRelationManager;
 use App\Filament\Resources\Panitias\Schemas\PanitiaForm;
 use App\Filament\Resources\Panitias\Tables\PanitiasTable;
 use App\Models\Panitia;
@@ -43,7 +45,8 @@ class PanitiaResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AssignmentsRelationManager::class,
+            PeranAksesRelationManager::class,
         ];
     }
 

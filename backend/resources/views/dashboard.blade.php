@@ -1300,7 +1300,7 @@
                                 <div class="timeline-list">
                                     @foreach ($activeFestival->periodes->take(4) as $periode)
                                         <div class="timeline-item">
-                                            <strong>{{ $periode->nama }}</strong>
+                                            <strong>{{ $periode->tahap }}</strong>
                                             <div class="field-hint">
                                                 {{ $periode->mulai?->format('d M Y') }} &ndash; {{ $periode->selesai?->format('d M Y') }}
                                             </div>
@@ -1445,6 +1445,13 @@
                                                         <input type="hidden" name="redirect_tab" value="karya">
                                                         <button type="submit" class="btn btn-primary btn-sm">Ajukan Kurasi</button>
                                                     </form>
+                                                    @if ($karya->status === 'draft')
+                                                        <form method="POST" action="{{ route('karya.destroy', $karya->id) }}">
+                                                            @csrf
+                                                            <input type="hidden" name="redirect_tab" value="karya">
+                                                            <button type="submit" class="btn btn-danger-outline btn-sm">Hapus Draft</button>
+                                                        </form>
+                                                    @endif
                                                 @endif
                                             </div>
                                         </div>
@@ -1763,11 +1770,18 @@
                                                                 <td>{{ number_format(($file->ukuran_byte ?? 0) / 1024, 1) }} KB</td>
                                                                 <td>{{ $file->keterangan ?? '-' }}</td>
                                                                 <td>
-                                                                    @if ($file->path)
-                                                                        <a href="{{ asset('storage/' . ltrim($file->path, '/')) }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Lihat Berkas</a>
-                                                                    @else
-                                                                        <span>-</span>
-                                                                    @endif
+                                                                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                                                        @if ($file->path)
+                                                                            <a href="{{ asset('storage/' . ltrim($file->path, '/')) }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Lihat Berkas</a>
+                                                                        @endif
+                                                                        @if (in_array($karya->status, ['draft', 'perlu_revisi'], true))
+                                                                            <form method="POST" action="{{ route('karya.files.destroy', [$karya->id, $file->id]) }}">
+                                                                                @csrf
+                                                                                <input type="hidden" name="redirect_tab" value="dokumen">
+                                                                                <button type="submit" class="btn btn-danger-outline btn-sm">Hapus</button>
+                                                                            </form>
+                                                                        @endif
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                         @endforeach

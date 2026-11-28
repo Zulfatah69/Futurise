@@ -46,6 +46,19 @@ class WorkController extends Controller
         return $user && ($user->hasAnyRole(User::ADMIN_ROLES) || $user->hasRole('panitia'));
     }
 
+    private function hasSameCampusAsPic(User $user, Peserta $peserta, Karya $karya): bool
+    {
+        if (! $user->hasRole('pic-kampus')) {
+            return false;
+        }
+
+        $karya->loadMissing('submitter:id,institusi');
+        $normalizedInst = mb_strtolower(trim((string) $peserta->institusi));
+        $submitterInst = mb_strtolower(trim((string) $karya->submitter?->institusi));
+
+        return $normalizedInst !== '' && $normalizedInst === $submitterInst;
+    }
+
     private function canViewKarya(Request $request, Karya $karya): bool
     {
         if ($this->isAdminOrPanitia($request)) {
@@ -53,11 +66,33 @@ class WorkController extends Controller
         }
 
         $peserta = $this->getCurrentPeserta($request);
+        if (! $peserta) {
+            return false;
+        }
 
-        return $peserta !== null && (
-            $karya->peserta_id === $peserta->id
+        return $karya->peserta_id === $peserta->id
             || $karya->pesertas()->where('peserta_id', $peserta->id)->exists()
-        );
+            || $this->hasSameCampusAsPic($request->user(), $peserta, $karya);
+    }
+
+    private function canManageKarya(Request $request, Karya $karya, bool $allowAdmin = false): bool
+    {
+        $user = $request->user();
+        if (! $user) {
+            return false;
+        }
+
+        if ($allowAdmin && ($user->hasRole('super-admin') || $user->hasRole('admin') || $user->hasAnyRole(User::ADMIN_ROLES))) {
+            return true;
+        }
+
+        $peserta = $this->getCurrentPeserta($request);
+        if (! $peserta) {
+            return false;
+        }
+
+        return $karya->peserta_id === $peserta->id
+            || $this->hasSameCampusAsPic($user, $peserta, $karya);
     }
 
     /**
@@ -68,17 +103,27 @@ class WorkController extends Controller
     {
         $query = Karya::query()->with(['festival:id,nama,edisi,tahun', 'submitter:id,nama_lengkap,institusi', 'anggotaTims', 'files']);
 
-        // Jika bukan admin/panitia, hanya tampilkan karya di mana user adalah ketua/anggota
+        // Jika bukan admin/panitia, hanya tampilkan karya di mana user adalah ketua/anggota (atau satu kampus untuk PIC Kampus)
         if (! $this->isAdminOrPanitia($request)) {
             $peserta = $this->getCurrentPeserta($request);
             if (! $peserta) {
                 return $this->jsonResponse(true, 'Belum memiliki karya yang didaftarkan.', []);
             }
-            $query->where(function ($q) use ($peserta) {
+
+            $user = $request->user();
+            $normalizedInst = mb_strtolower(trim((string) $peserta->institusi));
+
+            $query->where(function ($q) use ($peserta, $user, $normalizedInst) {
                 $q->where('peserta_id', $peserta->id)
-                  ->orWhereHas('pesertas', function ($p) use ($peserta) {
-                      $p->where('peserta.id', $peserta->id);
-                  });
+                    ->orWhereHas('pesertas', function ($p) use ($peserta) {
+                        $p->where('peserta.id', $peserta->id);
+                    });
+
+                if ($user->hasRole('pic-kampus') && $normalizedInst !== '') {
+                    $q->orWhereHas('submitter', function ($sq) use ($normalizedInst) {
+                        $sq->whereRaw('LOWER(TRIM(institusi)) = ?', [$normalizedInst]);
+                    });
+                }
             });
         }
 
@@ -253,11 +298,10 @@ class WorkController extends Controller
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
-        $peserta = $this->getCurrentPeserta($request);
         $user = $request->user();
 
-        // Cek izin (hanya ketua tim atau admin)
-        if ($karya->peserta_id !== ($peserta?->id) && ! $user->hasRole('super-admin') && ! $user->hasRole('admin')) {
+        // Cek izin (ketua tim, PIC kampus pemilik institusi, atau admin)
+        if (! $this->canManageKarya($request, $karya, allowAdmin: $user->hasRole('super-admin') || $user->hasRole('admin'))) {
             return $this->jsonResponse(false, 'Anda tidak memiliki hak untuk mengubah karya ini.', null, null, 403);
         }
 
@@ -298,14 +342,13 @@ class WorkController extends Controller
      */
     public function submit(Request $request, int $id): JsonResponse
     {
-        $karya = Karya::with(['files'])->find($id);
+        $karya = Karya::with(['files', 'submitter'])->find($id);
         if (! $karya) {
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
-        $peserta = $this->getCurrentPeserta($request);
-        if ($karya->peserta_id !== ($peserta?->id)) {
-            return $this->jsonResponse(false, 'Hanya ketua tim yang dapat mengajukan karya secara final.', null, null, 403);
+        if (! $this->canManageKarya($request, $karya)) {
+            return $this->jsonResponse(false, 'Hanya ketua tim atau PIC kampus yang dapat mengajukan karya secara final.', null, null, 403);
         }
 
         if ($karya->status !== 'draft' && $karya->status !== 'perlu_revisi') {
@@ -374,10 +417,52 @@ class WorkController extends Controller
             );
         });
 
+        $this->karyaService->notifyCurationStatus(
+            $karya->fresh('submitter'),
+            $validated['status'],
+            $validated['catatan'] ?? null
+        );
+
         return $this->jsonResponse(true, 'Status kurasi karya berhasil diperbarui.', $karya->fresh(['festival', 'submitter', 'versis']), [
             'catatan'     => $validated['catatan'] ?? null,
             'reviewed_by' => $request->user()->id,
         ]);
+    }
+
+    /**
+     * DELETE /api/v1/works/{id}
+     * Menghapus draft karya oleh pemilik, PIC kampus, atau super-admin agar kuota kampus terbebas.
+     */
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $karya = Karya::with(['files', 'submitter'])->find($id);
+        if (! $karya || ! $this->canViewKarya($request, $karya)) {
+            return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
+        }
+
+        $user = $request->user();
+        if (! $this->canManageKarya($request, $karya, allowAdmin: $user->hasRole('super-admin') || $user->hasRole('ketua-pelaksana'))) {
+            return $this->jsonResponse(false, 'Anda tidak berwenang menghapus karya ini.', null, null, 403);
+        }
+
+        if ($karya->status !== 'draft' && ! $user->hasRole('super-admin')) {
+            return $this->jsonResponse(false, 'Hanya karya berstatus draft yang dapat dihapus.', null, null, 422);
+        }
+
+        $filePaths = $karya->files->pluck('path')->filter()->values()->all();
+
+        DB::transaction(function () use ($karya): void {
+            $karya->pesertas()->detach();
+            $karya->delete();
+        });
+
+        foreach ($filePaths as $path) {
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        return $this->jsonResponse(true, 'Draft karya berhasil dihapus.');
     }
 
     /**
@@ -386,13 +471,13 @@ class WorkController extends Controller
      */
     public function uploadFile(Request $request, int $id): JsonResponse
     {
-        $karya = Karya::find($id);
+        $karya = Karya::with('submitter')->find($id);
         if (! $karya) {
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
         $peserta = $this->getCurrentPeserta($request);
-        if ($karya->peserta_id !== ($peserta?->id)) {
+        if (! $this->canManageKarya($request, $karya)) {
             return $this->jsonResponse(false, 'Anda tidak berwenang mengunggah berkas untuk karya ini.', null, null, 403);
         }
 
@@ -465,14 +550,13 @@ class WorkController extends Controller
      */
     public function deleteFile(Request $request, int $id, int $fileId): JsonResponse
     {
-        $karya = Karya::find($id);
+        $karya = Karya::with('submitter')->find($id);
         if (! $karya) {
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
-        $peserta = $this->getCurrentPeserta($request);
         $user = $request->user();
-        if ($karya->peserta_id !== ($peserta?->id) && ! $user->hasAnyRole(User::ADMIN_ROLES)) {
+        if (! $this->canManageKarya($request, $karya, allowAdmin: true)) {
             return $this->jsonResponse(false, 'Anda tidak berwenang menghapus berkas karya ini.', null, null, 403);
         }
 
@@ -536,14 +620,13 @@ class WorkController extends Controller
      */
     public function addTeamMember(Request $request, int $id): JsonResponse
     {
-        $karya = Karya::find($id);
+        $karya = Karya::with('submitter')->find($id);
         if (! $karya) {
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
-        $peserta = $this->getCurrentPeserta($request);
-        if ($karya->peserta_id !== ($peserta?->id)) {
-            return $this->jsonResponse(false, 'Hanya ketua tim yang dapat menambahkan anggota.', null, null, 403);
+        if (! $this->canManageKarya($request, $karya)) {
+            return $this->jsonResponse(false, 'Hanya ketua tim atau PIC kampus yang dapat menambahkan anggota.', null, null, 403);
         }
 
         $validated = $request->validate([
@@ -572,14 +655,13 @@ class WorkController extends Controller
      */
     public function removeTeamMember(Request $request, int $id, int $memberId): JsonResponse
     {
-        $karya = Karya::find($id);
+        $karya = Karya::with('submitter')->find($id);
         if (! $karya) {
             return $this->jsonResponse(false, 'Karya tidak ditemukan.', null, null, 404);
         }
 
-        $peserta = $this->getCurrentPeserta($request);
-        if ($karya->peserta_id !== ($peserta?->id)) {
-            return $this->jsonResponse(false, 'Hanya ketua tim yang dapat menghapus anggota.', null, null, 403);
+        if (! $this->canManageKarya($request, $karya)) {
+            return $this->jsonResponse(false, 'Hanya ketua tim atau PIC kampus yang dapat menghapus anggota.', null, null, 403);
         }
 
         $member = AnggotaTim::where('karya_id', $id)->find($memberId);

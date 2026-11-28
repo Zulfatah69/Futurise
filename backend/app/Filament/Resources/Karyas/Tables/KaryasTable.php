@@ -81,6 +81,7 @@ class KaryasTable
                             $record->update(['status' => 'lolos']);
                             app(KaryaService::class)->recordRevision($record, auth()->id(), $statusLama, 'lolos', 'Dinyatakan lolos kurasi via panel panitia.');
                         });
+                        app(KaryaService::class)->notifyCurationStatus($record->fresh('submitter'), 'lolos');
                     }),
 
                 Action::make('requestRevision')
@@ -107,6 +108,7 @@ class KaryasTable
                             ]);
                             app(KaryaService::class)->recordRevision($record, auth()->id(), $statusLama, 'perlu_revisi', $data['catatan']);
                         });
+                        app(KaryaService::class)->notifyCurationStatus($record->fresh('submitter'), 'perlu_revisi', $data['catatan']);
                     }),
 
                 EditAction::make(),

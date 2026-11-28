@@ -164,7 +164,9 @@ Route::middleware(['auth', 'verified:otp.show', 'account.active'])->group(functi
     Route::post('/karya/simpan', [WorkWebController::class, 'store'])->name('karya.store');
     Route::post('/karya/{id}/update', [WorkWebController::class, 'update'])->name('karya.update');
     Route::post('/karya/{id}/submit', [WorkWebController::class, 'submit'])->name('karya.submit');
+    Route::post('/karya/{id}/hapus', [WorkWebController::class, 'destroy'])->name('karya.destroy');
     Route::post('/karya/{id}/upload', [WorkWebController::class, 'uploadFile'])->name('karya.upload');
+    Route::post('/karya/{id}/files/{fileId}/hapus', [WorkWebController::class, 'deleteFile'])->name('karya.files.destroy');
     Route::post('/karya/{id}/anggota', [WorkWebController::class, 'addMember'])->name('karya.members.store');
     Route::post('/karya/{id}/anggota/{memberId}/hapus', [WorkWebController::class, 'removeMember'])->name('karya.members.destroy');
     Route::post('/karya/{id}/publikasi', [WorkWebController::class, 'requestPublication'])->name('karya.publication.request');

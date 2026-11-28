@@ -37,7 +37,7 @@ class OtpService
             ->first();
 
         if ($recent) {
-            $waitSeconds = now()->diffInSeconds($recent->last_sent_at->addMinutes(self::RESEND_COOLDOWN_MINUTES), false);
+            $waitSeconds = max(1, (int) ceil(now()->diffInSeconds($recent->last_sent_at->addMinutes(self::RESEND_COOLDOWN_MINUTES), false)));
             throw new \RuntimeException("Tunggu {$waitSeconds} detik sebelum meminta OTP baru.");
         }
 

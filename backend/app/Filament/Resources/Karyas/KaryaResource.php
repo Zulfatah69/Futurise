@@ -5,6 +5,9 @@ namespace App\Filament\Resources\Karyas;
 use App\Filament\Resources\Karyas\Pages\CreateKarya;
 use App\Filament\Resources\Karyas\Pages\EditKarya;
 use App\Filament\Resources\Karyas\Pages\ListKaryas;
+use App\Filament\Resources\Karyas\RelationManagers\AnggotaTimsRelationManager;
+use App\Filament\Resources\Karyas\RelationManagers\FilesRelationManager;
+use App\Filament\Resources\Karyas\RelationManagers\VersisRelationManager;
 use App\Filament\Resources\Karyas\Schemas\KaryaForm;
 use App\Filament\Resources\Karyas\Tables\KaryasTable;
 use App\Models\Karya;
@@ -41,7 +44,9 @@ class KaryaResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AnggotaTimsRelationManager::class,
+            FilesRelationManager::class,
+            VersisRelationManager::class,
         ];
     }
 

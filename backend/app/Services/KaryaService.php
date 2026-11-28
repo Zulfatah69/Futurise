@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Mail\CurationStatusMail;
 use App\Models\Karya;
 use App\Models\KaryaVersi;
 use App\Models\Peserta;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class KaryaService
@@ -86,5 +88,28 @@ class KaryaService
             ],
             'created_at'  => now(),
         ]);
+    }
+
+    /**
+     * Kirim notifikasi email pembaruan status kurasi kepada penanggung jawab karya.
+     */
+    public function notifyCurationStatus(Karya $karya, string $statusBaru, ?string $catatan = null): void
+    {
+        $karya->loadMissing('submitter');
+        $email = $karya->submitter?->email;
+
+        if (! $email || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        if (! in_array($statusBaru, ['dalam_pemeriksaan', 'perlu_revisi', 'lolos', 'tidak_lolos'], true)) {
+            return;
+        }
+
+        try {
+            Mail::to($email)->send(new CurationStatusMail($karya, $statusBaru, $catatan));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
     }
 }

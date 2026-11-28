@@ -304,6 +304,26 @@ class PanitiaService
     }
 
     /**
+     * Perbarui definisi peran akses kepanitiaan.
+     */
+    public function updateAccessRole(PeranAkses $role, array $data): PeranAkses
+    {
+        $role->update($data);
+
+        return $role->fresh();
+    }
+
+    /**
+     * Cabut peran akses dari panitia.
+     */
+    public function revokeAccessRole(Panitia $panitia, PeranAkses $role): Panitia
+    {
+        $panitia->peranAkses()->detach($role->id);
+
+        return $panitia->fresh(['peranAkses']);
+    }
+
+    /**
      * Berikan peran akses ke panitia (idempotent pada pasangan panitia + peran).
      */
     public function assignAccessRole(

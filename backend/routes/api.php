@@ -43,8 +43,10 @@ Route::prefix('v1')->group(function () {
 
         // Tahap 2: Registrasi & Profil Peserta Lomba setelah login
         Route::post('/participants/register', [AuthController::class, 'registerParticipant']);
+        Route::get('/participants', [ParticipantController::class, 'index']);
         Route::get('/participants/{id}', [ParticipantController::class, 'show']);
         Route::match(['put', 'patch'], '/participants/{id}', [ParticipantController::class, 'update']);
+        Route::delete('/participants/{id}', [ParticipantController::class, 'destroy']);
 
         // ── Festival Management (Admin/Panitia) ───────────────────────────────
         Route::post('/festivals', [FestivalController::class, 'store']);
@@ -63,7 +65,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/works', [WorkController::class, 'index']);
         Route::post('/works', [WorkController::class, 'store']);
         Route::get('/works/{id}', [WorkController::class, 'show']);
-        Route::match(['put', 'patch'], '/works/{id}', [WorkController::class, 'update']);
+        Route::put('/works/{id}', [WorkController::class, 'update']);
+        Route::patch('/works/{id}', [WorkController::class, 'update']);
+        Route::delete('/works/{id}', [WorkController::class, 'destroy']);
         Route::post('/works/{id}/submit', [WorkController::class, 'submit']);
         Route::post('/works/{id}/review', [WorkController::class, 'review']);
         Route::post('/works/{id}/files', [WorkController::class, 'uploadFile']);
@@ -97,7 +101,9 @@ Route::prefix('v1')->group(function () {
         // Peran & Hak Akses Kepanitiaan
         Route::get('/access-roles', [CommitteeController::class, 'accessRoles']);
         Route::post('/access-roles', [CommitteeController::class, 'storeAccessRole']);
+        Route::match(['put', 'patch'], '/access-roles/{role}', [CommitteeController::class, 'updateAccessRole']);
         Route::post('/committee/{committee}/roles', [CommitteeController::class, 'assignRole']);
+        Route::delete('/committee/{committee}/roles/{role}', [CommitteeController::class, 'revokeRole']);
 
         // Divisi Panitia Festival
         Route::get('/festivals/{festival}/divisions', [DivisionController::class, 'index']);

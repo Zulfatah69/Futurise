@@ -271,4 +271,52 @@ class WorkWebSubmissionTest extends TestCase
             'izin_peserta' => true,
         ]);
     }
+
+    /**
+     * Peserta dapat menghapus berkas lampiran dan menghapus karya berstatus draft lewat portal web.
+     */
+    public function test_peserta_can_delete_uploaded_file_and_draft_work_via_web(): void
+    {
+        $user = User::factory()->create(['account_status' => 'active']);
+        $peserta = Peserta::create([
+            'user_id'       => $user->id,
+            'nama_lengkap'  => $user->name,
+            'email'         => $user->email,
+            'institusi'     => 'Institut Teknologi Nasional Bandung',
+            'jenis_peserta' => 'mahasiswa',
+        ]);
+
+        $festival = Festival::aktif()->firstOrFail();
+        $karya = Karya::create([
+            'festival_id' => $festival->id,
+            'peserta_id'  => $peserta->id,
+            'judul'       => 'Karya Draft Hapus',
+            'deskripsi'   => 'Akan diuji hapus file dan draft.',
+            'kategori'    => 'Web',
+            'teknologi'   => 'Laravel',
+            'status'      => 'draft',
+        ]);
+
+        $fakePdf = UploadedFile::fake()->create('lampiran.pdf', 300, 'application/pdf');
+        $this->actingAs($user)->post("/karya/{$karya->id}/upload", [
+            'file'         => $fakePdf,
+            'jenis'        => 'dokumen',
+            'keterangan'   => 'Lampiran awal',
+            'redirect_tab' => 'dokumen',
+        ])->assertRedirect('/dashboard?tab=dokumen');
+
+        $file = $karya->files()->firstOrFail();
+
+        $this->actingAs($user)->post("/karya/{$karya->id}/files/{$file->id}/hapus", [
+            'redirect_tab' => 'dokumen',
+        ])->assertRedirect('/dashboard?tab=dokumen');
+
+        $this->assertDatabaseMissing('karya_file', ['id' => $file->id]);
+
+        $this->actingAs($user)->post("/karya/{$karya->id}/hapus", [
+            'redirect_tab' => 'karya',
+        ])->assertRedirect('/dashboard?tab=karya');
+
+        $this->assertDatabaseMissing('karya', ['id' => $karya->id]);
+    }
 }

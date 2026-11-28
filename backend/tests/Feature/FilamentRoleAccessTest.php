@@ -6,6 +6,7 @@ use App\Filament\Resources\DivisiPanitias\DivisiPanitiaResource;
 use App\Filament\Resources\Festivals\FestivalResource;
 use App\Filament\Resources\Karyas\KaryaResource;
 use App\Filament\Resources\Panitias\PanitiaResource;
+use App\Filament\Resources\Pesertas\PesertaResource;
 use App\Filament\Resources\PublikasiKaryas\PublikasiKaryaResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\DivisiPanitia;
@@ -336,5 +337,59 @@ class FilamentRoleAccessTest extends TestCase
             ->assertSee('Portal Tim Karya Mahasiswa')
             ->assertSee('Karya yang Didaftarkan')
             ->assertSee('Pendaftaran Karya Inovasi Baru');
+    }
+
+    public function test_peserta_resource_relation_managers_and_dev1_stats_widget_enforce_rbac_and_render(): void
+    {
+        $superAdmin = $this->createUserWithRole('super-admin');
+        $kurator = $this->createUserWithRole('program-kurasi');
+        $sponsor = $this->createUserWithRole('industri-sponsor');
+        $festival = Festival::firstOrFail();
+
+        $owner = $this->createUserWithRole('tim-mahasiswa');
+        $peserta = Peserta::create([
+            'user_id'       => $owner->id,
+            'nama_lengkap'  => $owner->name,
+            'email'         => $owner->email,
+            'institusi'     => 'Institut Teknologi Bandung',
+            'jenis_peserta' => 'mahasiswa',
+        ]);
+        $karya = Karya::create([
+            'festival_id' => $festival->id,
+            'peserta_id'  => $peserta->id,
+            'judul'       => 'Panel Evaluasi Karya',
+            'deskripsi'   => 'Uji relation managers.',
+            'kategori'    => 'Web',
+            'teknologi'   => 'Laravel',
+            'status'      => 'diajukan',
+        ]);
+        $panitia = Panitia::create([
+            'nama_lengkap' => 'Koordinator Uji',
+            'email'        => 'koor.uji@futurise.id',
+            'jenis'        => 'internal',
+            'aktif'        => true,
+        ]);
+
+        // Super Admin: akses penuh PesertaResource, Widget Dashboard, dan halaman Edit ber-RelationManager
+        $this->actingAs($superAdmin);
+        $this->assertTrue(PesertaResource::canViewAny());
+        $this->assertTrue(PesertaResource::canEdit($peserta));
+        $this->get('/admin')->assertOk()->assertSee('Ringkasan Operasional Dev 1');
+        $this->get(PesertaResource::getUrl('index'))->assertOk()->assertSee('Institut Teknologi Bandung');
+        $this->get(KaryaResource::getUrl('edit', ['record' => $karya]))->assertOk();
+        $this->get(FestivalResource::getUrl('edit', ['record' => $festival]))->assertOk();
+        $this->get(PanitiaResource::getUrl('edit', ['record' => $panitia]))->assertOk();
+
+        // Program & Kurasi: hanya read-only di PesertaResource
+        $this->actingAs($kurator);
+        $this->assertTrue(PesertaResource::canViewAny());
+        $this->assertFalse(PesertaResource::canCreate());
+        $this->assertFalse(PesertaResource::canEdit($peserta));
+        $this->get(PesertaResource::getUrl('index'))->assertOk();
+
+        // Industri & Sponsor: tidak berhak melihat daftar peserta
+        $this->actingAs($sponsor);
+        $this->assertFalse(PesertaResource::canViewAny());
+        $this->get(PesertaResource::getUrl('index'))->assertForbidden();
     }
 }

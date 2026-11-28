@@ -11,6 +11,7 @@ use App\Services\PublikasiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class WorkWebController extends Controller
@@ -451,5 +452,69 @@ class WorkWebController extends Controller
 
         return $this->redirectToDashboard($request)
             ->with('status', 'Pengajuan publikasi Showcase berhasil dikirim ke Divisi Publikasi.');
+    }
+
+    /**
+     * Hapus draft karya agar kuota pengajuan kampus dapat digunakan kembali.
+     */
+    public function destroy(Request $request, int $id): RedirectResponse
+    {
+        $karya = $this->findAccessibleWork($request->user(), $id);
+
+        if ($karya->status !== 'draft') {
+            return $this->redirectToDashboard($request)
+                ->with('error', 'Hanya karya berstatus Draft yang dapat dihapus.');
+        }
+
+        $karya->load('files');
+        $paths = $karya->files->pluck('path')->filter()->values()->all();
+
+        DB::transaction(function () use ($karya): void {
+            $karya->pesertas()->detach();
+            $karya->delete();
+        });
+
+        foreach ($paths as $path) {
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        return $this->redirectToDashboard($request)
+            ->with('status', 'Draft karya berhasil dihapus dan kuota pengajuan kembali tersedia.');
+    }
+
+    /**
+     * Hapus berkas lampiran karya saat status masih draft atau perlu_revisi.
+     */
+    public function deleteFile(Request $request, int $id, int $fileId): RedirectResponse
+    {
+        $karya = $this->findAccessibleWork($request->user(), $id);
+
+        if (! in_array($karya->status, ['draft', 'perlu_revisi'], true)) {
+            return $this->redirectToDashboard($request)
+                ->with('error', 'Berkas lampiran hanya dapat dihapus saat karya berstatus Draft atau Perlu Revisi.');
+        }
+
+        $file = $karya->files()->findOrFail($fileId);
+        $path = $file->path;
+
+        DB::transaction(function () use ($karya, $file, $path): void {
+            if ($karya->file_utama === $path) {
+                $karya->update(['file_utama' => null]);
+            }
+            if ($karya->thumbnail === $path) {
+                $karya->update(['thumbnail' => null]);
+            }
+
+            $file->delete();
+        });
+
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+
+        return $this->redirectToDashboard($request)
+            ->with('status', 'Berkas lampiran berhasil dihapus.');
     }
 }

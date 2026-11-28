@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Mail\PicAccountActivatedMail;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -9,6 +10,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Mail;
 
 class UsersTable
 {
@@ -79,11 +81,17 @@ class UsersTable
                         && $record->account_status === 'pending_approval'
                         && $record->hasVerifiedEmail()
                     )
-                    ->action(fn (User $record) =>
+                    ->action(function (User $record): void {
                         $record->update([
                             'account_status' => 'active',
-                        ])
-                    ),
+                        ]);
+
+                        try {
+                            Mail::to($record->email)->send(new PicAccountActivatedMail($record->fresh()));
+                        } catch (\Throwable $exception) {
+                            report($exception);
+                        }
+                    }),
 
                 Action::make('deactivate')
                     ->label('Nonaktifkan')
@@ -117,11 +125,17 @@ class UsersTable
                         && $record->account_status === 'inactive'
                         && $record->id !== auth()->id()
                     )
-                    ->action(fn (User $record) =>
+                    ->action(function (User $record): void {
                         $record->update([
                             'account_status' => 'active',
-                        ])
-                    ),
+                        ]);
+
+                        try {
+                            Mail::to($record->email)->send(new PicAccountActivatedMail($record->fresh()));
+                        } catch (\Throwable $exception) {
+                            report($exception);
+                        }
+                    }),
 
                 EditAction::make(),
             ])

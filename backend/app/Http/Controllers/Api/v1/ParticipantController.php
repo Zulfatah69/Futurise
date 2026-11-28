@@ -30,6 +30,49 @@ class ParticipantController extends Controller
     }
 
     /**
+     * GET /api/v1/participants
+     * Daftar seluruh peserta & PIC institusi (hanya admin/panitia).
+     */
+    public function index(Request $request): JsonResponse
+    {
+        if (! $this->isAdminOrPanitia($request->user())) {
+            return $this->jsonResponse(false, 'Akses ditolak. Hanya panitia yang dapat melihat daftar peserta.', null, null, 403);
+        }
+
+        $query = Peserta::query()
+            ->with(['user:id,name,email,account_type,account_status'])
+            ->withCount('karyasAsLeader');
+
+        if ($request->filled('q')) {
+            $search = '%' . trim((string) $request->query('q')) . '%';
+            $query->where(function ($q) use ($search): void {
+                $q->where('nama_lengkap', 'like', $search)
+                    ->orWhere('email', 'like', $search)
+                    ->orWhere('institusi', 'like', $search)
+                    ->orWhere('nomor_identitas', 'like', $search);
+            });
+        }
+
+        if ($request->filled('jenis_peserta')) {
+            $query->where('jenis_peserta', $request->query('jenis_peserta'));
+        }
+
+        if ($request->filled('institusi')) {
+            $query->where('institusi', 'like', '%' . trim((string) $request->query('institusi')) . '%');
+        }
+
+        $perPage = min((int) $request->query('per_page', 20), 100);
+        $paginator = $query->latest('id')->paginate($perPage);
+
+        return $this->jsonResponse(true, 'Daftar peserta berhasil dimuat.', $paginator->items(), [
+            'current_page' => $paginator->currentPage(),
+            'per_page'     => $paginator->perPage(),
+            'total'        => $paginator->total(),
+            'last_page'    => $paginator->lastPage(),
+        ]);
+    }
+
+    /**
      * GET /api/v1/participants/{id}
      * Menampilkan profil peserta/PIC untuk pemilik akun atau pengelola.
      */
@@ -125,5 +168,32 @@ class ParticipantController extends Controller
         });
 
         return $this->jsonResponse(true, 'Profil peserta berhasil diperbarui.', $updated);
+    }
+
+    /**
+     * DELETE /api/v1/participants/{id}
+     * Menghapus profil peserta oleh administrator yang berwenang.
+     */
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        if (! $request->user()->hasAnyRole(User::ADMIN_ROLES)) {
+            return $this->jsonResponse(false, 'Anda tidak berwenang menghapus data peserta.', null, null, 403);
+        }
+
+        $peserta = Peserta::find($id);
+        if (! $peserta) {
+            return $this->jsonResponse(false, 'Profil peserta tidak ditemukan.', null, null, 404);
+        }
+
+        if ($peserta->karyasAsLeader()->exists()) {
+            return $this->jsonResponse(false, 'Peserta tidak dapat dihapus karena masih menjadi pengusul karya.', null, null, 422);
+        }
+
+        DB::transaction(function () use ($peserta): void {
+            $peserta->karyas()->detach();
+            $peserta->delete();
+        });
+
+        return $this->jsonResponse(true, 'Profil peserta berhasil dihapus.');
     }
 }

@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Festivals;
 use App\Filament\Resources\Festivals\Pages\CreateFestival;
 use App\Filament\Resources\Festivals\Pages\EditFestival;
 use App\Filament\Resources\Festivals\Pages\ListFestivals;
+use App\Filament\Resources\Festivals\RelationManagers\KategorisRelationManager;
+use App\Filament\Resources\Festivals\RelationManagers\PeriodesRelationManager;
 use App\Filament\Resources\Festivals\Schemas\FestivalForm;
 use App\Filament\Resources\Festivals\Tables\FestivalsTable;
 use App\Models\Festival;
@@ -41,7 +43,8 @@ class FestivalResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PeriodesRelationManager::class,
+            KategorisRelationManager::class,
         ];
     }
 
